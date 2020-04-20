@@ -8,6 +8,7 @@
  (data (i32.const 16) "\18\00\00\00\01\00\00\00\01\00\00\00\18\00\00\00l\00o\00o\00p\00-\00f\00l\00o\00w\00.\00t\00s\00")
  (data (i32.const 64) "\08\00\00\00\01\00\00\00\01\00\00\00\08\00\00\00t\00e\00r\00m\00")
  (table $0 1 funcref)
+ (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (export "memory" (memory $0))
  (export "whileReturn" (func $loop-flow/whileReturn))
  (export "whileThrow" (func $loop-flow/whileThrow))

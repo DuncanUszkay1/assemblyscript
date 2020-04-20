@@ -10,6 +10,7 @@
  (data (i32.const 16) "\16\00\00\00\01\00\00\00\01\00\00\00\16\00\00\00t\00h\00e\00 \00m\00e\00s\00s\00a\00g\00e\00")
  (data (i32.const 64) "\1a\00\00\00\01\00\00\00\01\00\00\00\1a\00\00\00w\00a\00s\00i\00/\00a\00b\00o\00r\00t\00.\00t\00s\00")
  (table $0 1 funcref)
+ (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (export "_start" (func $~start))
  (export "memory" (memory $0))
  (export "test" (func $wasi/abort/test))

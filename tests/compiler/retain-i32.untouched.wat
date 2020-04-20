@@ -6,6 +6,7 @@
  (memory $0 1)
  (data (i32.const 16) "\1a\00\00\00\01\00\00\00\01\00\00\00\1a\00\00\00r\00e\00t\00a\00i\00n\00-\00i\003\002\00.\00t\00s\00")
  (table $0 1 funcref)
+ (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $~lib/builtins/i8.MAX_VALUE i32 (i32.const 127))
  (global $~lib/builtins/i8.MIN_VALUE i32 (i32.const -128))
  (global $~lib/builtins/u8.MAX_VALUE i32 (i32.const 255))

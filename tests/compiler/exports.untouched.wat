@@ -7,6 +7,7 @@
  (type $none_=>_none (func))
  (memory $0 0)
  (table $0 1 funcref)
+ (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $exports/Animal.CAT i32 (i32.const 0))
  (global $exports/Animal.DOG i32 (i32.const 1))
  (global $exports/animals.Animal.CAT i32 (i32.const 0))

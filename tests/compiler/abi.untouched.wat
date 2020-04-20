@@ -6,6 +6,7 @@
  (memory $0 1)
  (data (i32.const 16) "\0c\00\00\00\01\00\00\00\01\00\00\00\0c\00\00\00a\00b\00i\00.\00t\00s\00")
  (table $0 1 funcref)
+ (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $abi/condition (mut i32) (i32.const 0))
  (global $abi/y (mut i32) (i32.const 0))
  (export "memory" (memory $0))

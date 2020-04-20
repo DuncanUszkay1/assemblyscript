@@ -7,6 +7,7 @@
  (type $i32_f64_f64_=>_f64 (func (param i32 f64 f64) (result f64)))
  (memory $0 0)
  (table $0 1 funcref)
+ (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
  (global $optional-typeparameters/tConcrete (mut i32) (i32.const 0))

@@ -2,6 +2,7 @@
  (type $none_=>_none (func))
  (memory $0 0)
  (table $0 1 funcref)
+ (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $~lib/ASC_TARGET i32 (i32.const 0))
  (global $~lib/ASC_NO_ASSERT i32 (i32.const 0))
  (global $~lib/ASC_MEMORY_BASE i32 (i32.const 0))

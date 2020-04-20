@@ -3,6 +3,7 @@
  (type $none_=>_i32 (func (result i32)))
  (memory $0 0)
  (table $0 1 funcref)
+ (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $namespace/Outer.outerVar (mut i32) (i32.const 1))
  (global $namespace/Outer.Inner.aVar (mut i32) (i32.const 0))
  (global $namespace/Outer.Inner.anotherVar (mut i32) (i32.const 0))

@@ -13,7 +13,7 @@
  (export "test3" (func $infer-generic/test2))
  (export "test4" (func $infer-generic/test2))
  (start $~start)
- (func $start:infer-generic~anonymous|0 (param $0 i32) (param $1 f32) (param $2 i32) (param $3 i32) (result i32)
+ (func $start:infer-generic~anonymous|0~nonClosure (param $0 i32) (param $1 f32) (param $2 i32) (param $3 i32) (result i32)
   local.get $1
   f32.const 0
   f32.ne
@@ -32,18 +32,21 @@
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
+  (local $4 i32)
   i32.const 1132
   i32.load
   local.set $2
   loop $for-loop|0
-   local.get $0
    local.get $2
    i32.const 1132
    i32.load
    local.tee $3
+   i32.lt_s
+   local.set $4
+   local.get $0
    local.get $2
    local.get $3
-   i32.lt_s
+   local.get $4
    select
    i32.lt_s
    if
@@ -57,7 +60,7 @@
     f32.load
     local.get $0
     i32.const 1120
-    call $start:infer-generic~anonymous|0
+    call $start:infer-generic~anonymous|0~nonClosure
     local.set $1
     local.get $0
     i32.const 1

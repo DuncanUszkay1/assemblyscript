@@ -671,6 +671,47 @@ export class Program extends DiagnosticEmitter {
     );
   }
 
+  makeNativeMember(
+    name: string,
+    type: string
+  ): DeclarationStatement {
+    return Node.createFieldDeclaration(
+      Node.createIdentifierExpression(name, this.nativeSource.range), //name: IdentifierExpression,
+      Node.createNamedType(
+        Node.createSimpleTypeName(type, this.nativeSource.range), //name: TypeName,
+        null,//typeArguments: TypeNode[] | null,
+        false,//isNullable: bool,
+        this.nativeSource.range,//range: Range
+      ), //type: TypeNode | null,
+      null,//initializer: Expression | null,
+      null,//decorators: DecoratorNode[] | null,
+      CommonFlags.INSTANCE,//flags: CommonFlags,
+      this.nativeSource.range//range: Range
+    )
+  }
+
+  makeNativeClassDeclaration(name: string, members: DeclarationStatement[]): ClassDeclaration {
+    return Node.createClassDeclaration(
+      Node.createIdentifierExpression(name, this.nativeSource.range), //identifier: IdentifierExpression,
+      null,//typeParameters: TypeParameterNode[] | null,
+      null,//extendsType: NamedTypeNode | null, // can't be a function
+      null,//implementsTypes: NamedTypeNode[] | null, // can't be functions
+      members,//members: DeclarationStatement[],
+      null,//decorators: DecoratorNode[] | null,
+      0,//flags: CommonFlags,
+      this.nativeSource.range//range: Range
+    )
+  }
+
+  makeNativeClassPrototype(name: string, members: DeclarationStatement[]): ClassPrototype | null {
+    return this.initializeClass(
+      this.makeNativeClassDeclaration(name, members),
+      this.nativeFile,
+      [],
+      []
+    )
+  }
+
   /** Gets the (possibly merged) program element linked to the specified declaration. */
   getElementByDeclaration(declaration: DeclarationStatement): DeclaredElement | null {
     var elementsByDeclaration = this.elementsByDeclaration;
@@ -2402,7 +2443,8 @@ export enum ElementKind {
   /** A {@link TypeDefinition}.  */
   TYPEDEFINITION,
   /** An {@link IndexSignature}. */
-  INDEXSIGNATURE
+  INDEXSIGNATURE,
+  CLOSEDLOCAL
 }
 
 /** Indicates built-in decorators that are present. */
@@ -3149,6 +3191,28 @@ export class Local extends VariableLikeElement {
     assert(type != Type.void);
     this.setType(type);
   }
+
+  close(offset: usize): ClosedLocal {
+    return new ClosedLocal(this, offset);
+  }
+}
+
+/** a closed-over local variable. */
+export class ClosedLocal extends VariableLikeElement {
+  //TODO once class is precompiled, we won't need this
+  offset: usize;
+  index: i32;
+  constructor(local: Local, offset: usize) {
+    super(
+      ElementKind.CLOSEDLOCAL,
+      local.name,
+      local,
+      <VariableLikeDeclarationStatement>local.declaration
+    );
+    this.type = local.type;
+    this.index = local.index;
+    this.offset = offset;
+  }
 }
 
 /** A yet unresolved function prototype. */
@@ -3216,6 +3280,11 @@ export class FunctionPrototype extends DeclaredElement {
            );
   }
 
+  get isAnonymous(): bool {
+    var parent = this.parent;
+    return parent.kind == ElementKind.FUNCTION
+  }
+
   /** Creates a clone of this prototype that is bound to a concrete class instead. */
   toBound(classInstance: Class): FunctionPrototype {
     assert(this.is(CommonFlags.INSTANCE));
@@ -3275,6 +3344,12 @@ export class Function extends TypedElement {
   additionalLocals: Type[] = [];
   /** Concrete type arguments. */
   typeArguments: Type[] | null;
+  /** List of all closed locals discovered so far */
+  closedLocals: Map<string, ClosedLocal> = new Map();
+  /** Next global closure offset to use, assuming that classes are packed as c-structs in the order given */
+  /** This is temporary- once we have a ScopeAnalyzer, then the closure class will be defined before we */
+  /** start compiling, and we can just insert a field access */
+  nextGlobalClosureOffset: u32 = 4;
   /** Contextual type arguments. */
   contextualTypeArguments: Map<string,Type> | null;
   /** Default control flow. */
@@ -3308,7 +3383,9 @@ export class Function extends TypedElement {
     /** Concrete signature. */
     signature: Signature, // pre-resolved
     /** Contextual type arguments inherited from its parent class, if any. */
-    contextualTypeArguments: Map<string,Type> | null = null
+    contextualTypeArguments: Map<string,Type> | null = null,
+    /** Context Argument */
+    contextArgument: Type | null = null
   ) {
     super(
       ElementKind.FUNCTION,
@@ -3328,11 +3405,11 @@ export class Function extends TypedElement {
     this.type = program.options.usizeType.asFunction(signature);
     if (!prototype.is(CommonFlags.AMBIENT)) {
       let localIndex = 0;
-      if (this.is(CommonFlags.INSTANCE)) {
+      if (this.is(CommonFlags.INSTANCE) || contextArgument) {
         let local = new Local(
           CommonNames.this_,
           localIndex++,
-          assert(signature.thisType),
+          contextArgument || assert(signature.thisType),
           this
         );
         this.localsByName.set(CommonNames.this_, local);
@@ -3398,7 +3475,26 @@ export class Function extends TypedElement {
   lookup(name: string): Element | null {
     var locals = this.localsByName;
     if (locals.has(name)) return assert(locals.get(name));
-    return this.parent.lookup(name);
+    var parentResult = this.parent.lookup(name);
+    if(parentResult && this.parent.kind == ElementKind.FUNCTION) {
+      var parentFunction = <Function>this.parent;
+      if(parentFunction.closedLocals.size > 0) { //TODO allow nested closure definitions
+        this.program.error(
+          DiagnosticCode.Not_implemented,
+          this.identifierNode.range, this.identifierNode.text
+        );
+        return null;
+      }
+      if(parentResult.kind == ElementKind.LOCAL) {
+        let local = changetype<Local>(parentResult)
+        if(this.closedLocals.has(local.name)) return assert(this.closedLocals.get(local.name))
+        var closedLocal = local.close(this.nextGlobalClosureOffset);
+        this.nextGlobalClosureOffset += local.type.byteSize;
+        this.closedLocals.set(local.name, closedLocal)
+        return closedLocal;
+      }
+    }
+    return parentResult;
   }
 
   // used by flows to keep track of temporary locals

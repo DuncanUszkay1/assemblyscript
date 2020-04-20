@@ -16,6 +16,7 @@
  (type $f64_f64_=>_f64 (func (param f64 f64) (result f64)))
  (memory $0 0)
  (table $0 1 funcref)
+ (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (export "memory" (memory $0))
  (start $~start)
  (func $function/_

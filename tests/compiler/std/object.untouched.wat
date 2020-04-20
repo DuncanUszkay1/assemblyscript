@@ -15,6 +15,7 @@
  (data (i32.const 128) "\04\00\00\00\01\00\00\00\01\00\00\00\04\00\00\00a\00b\00")
  (data (i32.const 160) "\00\00\00\00\01\00\00\00\01\00\00\00\00\00\00\00")
  (table $0 1 funcref)
+ (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $~lib/ASC_SHRINK_LEVEL i32 (i32.const 0))
  (export "memory" (memory $0))
  (start $~start)

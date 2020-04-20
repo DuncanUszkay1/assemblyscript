@@ -1290,6 +1290,7 @@ export class Resolver extends DiagnosticEmitter {
       case ElementKind.GLOBAL: if (!this.ensureResolvedLazyGlobal(<Global>target, reportMode)) return null;
       case ElementKind.ENUMVALUE:
       case ElementKind.LOCAL:
+      case ElementKind.CLOSEDLOCAL:
       case ElementKind.FIELD: { // someVar.prop
         let variableLikeElement = <VariableLikeElement>target;
         let type = variableLikeElement.type;
@@ -2774,6 +2775,7 @@ export class Resolver extends DiagnosticEmitter {
     var signature = new Signature(this.program, parameterTypes, returnType, thisType);
     signature.parameterNames = parameterNames;
     signature.requiredParameters = requiredParameters;
+    if (prototype.isAnonymous) signature = signature.toClosureSignature()
 
     var nameInclTypeParameters = prototype.name;
     if (instanceKey.length) nameInclTypeParameters += "<" + instanceKey + ">";
@@ -2782,7 +2784,8 @@ export class Resolver extends DiagnosticEmitter {
       prototype,
       typeArguments,
       signature,
-      ctxTypes
+      ctxTypes,
+      prototype.isAnonymous ? this.program.options.usizeType : null
     );
     prototype.setResolvedInstance(instanceKey, instance);
     return instance;

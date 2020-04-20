@@ -23,6 +23,7 @@
  (data (i32.const 432) "\14\00\00\00\01\00\00\00\01\00\00\00\14\00\00\00~\00l\00i\00b\00/\00r\00t\00.\00t\00s\00")
  (data (i32.const 480) "\t\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\04\00\00\00\"A\00\00\00\00\00\00\"A\00\00\00\00\00\00")
  (table $0 1 funcref)
+ (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $extends-baseaggregate/poolB i32 (i32.const 48))
  (global $extends-baseaggregate/poolA i32 (i32.const 96))
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))

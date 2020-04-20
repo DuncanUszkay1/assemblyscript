@@ -2,6 +2,7 @@
  (type $i32_=>_i32 (func (param i32) (result i32)))
  (memory $0 0)
  (table $0 1 funcref)
+ (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (export "memory" (memory $0))
  (export "fib" (func $recursive/fib))
  (func $recursive/fib (param $0 i32) (result i32)

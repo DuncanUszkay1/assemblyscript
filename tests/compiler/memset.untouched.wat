@@ -6,6 +6,7 @@
  (memory $0 1)
  (data (i32.const 16) "\12\00\00\00\01\00\00\00\01\00\00\00\12\00\00\00m\00e\00m\00s\00e\00t\00.\00t\00s\00")
  (table $0 1 funcref)
+ (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $memset/dest (mut i32) (i32.const 0))
  (global $~lib/heap/__heap_base i32 (i32.const 52))
  (export "memory" (memory $0))

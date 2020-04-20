@@ -1,12 +1,13 @@
 (module
- (type $none_=>_i32 (func (result i32)))
  (type $i32_=>_i32 (func (param i32) (result i32)))
+ (type $none_=>_i32 (func (result i32)))
  (type $i32_=>_none (func (param i32)))
  (type $none_=>_none (func))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (memory $0 0)
  (table $0 2 funcref)
- (elem (i32.const 1) $getter-call/C#get:x~anonymous|0)
+ (elem (i32.const 1) $getter-call/C#get:x~anonymous|0~nonClosure)
+ (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
  (global $~argumentsLength (mut i32) (i32.const 0))
@@ -138,11 +139,28 @@
   end
   local.get $0
  )
- (func $getter-call/C#get:x~anonymous|0 (result i32)
+ (func $getter-call/C#get:x~anonymous|0~nonClosure (result i32)
   i32.const 42
  )
  (func $getter-call/C#get:x (param $0 i32) (result i32)
+  (local $1 i32)
   i32.const 1
+  local.set $1
+  local.get $1
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $1
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
+  call $~lib/rt/stub/__retain
+  drop
+  local.get $1
  )
  (func $~lib/rt/stub/__release (param $0 i32)
   nop
@@ -150,18 +168,57 @@
  (func $getter-call/test (result i32)
   (local $0 i32)
   (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
   i32.const 0
   call $getter-call/C#constructor
   local.set $0
-  i32.const 0
-  global.set $~argumentsLength
   local.get $0
   call $getter-call/C#get:x
-  call_indirect (type $none_=>_i32)
-  local.set $1
+  local.tee $1
+  local.set $2
+  local.get $2
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $2
+   i32.const 4
+   i32.shl
+   i32.const 0
+   global.set $~argumentsLength
+   local.get $2
+   i32.const 4
+   i32.shl
+   i32.load
+   call_indirect (type $i32_=>_i32)
+  else
+   i32.const 0
+   global.set $~argumentsLength
+   local.get $2
+   call_indirect (type $none_=>_i32)
+  end
+  local.set $4
   local.get $0
   call $~lib/rt/stub/__release
   local.get $1
+  local.set $3
+  local.get $3
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $3
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
+  call $~lib/rt/stub/__release
+  local.get $4
  )
  (func $~start
   global.get $~lib/heap/__heap_base

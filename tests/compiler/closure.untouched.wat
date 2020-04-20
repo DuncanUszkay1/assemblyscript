@@ -1,135 +1,40 @@
 (module
- (type $i32_=>_none (func (param i32)))
- (type $i32_i32_=>_none (func (param i32 i32)))
- (type $none_=>_none (func))
  (type $i32_=>_i32 (func (param i32) (result i32)))
- (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
+ (type $i32_i32_=>_none (func (param i32 i32)))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
+ (type $i32_=>_none (func (param i32)))
+ (type $none_=>_none (func))
  (type $none_=>_i32 (func (result i32)))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
+ (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
- (import "rtrace" "onincrement" (func $~lib/rt/rtrace/onincrement (param i32)))
  (import "rtrace" "onalloc" (func $~lib/rt/rtrace/onalloc (param i32)))
+ (import "rtrace" "onincrement" (func $~lib/rt/rtrace/onincrement (param i32)))
  (import "rtrace" "ondecrement" (func $~lib/rt/rtrace/ondecrement (param i32)))
  (import "rtrace" "onfree" (func $~lib/rt/rtrace/onfree (param i32)))
  (memory $0 1)
- (data (i32.const 16) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s\00")
- (data (i32.const 64) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00t\00l\00s\00f\00.\00t\00s\00")
- (data (i32.const 112) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00")
- (data (i32.const 176) "\02\00\00\00\01\00\00\00\01\00\00\00\02\00\00\00a\00")
- (table $0 1 funcref)
+ (data (i32.const 16) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00t\00l\00s\00f\00.\00t\00s\00")
+ (data (i32.const 64) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00")
+ (data (i32.const 128) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s\00")
+ (data (i32.const 176) "\n\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
+ (table $0 8 funcref)
+ (elem (i32.const 1) $closure/testParam~inner $closure/testVar~inner $closure/complexCreateClosure~anonymous|0 $closure/complexCreateClosure~anonymous|1 $closure/nestedExecutionTest~anonymous|0 $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0)
  (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
  (global $~lib/gc/gc.auto (mut i32) (i32.const 1))
- (global $~lib/heap/__heap_base i32 (i32.const 196))
+ (global $~argumentsLength (mut i32) (i32.const 0))
+ (global $~lib/rt/__rtti_base i32 (i32.const 176))
+ (global $~lib/heap/__heap_base i32 (i32.const 260))
  (export "memory" (memory $0))
- (export "eliminated_v" (func $rc/optimize/eliminated_v))
- (export "eliminated_vi" (func $rc/optimize/eliminated_vi))
- (export "eliminated_vii" (func $rc/optimize/eliminated_vii))
- (export "eliminated_viii" (func $rc/optimize/eliminated_viii))
- (export "eliminated_rr" (func $rc/optimize/eliminated_rr))
- (export "getRef" (func $rc/optimize/getRef))
- (export "OptimizeARC.eliminates.linearArgument" (func $rc/optimize/OptimizeARC.eliminates.linearArgument))
- (export "OptimizeARC.eliminates.linearLocal" (func $rc/optimize/OptimizeARC.eliminates.linearLocal))
- (export "OptimizeARC.eliminates.linearChain" (func $rc/optimize/OptimizeARC.eliminates.linearChain))
- (export "OptimizeARC.eliminates.balancedReleases" (func $rc/optimize/OptimizeARC.eliminates.balancedReleases))
- (export "OptimizeARC.eliminates.partialReleases" (func $rc/optimize/OptimizeARC.eliminates.partialReleases))
- (export "OptimizeARC.eliminates.balancedRetains" (func $rc/optimize/OptimizeARC.eliminates.balancedRetains))
- (export "OptimizeARC.eliminates.balancedInsideLoop" (func $rc/optimize/OptimizeARC.eliminates.balancedInsideLoop))
- (export "OptimizeARC.eliminates.balancedOutsideLoop" (func $rc/optimize/OptimizeARC.eliminates.balancedOutsideLoop))
- (export "OptimizeARC.eliminates.balancedInsideOutsideLoop" (func $rc/optimize/OptimizeARC.eliminates.balancedInsideOutsideLoop))
- (export "OptimizeARC.eliminates.balancedInsideOutsideLoopWithBranch" (func $rc/optimize/OptimizeARC.eliminates.balancedInsideOutsideLoopWithBranch))
- (export "OptimizeARC.eliminates.replace" (func $rc/optimize/OptimizeARC.eliminates.replace))
- (export "OptimizeARC.eliminates.replaceAlreadyRetained" (func $rc/optimize/OptimizeARC.eliminates.replaceAlreadyRetained))
- (export "OptimizeARC.keeps.partialRetains" (func $rc/optimize/OptimizeARC.keeps.partialRetains))
- (export "OptimizeARC.keeps.reachesReturn" (func $rc/optimize/OptimizeARC.keeps.reachesReturn))
- (export "FinalizeARC.eliminates.unnecessaryAllocation" (func $rc/optimize/FinalizeARC.eliminates.unnecessaryAllocation))
- (export "FinalizeARC.eliminates.unnecessaryPair" (func $rc/optimize/FinalizeARC.eliminates.unnecessaryPair))
- (export "FinalizeARC.eliminates.unnecessaryStaticPair" (func $rc/optimize/FinalizeARC.eliminates.unnecessaryStaticPair))
- (export "FinalizeARC.eliminates.unnecessaryStaticRetain" (func $rc/optimize/FinalizeARC.eliminates.unnecessaryStaticRetain))
- (export "FinalizeARC.eliminates.unnecessaryStaticRelease" (func $rc/optimize/FinalizeARC.eliminates.unnecessaryStaticRelease))
- (export "FinalizeARC.keeps.dynamicRetain" (func $rc/optimize/FinalizeARC.keeps.dynamicRetain))
- (export "FinalizeARC.keeps.dynamicRelease" (func $rc/optimize/FinalizeARC.keeps.dynamicRelease))
- (func $rc/optimize/eliminated_v
-  nop
- )
- (func $rc/optimize/eliminated_vi (param $0 i32)
-  nop
- )
- (func $rc/optimize/eliminated_vii (param $0 i32) (param $1 i32)
-  nop
- )
- (func $rc/optimize/eliminated_viii (param $0 i32) (param $1 i32) (param $2 i32)
-  nop
- )
- (func $~lib/rt/pure/increment (param $0 i32)
-  (local $1 i32)
-  local.get $0
-  i32.load offset=4
-  local.set $1
-  local.get $1
-  i32.const 268435455
-  i32.const -1
-  i32.xor
-  i32.and
-  local.get $1
-  i32.const 1
-  i32.add
-  i32.const 268435455
-  i32.const -1
-  i32.xor
-  i32.and
-  i32.eq
-  i32.eqz
-  if
-   i32.const 0
-   i32.const 32
-   i32.const 109
-   i32.const 3
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $0
-  local.get $1
-  i32.const 1
-  i32.add
-  i32.store offset=4
-  i32.const 1
-  drop
-  local.get $0
-  call $~lib/rt/rtrace/onincrement
-  i32.const 1
-  drop
-  local.get $0
-  i32.load
-  i32.const 1
-  i32.and
-  i32.eqz
-  i32.eqz
-  if
-   i32.const 0
-   i32.const 32
-   i32.const 112
-   i32.const 14
-   call $~lib/builtins/abort
-   unreachable
-  end
- )
- (func $~lib/rt/pure/__retain (param $0 i32) (result i32)
-  local.get $0
-  global.get $~lib/heap/__heap_base
-  i32.gt_u
-  if
-   local.get $0
-   i32.const 16
-   i32.sub
-   call $~lib/rt/pure/increment
-  end
-  local.get $0
- )
+ (export "__alloc" (func $~lib/rt/tlsf/__alloc))
+ (export "__retain" (func $~lib/rt/pure/__retain))
+ (export "__release" (func $~lib/rt/pure/__release))
+ (export "__collect" (func $~lib/rt/pure/__collect))
+ (export "__rtti_base" (global $~lib/rt/__rtti_base))
+ (start $~start)
  (func $~lib/rt/tlsf/removeBlock (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -152,7 +57,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 80
+   i32.const 32
    i32.const 277
    i32.const 14
    call $~lib/builtins/abort
@@ -179,7 +84,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 80
+   i32.const 32
    i32.const 279
    i32.const 14
    call $~lib/builtins/abort
@@ -233,7 +138,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 80
+   i32.const 32
    i32.const 292
    i32.const 14
    call $~lib/builtins/abort
@@ -365,7 +270,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 80
+   i32.const 32
    i32.const 205
    i32.const 14
    call $~lib/builtins/abort
@@ -382,7 +287,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 80
+   i32.const 32
    i32.const 207
    i32.const 14
    call $~lib/builtins/abort
@@ -477,7 +382,7 @@
    i32.eqz
    if
     i32.const 0
-    i32.const 80
+    i32.const 32
     i32.const 228
     i32.const 16
     call $~lib/builtins/abort
@@ -542,7 +447,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 80
+   i32.const 32
    i32.const 243
    i32.const 14
    call $~lib/builtins/abort
@@ -560,7 +465,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 80
+   i32.const 32
    i32.const 244
    i32.const 14
    call $~lib/builtins/abort
@@ -619,7 +524,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 80
+   i32.const 32
    i32.const 260
    i32.const 14
    call $~lib/builtins/abort
@@ -740,7 +645,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 80
+   i32.const 32
    i32.const 386
    i32.const 5
    call $~lib/builtins/abort
@@ -765,7 +670,7 @@
    i32.eqz
    if
     i32.const 0
-    i32.const 80
+    i32.const 32
     i32.const 396
     i32.const 16
     call $~lib/builtins/abort
@@ -798,7 +703,7 @@
    i32.eqz
    if
     i32.const 0
-    i32.const 80
+    i32.const 32
     i32.const 408
     i32.const 5
     call $~lib/builtins/abort
@@ -1029,8 +934,8 @@
   i32.const 1073741808
   i32.ge_u
   if
-   i32.const 128
    i32.const 80
+   i32.const 32
    i32.const 461
    i32.const 30
    call $~lib/builtins/abort
@@ -1126,7 +1031,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 80
+   i32.const 32
    i32.const 338
    i32.const 14
    call $~lib/builtins/abort
@@ -1191,7 +1096,7 @@
     i32.eqz
     if
      i32.const 0
-     i32.const 80
+     i32.const 32
      i32.const 351
      i32.const 18
      call $~lib/builtins/abort
@@ -1340,7 +1245,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 80
+   i32.const 32
    i32.const 365
    i32.const 14
    call $~lib/builtins/abort
@@ -1433,7 +1338,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 80
+   i32.const 32
    i32.const 501
    i32.const 14
    call $~lib/builtins/abort
@@ -1480,7 +1385,7 @@
      i32.eqz
      if
       i32.const 0
-      i32.const 80
+      i32.const 32
       i32.const 513
       i32.const 20
       call $~lib/builtins/abort
@@ -1501,7 +1406,7 @@
     i32.eqz
     if
      i32.const 0
-     i32.const 80
+     i32.const 32
      i32.const 518
      i32.const 18
      call $~lib/builtins/abort
@@ -1522,7 +1427,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 80
+   i32.const 32
    i32.const 521
    i32.const 14
    call $~lib/builtins/abort
@@ -1558,21 +1463,70 @@
   i32.const 16
   i32.add
  )
- (func $rc/optimize/Ref#constructor (param $0 i32) (result i32)
+ (func $~lib/rt/pure/increment (param $0 i32)
+  (local $1 i32)
   local.get $0
+  i32.load offset=4
+  local.set $1
+  local.get $1
+  i32.const 268435455
+  i32.const -1
+  i32.xor
+  i32.and
+  local.get $1
+  i32.const 1
+  i32.add
+  i32.const 268435455
+  i32.const -1
+  i32.xor
+  i32.and
+  i32.eq
   i32.eqz
   if
    i32.const 0
+   i32.const 144
+   i32.const 109
    i32.const 3
-   call $~lib/rt/tlsf/__alloc
-   call $~lib/rt/pure/__retain
-   local.set $0
+   call $~lib/builtins/abort
+   unreachable
   end
   local.get $0
+  local.get $1
+  i32.const 1
+  i32.add
+  i32.store offset=4
+  i32.const 1
+  drop
+  local.get $0
+  call $~lib/rt/rtrace/onincrement
+  i32.const 1
+  drop
+  local.get $0
+  i32.load
+  i32.const 1
+  i32.and
+  i32.eqz
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 144
+   i32.const 112
+   i32.const 14
+   call $~lib/builtins/abort
+   unreachable
+  end
  )
- (func $rc/optimize/getRef (result i32)
-  i32.const 0
-  call $rc/optimize/Ref#constructor
+ (func $~lib/rt/pure/__retain (param $0 i32) (result i32)
+  local.get $0
+  global.get $~lib/heap/__heap_base
+  i32.gt_u
+  if
+   local.get $0
+   i32.const 16
+   i32.sub
+   call $~lib/rt/pure/increment
+  end
+  local.get $0
  )
  (func $~lib/rt/pure/__release (param $0 i32)
   local.get $0
@@ -1585,277 +1539,975 @@
    call $~lib/rt/pure/decrement
   end
  )
- (func $rc/optimize/eliminated_rr (param $0 i32) (result i32)
-  (local $1 i32)
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.set $0
-  call $rc/optimize/getRef
-  local.set $1
-  local.get $0
-  call $~lib/rt/pure/__release
-  local.get $1
- )
- (func $rc/optimize/OptimizeARC.eliminates.linearArgument (param $0 i32)
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.set $0
-  local.get $0
-  call $~lib/rt/pure/__release
- )
- (func $rc/optimize/OptimizeARC.eliminates.linearLocal (param $0 i32)
-  (local $1 i32)
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.set $1
-  local.get $1
-  call $~lib/rt/pure/__release
- )
- (func $rc/optimize/OptimizeARC.eliminates.linearChain (param $0 i32)
-  (local $1 i32)
+ (func $closure/testParam~inner (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
-  (local $3 i32)
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.set $1
   local.get $1
-  call $~lib/rt/pure/__retain
-  local.set $2
-  local.get $2
-  call $~lib/rt/pure/__retain
-  local.set $3
-  local.get $3
-  call $~lib/rt/pure/__release
-  local.get $2
-  call $~lib/rt/pure/__release
-  local.get $1
-  call $~lib/rt/pure/__release
+  i32.load offset=4
  )
- (func $rc/optimize/OptimizeARC.eliminates.balancedReleases (param $0 i32) (param $1 i32)
-  (local $2 i32)
+ (func $~lib/closure|3#constructor (param $0 i32) (result i32)
   local.get $0
-  call $~lib/rt/pure/__retain
-  local.set $2
-  local.get $1
+  i32.eqz
   if
-   local.get $2
-   call $~lib/rt/pure/__release
-  else
-   local.get $2
-   call $~lib/rt/pure/__release
-  end
- )
- (func $rc/optimize/OptimizeARC.eliminates.partialReleases (param $0 i32) (param $1 i32)
-  (local $2 i32)
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.set $2
-  local.get $1
-  if
-   local.get $2
-   call $~lib/rt/pure/__release
-  end
- )
- (func $rc/optimize/OptimizeARC.eliminates.balancedRetains (param $0 i32) (param $1 i32) (param $2 i32)
-  (local $3 i32)
-  local.get $1
-  if
-   local.get $2
-   if
-    local.get $0
-    call $~lib/rt/pure/__retain
-    local.set $3
-   else
-    local.get $0
-    call $~lib/rt/pure/__retain
-    local.set $3
-   end
-  else
-   local.get $0
-   call $~lib/rt/pure/__retain
-   local.set $3
-  end
-  local.get $3
-  call $~lib/rt/pure/__release
- )
- (func $rc/optimize/OptimizeARC.eliminates.balancedInsideLoop (param $0 i32) (param $1 i32)
-  (local $2 i32)
-  loop $while-continue|0
-   local.get $1
-   local.set $2
-   local.get $2
-   if
-    local.get $0
-    call $~lib/rt/pure/__retain
-    local.set $0
-    local.get $0
-    call $~lib/rt/pure/__release
-    br $while-continue|0
-   end
-  end
- )
- (func $rc/optimize/OptimizeARC.eliminates.balancedOutsideLoop (param $0 i32) (param $1 i32)
-  (local $2 i32)
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.set $0
-  loop $while-continue|0
-   local.get $1
-   local.set $2
-   local.get $2
-   if
-    br $while-continue|0
-   end
-  end
-  local.get $0
-  call $~lib/rt/pure/__release
- )
- (func $rc/optimize/OptimizeARC.eliminates.balancedInsideOutsideLoop (param $0 i32) (param $1 i32)
-  (local $2 i32)
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.set $0
-  loop $while-continue|0
-   local.get $1
-   local.set $2
-   local.get $2
-   if
-    local.get $0
-    call $~lib/rt/pure/__release
-    local.get $0
-    call $~lib/rt/pure/__retain
-    local.set $0
-    br $while-continue|0
-   end
-  end
-  local.get $0
-  call $~lib/rt/pure/__release
- )
- (func $rc/optimize/OptimizeARC.eliminates.balancedInsideOutsideLoopWithBranch (param $0 i32) (param $1 i32) (param $2 i32)
-  (local $3 i32)
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.set $0
-  loop $while-continue|0
-   local.get $1
-   local.set $3
-   local.get $3
-   if
-    local.get $2
-    if
-     local.get $0
-     call $~lib/rt/pure/__release
-     return
-    end
-    local.get $0
-    call $~lib/rt/pure/__release
-    local.get $0
-    call $~lib/rt/pure/__retain
-    local.set $0
-    br $while-continue|0
-   end
-  end
-  local.get $0
-  call $~lib/rt/pure/__release
- )
- (func $rc/optimize/OptimizeARC.eliminates.replace (param $0 i32) (param $1 i32)
-  (local $2 i32)
-  (local $3 i32)
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.set $0
-  local.get $1
-  call $~lib/rt/pure/__retain
-  local.set $1
-  local.get $1
-  local.tee $2
-  local.get $0
-  local.tee $3
-  i32.ne
-  if
-   local.get $2
-   call $~lib/rt/pure/__retain
-   local.set $2
-   local.get $3
-   call $~lib/rt/pure/__release
-  end
-  local.get $2
-  local.set $0
-  local.get $0
-  call $~lib/rt/pure/__release
-  local.get $1
-  call $~lib/rt/pure/__release
- )
- (func $rc/optimize/OptimizeARC.eliminates.replaceAlreadyRetained (param $0 i32) (result i32)
-  (local $1 i32)
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.set $0
-  call $rc/optimize/getRef
-  local.set $1
-  local.get $0
-  call $~lib/rt/pure/__release
-  local.get $1
-  local.set $0
-  local.get $0
- )
- (func $rc/optimize/OptimizeARC.keeps.partialRetains (param $0 i32) (param $1 i32)
-  local.get $1
-  if
-   local.get $0
+   i32.const 8
+   i32.const 3
+   call $~lib/rt/tlsf/__alloc
    call $~lib/rt/pure/__retain
    local.set $0
   end
   local.get $0
-  call $~lib/rt/pure/__release
- )
- (func $rc/optimize/OptimizeARC.keeps.reachesReturn (param $0 i32) (param $1 i32) (result i32)
+  i32.const 0
+  i32.store
   local.get $0
-  call $~lib/rt/pure/__retain
-  local.set $0
+  i32.const 0
+  i32.store offset=4
+  local.get $0
+ )
+ (func $~lib/closure|3#get:__functionPtr (param $0 i32) (result i32)
+  local.get $0
+  i32.load
+ )
+ (func $~lib/closure|3#set:__functionPtr (param $0 i32) (param $1 i32)
+  local.get $0
   local.get $1
-  if
-   local.get $0
-   return
-  end
-  local.get $0
-  call $~lib/rt/pure/__release
-  i32.const 0
+  i32.store
  )
- (func $rc/optimize/FinalizeARC.eliminates.unnecessaryAllocation
-  i32.const 1
-  i32.const 0
+ (func $~lib/closure|3#get:$local1 (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=4
+ )
+ (func $~lib/closure|3#set:$local1 (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=4
+ )
+ (func $closure/testParam (param $0 i32) (param $1 i32) (result i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  i32.const 4
+  i32.const 3
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
-  call $~lib/rt/pure/__release
- )
- (func $rc/optimize/FinalizeARC.eliminates.unnecessaryPair (param $0 i32)
-  local.get $0
-  call $~lib/rt/pure/__retain
-  call $~lib/rt/pure/__release
- )
- (func $rc/optimize/FinalizeARC.eliminates.unnecessaryStaticPair
-  i32.const 192
-  call $~lib/rt/pure/__retain
-  call $~lib/rt/pure/__release
- )
- (func $rc/optimize/FinalizeARC.eliminates.unnecessaryStaticRetain
-  i32.const 192
+  local.set $2
+  local.get $2
+  i32.const 1
+  i32.store
+  local.get $2
+  local.set $3
+  local.get $3
+  local.get $1
+  i32.store offset=4
+  local.get $3
+  i32.const 4
+  i32.shr_s
+  i32.const -2147483648
+  i32.or
+  local.set $4
+  local.get $4
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $4
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
   call $~lib/rt/pure/__retain
   drop
- )
- (func $rc/optimize/FinalizeARC.eliminates.unnecessaryStaticRelease
-  i32.const 192
+  local.get $4
+  local.set $5
+  local.get $2
   call $~lib/rt/pure/__release
+  local.get $5
  )
- (func $rc/optimize/FinalizeARC.keeps.dynamicRetain (param $0 i32)
+ (func $closure/testVar~inner (param $0 i32) (param $1 i32) (result i32)
+  (local $2 i32)
+  local.get $1
+  i32.load offset=4
+ )
+ (func $~lib/closure|4#constructor (param $0 i32) (result i32)
   local.get $0
-  call $~lib/rt/pure/__retain
+  i32.eqz
+  if
+   i32.const 8
+   i32.const 4
+   call $~lib/rt/tlsf/__alloc
+   call $~lib/rt/pure/__retain
+   local.set $0
+  end
+  local.get $0
+  i32.const 0
+  i32.store
+  local.get $0
+  i32.const 0
+  i32.store offset=4
+  local.get $0
+ )
+ (func $~lib/closure|4#get:__functionPtr (param $0 i32) (result i32)
+  local.get $0
+  i32.load
+ )
+ (func $~lib/closure|4#set:__functionPtr (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store
+ )
+ (func $~lib/closure|4#get:$local0 (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=4
+ )
+ (func $~lib/closure|4#set:$local0 (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=4
+ )
+ (func $closure/testVar (result i32)
+  (local $0 i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  i32.const 0
   local.set $0
- )
- (func $rc/optimize/FinalizeARC.keeps.dynamicRelease (param $0 i32)
+  i32.const 4
+  i32.const 4
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.set $1
+  local.get $1
+  i32.const 2
+  i32.store
+  local.get $1
+  local.set $2
+  local.get $2
   local.get $0
+  i32.store offset=4
+  local.get $2
+  i32.const 4
+  i32.shr_s
+  i32.const -2147483648
+  i32.or
+  local.set $3
+  local.get $3
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $3
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
+  call $~lib/rt/pure/__retain
+  drop
+  local.get $3
+  local.set $4
+  local.get $1
   call $~lib/rt/pure/__release
+  local.get $4
+ )
+ (func $closure/complexCreateClosure~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+  local.get $0
+  i32.load offset=4
+  local.get $0
+  i32.load offset=8
+  i32.add
+  local.get $0
+  i32.load offset=12
+  i32.sub
+ )
+ (func $~lib/closure|5#constructor (param $0 i32) (result i32)
+  local.get $0
+  i32.eqz
+  if
+   i32.const 16
+   i32.const 5
+   call $~lib/rt/tlsf/__alloc
+   call $~lib/rt/pure/__retain
+   local.set $0
+  end
+  local.get $0
+  i32.const 0
+  i32.store
+  local.get $0
+  i32.const 0
+  i32.store offset=4
+  local.get $0
+  i32.const 0
+  i32.store offset=8
+  local.get $0
+  i32.const 0
+  i32.store offset=12
+  local.get $0
+ )
+ (func $~lib/closure|5#get:__functionPtr (param $0 i32) (result i32)
+  local.get $0
+  i32.load
+ )
+ (func $~lib/closure|5#set:__functionPtr (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store
+ )
+ (func $~lib/closure|5#get:foo (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=4
+ )
+ (func $~lib/closure|5#set:foo (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=4
+ )
+ (func $~lib/closure|5#get:bar (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=8
+ )
+ (func $~lib/closure|5#set:bar (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=8
+ )
+ (func $~lib/closure|5#get:baz (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=12
+ )
+ (func $~lib/closure|5#set:baz (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=12
+ )
+ (func $closure/complexCreateClosure~anonymous|1 (param $0 i32) (param $1 i32) (result i32)
+  local.get $0
+  i32.load offset=4
+  local.get $0
+  i32.load offset=8
+  i32.sub
+  local.get $0
+  i32.load offset=12
+  i32.add
+ )
+ (func $~lib/closure|6#constructor (param $0 i32) (result i32)
+  local.get $0
+  i32.eqz
+  if
+   i32.const 16
+   i32.const 6
+   call $~lib/rt/tlsf/__alloc
+   call $~lib/rt/pure/__retain
+   local.set $0
+  end
+  local.get $0
+  i32.const 0
+  i32.store
+  local.get $0
+  i32.const 0
+  i32.store offset=4
+  local.get $0
+  i32.const 0
+  i32.store offset=8
+  local.get $0
+  i32.const 0
+  i32.store offset=12
+  local.get $0
+ )
+ (func $~lib/closure|6#get:__functionPtr (param $0 i32) (result i32)
+  local.get $0
+  i32.load
+ )
+ (func $~lib/closure|6#set:__functionPtr (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store
+ )
+ (func $~lib/closure|6#get:bar (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=4
+ )
+ (func $~lib/closure|6#set:bar (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=4
+ )
+ (func $~lib/closure|6#get:baz (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=8
+ )
+ (func $~lib/closure|6#set:baz (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=8
+ )
+ (func $~lib/closure|6#get:foo (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=12
+ )
+ (func $~lib/closure|6#set:foo (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=12
+ )
+ (func $closure/complexCreateClosure (param $0 i32) (result i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  (local $6 i32)
+  (local $7 i32)
+  (local $8 i32)
+  (local $9 i32)
+  (local $10 i32)
+  i32.const 2
+  local.set $1
+  i32.const 3
+  local.set $2
+  i32.const 4
+  local.set $3
+  i32.const 4
+  i32.const 5
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.set $4
+  local.get $4
+  i32.const 3
+  i32.store
+  local.get $4
+  call $~lib/rt/pure/__retain
+  local.set $5
+  i32.const 4
+  i32.const 6
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.set $6
+  local.get $6
+  i32.const 4
+  i32.store
+  local.get $6
+  call $~lib/rt/pure/__retain
+  local.set $7
+  i32.const 7
+  local.set $1
+  i32.const 11
+  local.set $2
+  local.get $7
+  local.set $8
+  local.get $8
+  local.get $2
+  i32.store offset=4
+  local.get $8
+  local.get $3
+  i32.store offset=8
+  local.get $8
+  local.get $1
+  i32.store offset=12
+  local.get $8
+  i32.const 4
+  i32.shr_s
+  i32.const -2147483648
+  i32.or
+  local.set $9
+  local.get $9
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $9
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
+  call $~lib/rt/pure/__retain
+  drop
+  local.get $9
+  local.set $10
+  local.get $4
+  call $~lib/rt/pure/__release
+  local.get $6
+  call $~lib/rt/pure/__release
+  local.get $5
+  call $~lib/rt/pure/__release
+  local.get $7
+  call $~lib/rt/pure/__release
+  local.get $10
+ )
+ (func $closure/nestedExecutionTest~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  (local $6 i32)
+  local.get $1
+  local.set $1
+  local.get $1
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $1
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
+  call $~lib/rt/pure/__retain
+  drop
+  local.get $1
+  local.set $1
+  local.get $1
+  local.set $2
+  local.get $2
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $2
+   i32.const 4
+   i32.shl
+   local.get $0
+   i32.load offset=4
+   i32.const 1
+   global.set $~argumentsLength
+   local.get $2
+   i32.const 4
+   i32.shl
+   i32.load
+   call_indirect (type $i32_i32_=>_i32)
+  else
+   local.get $0
+   i32.load offset=4
+   i32.const 1
+   global.set $~argumentsLength
+   local.get $2
+   call_indirect (type $i32_=>_i32)
+  end
+  local.set $3
+  local.get $0
+  i32.load offset=8
+  local.set $5
+  local.get $1
+  local.set $4
+  local.get $4
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $4
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
+  call $~lib/rt/pure/__release
+  local.get $5
+ )
+ (func $~lib/closure|7#constructor (param $0 i32) (result i32)
+  local.get $0
+  i32.eqz
+  if
+   i32.const 12
+   i32.const 7
+   call $~lib/rt/tlsf/__alloc
+   call $~lib/rt/pure/__retain
+   local.set $0
+  end
+  local.get $0
+  i32.const 0
+  i32.store
+  local.get $0
+  i32.const 0
+  i32.store offset=4
+  local.get $0
+  i32.const 0
+  i32.store offset=8
+  local.get $0
+ )
+ (func $~lib/closure|7#get:__functionPtr (param $0 i32) (result i32)
+  local.get $0
+  i32.load
+ )
+ (func $~lib/closure|7#set:__functionPtr (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store
+ )
+ (func $~lib/closure|7#get:arg (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=4
+ )
+ (func $~lib/closure|7#set:arg (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=4
+ )
+ (func $~lib/closure|7#get:x (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=8
+ )
+ (func $~lib/closure|7#set:x (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=8
+ )
+ (func $closure/nestedExecutionTest (param $0 i32) (result i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  (local $6 i32)
+  i32.const 7
+  local.set $1
+  local.get $0
+  call $closure/complexCreateClosure
+  local.set $2
+  i32.const 4
+  i32.const 7
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.set $3
+  local.get $3
+  i32.const 5
+  i32.store
+  local.get $3
+  call $~lib/rt/pure/__retain
+  local.set $4
+  local.get $4
+  local.get $0
+  i32.store offset=4
+  local.get $4
+  local.get $1
+  i32.store offset=8
+  local.get $4
+  local.get $2
+  i32.const 1
+  global.set $~argumentsLength
+  local.get $4
+  i32.load
+  call_indirect (type $i32_i32_=>_i32)
+  local.set $6
+  local.get $3
+  call $~lib/rt/pure/__release
+  local.get $2
+  local.set $5
+  local.get $5
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $5
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
+  call $~lib/rt/pure/__release
+  local.get $4
+  call $~lib/rt/pure/__release
+  local.get $6
+ )
+ (func $closure/createClosure~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+  local.get $0
+  i32.load offset=4
+  local.get $1
+  i32.add
+ )
+ (func $~lib/closure|8#constructor (param $0 i32) (result i32)
+  local.get $0
+  i32.eqz
+  if
+   i32.const 8
+   i32.const 8
+   call $~lib/rt/tlsf/__alloc
+   call $~lib/rt/pure/__retain
+   local.set $0
+  end
+  local.get $0
+  i32.const 0
+  i32.store
+  local.get $0
+  i32.const 0
+  i32.store offset=4
+  local.get $0
+ )
+ (func $~lib/closure|8#get:__functionPtr (param $0 i32) (result i32)
+  local.get $0
+  i32.load
+ )
+ (func $~lib/closure|8#set:__functionPtr (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store
+ )
+ (func $~lib/closure|8#get:arg (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=4
+ )
+ (func $~lib/closure|8#set:arg (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=4
+ )
+ (func $closure/createClosure (param $0 i32) (result i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  i32.const 4
+  i32.const 8
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.set $1
+  local.get $1
+  i32.const 6
+  i32.store
+  local.get $1
+  call $~lib/rt/pure/__retain
+  local.set $2
+  local.get $2
+  local.set $3
+  local.get $3
+  local.get $0
+  i32.store offset=4
+  local.get $3
+  i32.const 4
+  i32.shr_s
+  i32.const -2147483648
+  i32.or
+  local.set $4
+  local.get $4
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $4
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
+  call $~lib/rt/pure/__retain
+  drop
+  local.get $4
+  local.set $5
+  local.get $1
+  call $~lib/rt/pure/__release
+  local.get $2
+  call $~lib/rt/pure/__release
+  local.get $5
+ )
+ (func $closure/runClosure (param $0 i32) (result i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  local.get $0
+  local.set $1
+  local.get $1
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $1
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
+  call $~lib/rt/pure/__retain
+  drop
+  local.get $1
+  local.set $0
+  local.get $0
+  local.set $2
+  local.get $2
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $2
+   i32.const 4
+   i32.shl
+   i32.const 1
+   i32.const 1
+   global.set $~argumentsLength
+   local.get $2
+   i32.const 4
+   i32.shl
+   i32.load
+   call_indirect (type $i32_i32_=>_i32)
+  else
+   i32.const 1
+   i32.const 1
+   global.set $~argumentsLength
+   local.get $2
+   call_indirect (type $i32_=>_i32)
+  end
+  local.set $4
+  local.get $0
+  local.set $3
+  local.get $3
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $3
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
+  call $~lib/rt/pure/__release
+  local.get $4
+ )
+ (func $closure/passItAround (param $0 i32) (result i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  local.get $0
+  call $closure/createClosure
+  local.tee $1
+  call $closure/runClosure
+  local.set $3
+  local.get $1
+  local.set $2
+  local.get $2
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $2
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
+  call $~lib/rt/pure/__release
+  local.get $3
+ )
+ (func $closure/runInline~anonymous|0 (param $0 i32) (result i32)
+  (local $1 i32)
+  local.get $0
+  i32.load offset=4
+  local.get $0
+  i32.load offset=8
+  i32.add
+  local.get $0
+  i32.load offset=12
+  i32.add
+ )
+ (func $~lib/closure|9#constructor (param $0 i32) (result i32)
+  local.get $0
+  i32.eqz
+  if
+   i32.const 16
+   i32.const 9
+   call $~lib/rt/tlsf/__alloc
+   call $~lib/rt/pure/__retain
+   local.set $0
+  end
+  local.get $0
+  i32.const 0
+  i32.store
+  local.get $0
+  i32.const 0
+  i32.store offset=4
+  local.get $0
+  i32.const 0
+  i32.store offset=8
+  local.get $0
+  i32.const 0
+  i32.store offset=12
+  local.get $0
+ )
+ (func $~lib/closure|9#get:__functionPtr (param $0 i32) (result i32)
+  local.get $0
+  i32.load
+ )
+ (func $~lib/closure|9#set:__functionPtr (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store
+ )
+ (func $~lib/closure|9#get:arg (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=4
+ )
+ (func $~lib/closure|9#set:arg (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=4
+ )
+ (func $~lib/closure|9#get:foo (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=8
+ )
+ (func $~lib/closure|9#set:foo (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=8
+ )
+ (func $~lib/closure|9#get:bar (param $0 i32) (result i32)
+  local.get $0
+  i32.load offset=12
+ )
+ (func $~lib/closure|9#set:bar (param $0 i32) (param $1 i32)
+  local.get $0
+  local.get $1
+  i32.store offset=12
+ )
+ (func $closure/runInline (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  (local $6 i32)
+  i32.const 4
+  i32.const 9
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.set $3
+  local.get $3
+  i32.const 7
+  i32.store
+  local.get $3
+  local.set $4
+  local.get $4
+  local.get $0
+  i32.store offset=4
+  local.get $4
+  local.get $1
+  i32.store offset=8
+  local.get $4
+  local.get $2
+  i32.store offset=12
+  local.get $4
+  i32.const 4
+  i32.shr_s
+  i32.const -2147483648
+  i32.or
+  local.set $5
+  local.get $5
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $5
+   i32.const 4
+   i32.shl
+   i32.const 0
+   global.set $~argumentsLength
+   local.get $5
+   i32.const 4
+   i32.shl
+   i32.load
+   call_indirect (type $i32_=>_i32)
+  else
+   i32.const 0
+   global.set $~argumentsLength
+   local.get $5
+   call_indirect (type $none_=>_i32)
+  end
+  local.set $6
+  local.get $3
+  call $~lib/rt/pure/__release
+  local.get $6
+ )
+ (func $closure/fallOutOfScope (param $0 i32) (result i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  local.get $0
+  call $closure/createClosure
+  local.set $1
+  i32.const 10
+  local.set $3
+  local.get $1
+  local.set $2
+  local.get $2
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $2
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
+  call $~lib/rt/pure/__release
+  local.get $3
+ )
+ (func $start:closure
+  (local $0 i32)
+  (local $1 i32)
+  i32.const 1
+  i32.const 2
+  call $closure/testParam
+  local.set $0
+  local.get $0
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $0
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
+  call $~lib/rt/pure/__release
+  call $closure/testVar
+  local.set $1
+  local.get $1
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if (result i32)
+   local.get $1
+   i32.const 4
+   i32.shl
+  else
+   i32.const 0
+  end
+  call $~lib/rt/pure/__release
+  i32.const 1
+  call $closure/nestedExecutionTest
+  drop
+  i32.const 1
+  call $closure/passItAround
+  drop
+  i32.const 1
+  i32.const 1
+  i32.const 1
+  call $closure/runInline
+  drop
+  i32.const 1
+  call $closure/fallOutOfScope
+  drop
+ )
+ (func $~start
+  call $start:closure
  )
  (func $~lib/rt/pure/__collect
   i32.const 1
@@ -1911,7 +2563,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 32
+   i32.const 144
    i32.const 122
    i32.const 14
    call $~lib/builtins/abort
@@ -1937,7 +2589,7 @@
    i32.eqz
    if
     i32.const 0
-    i32.const 32
+    i32.const 144
     i32.const 126
     i32.const 18
     call $~lib/builtins/abort
@@ -1954,7 +2606,7 @@
    i32.eqz
    if
     i32.const 0
-    i32.const 32
+    i32.const 144
     i32.const 136
     i32.const 16
     call $~lib/builtins/abort
@@ -1992,7 +2644,7 @@
   i32.eqz
   if
    i32.const 0
-   i32.const 32
+   i32.const 144
    i32.const 69
    i32.const 16
    call $~lib/builtins/abort
@@ -2012,7 +2664,7 @@
      i32.const 8
      i32.sub
      i32.load
-     br_table $switch$1$case$2 $switch$1$case$2 $switch$1$case$4 $switch$1$case$2 $switch$1$default
+     br_table $switch$1$case$2 $switch$1$case$2 $switch$1$case$4 $switch$1$case$2 $switch$1$case$2 $switch$1$case$2 $switch$1$case$2 $switch$1$case$2 $switch$1$case$2 $switch$1$case$2 $switch$1$default
     end
     return
    end
