@@ -5668,7 +5668,7 @@ export class Compiler extends DiagnosticEmitter {
               rightStmts.unshift(
                 this.makeRelease(
                   module.local_get(temp.index, leftType.toNativeType()),
-                  rightType
+                  leftType
                 )
               );
             }
@@ -5916,10 +5916,6 @@ export class Compiler extends DiagnosticEmitter {
       case ElementKind.FIELD: {
         targetType = (<VariableLikeElement>target).type;
         if (target.hasDecorator(DecoratorFlags.UNSAFE)) this.checkUnsafe(expression);
-        break;
-      }
-      case ElementKind.CLOSEDLOCAL: {
-        targetType = Type.i32
         break;
       }
       case ElementKind.PROPERTY_PROTOTYPE: {
