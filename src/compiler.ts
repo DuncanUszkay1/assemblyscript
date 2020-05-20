@@ -7871,7 +7871,7 @@ export class Compiler extends DiagnosticEmitter {
     argumentExpressions: Expression[],
     reportNode: Node,
     thisArg: ExpressionRef = 0,
-    immediatelyDropped: bool = false,
+    immediatelyDropped: bool = false
   ): ExpressionRef {
     var numArguments = argumentExpressions.length;
 
