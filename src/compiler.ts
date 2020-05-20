@@ -6530,6 +6530,8 @@ export class Compiler extends DiagnosticEmitter {
         let local = <Local>target;
         signature = local.type.signatureReference!;
         if(local.type.is(TypeFlags.CLOSURE)) {
+          // If we're calling a local we know to be a closure, then we must still be in the creator functions
+          // scope. Because of this, we should update the values of locals that are still available
           return module.block(null, [
             this.injectClosedLocals(local),
             this.compileCallIndirect(
@@ -8156,7 +8158,7 @@ export class Compiler extends DiagnosticEmitter {
     }
 
     // if this anonymous function turns out to be a non-closure, recompile a version
-    // of the function without context, deleting the previous function 
+    // of the function without context, deleting the previous function
     if (instance.closedLocals.size == 0 && instance.prototype.isAnonymous) {
       this.module.removeFunction(instance.internalName)
       instance = new Function(
