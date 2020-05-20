@@ -20,7 +20,6 @@
  (data (i32.const 176) "\n\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
  (table $0 8 funcref)
  (elem (i32.const 1) $closure/testParam~inner $closure/testVar~inner $closure/complexCreateClosure~anonymous|0 $closure/complexCreateClosure~anonymous|1 $closure/nestedExecutionTest~anonymous|0 $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))

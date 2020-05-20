@@ -29,7 +29,6 @@
  (data (i32.const 592) "\04\00\00\00\01\00\00\00\00\00\00\00\04\00\00\00\02\00\00\00")
  (data (i32.const 624) "^\00\00\00\01\00\00\00\01\00\00\00^\00\00\00E\00l\00e\00m\00e\00n\00t\00 \00t\00y\00p\00e\00 \00m\00u\00s\00t\00 \00b\00e\00 \00n\00u\00l\00l\00a\00b\00l\00e\00 \00i\00f\00 \00a\00r\00r\00a\00y\00 \00i\00s\00 \00h\00o\00l\00e\00y\00")
  (table $0 1 funcref)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
  (global $~lib/ASC_SHRINK_LEVEL i32 (i32.const 0))

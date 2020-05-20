@@ -30,7 +30,6 @@
  (data (i32.const 207) "\01")
  (data (i32.const 208) "\01")
  (table $0 1 funcref)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $memory/ptr (mut i32) (i32.const 80))
  (export "memory" (memory $0))
  (start $~start)

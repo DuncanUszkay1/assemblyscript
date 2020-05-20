@@ -17,7 +17,6 @@
  (data (i32.const 224) "\04\00\00\00\01\00\00\00\01\00\00\00\04\00\00\00I\00B\00")
  (data (i32.const 256) "\04\00\00\00\01\00\00\00\01\00\00\00\04\00\00\00I\00C\00")
  (table $0 1 funcref)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $class-overloading/which (mut i32) (i32.const 32))
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))

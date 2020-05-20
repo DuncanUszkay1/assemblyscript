@@ -5,7 +5,6 @@
  (memory $0 1)
  (data (i32.const 16) "\0e\00\00\00\01\00\00\00\01\00\00\00\0e\00\00\00b\00o\00o\00l\00.\00t\00s\00")
  (table $0 1 funcref)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $bool/i (mut i32) (i32.const 2))
  (global $bool/I (mut i64) (i64.const 2))
  (global $bool/u (mut i32) (i32.const 2))

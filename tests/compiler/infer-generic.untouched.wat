@@ -15,7 +15,6 @@
  (data (i32.const 96) "\10\00\00\00\01\00\00\00\03\00\00\00\10\00\00\00P\00\00\00P\00\00\00\0c\00\00\00\03\00\00\00")
  (table $0 2 funcref)
  (elem (i32.const 1) $start:infer-generic~anonymous|0~nonClosure)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $infer-generic/arr i32 (i32.const 112))
  (global $~argumentsLength (mut i32) (i32.const 0))
  (export "memory" (memory $0))

@@ -6,7 +6,6 @@
  (memory $0 1)
  (data (i32.const 16) "\12\00\00\00\01\00\00\00\01\00\00\00\12\00\00\00s\00w\00i\00t\00c\00h\00.\00t\00s\00")
  (table $0 1 funcref)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (export "memory" (memory $0))
  (start $~start)
  (func $switch/doSwitch (param $0 i32) (result i32)

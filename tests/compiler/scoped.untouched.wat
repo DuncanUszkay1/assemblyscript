@@ -3,7 +3,6 @@
  (type $i32_=>_none (func (param i32)))
  (memory $0 0)
  (table $0 1 funcref)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $scoped/aGlobal (mut i32) (i32.const 1))
  (global $scoped/aConstant i32 (i32.const 3))
  (global $scoped/aStartFunctionLocal (mut i32) (i32.const 2))

@@ -14,7 +14,6 @@
  (data (i32.const 528) "\04\00\00\00\01\00\00\00\01\00\00\00\04\00\00\004\002\00")
  (table $0 4 funcref)
  (elem (i32.const 1) $start:resolve-function-expression~anonymous|0~nonClosure $start:resolve-function-expression~anonymous|1~nonClosure $start:resolve-function-expression~anonymous|2~nonClosure)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $~argumentsLength (mut i32) (i32.const 0))
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))

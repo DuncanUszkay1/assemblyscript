@@ -17,7 +17,6 @@
  (data (i32.const 256) "\12\00\00\00\01\00\00\00\01\00\00\00\12\00\00\00u\00n\00d\00e\00f\00i\00n\00e\00d\00")
  (table $0 2 funcref)
  (elem (i32.const 1) $start:typeof~anonymous|0~nonClosure)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $typeof/SomeNamespace.a i32 (i32.const 1))
  (global $~lib/ASC_SHRINK_LEVEL i32 (i32.const 0))
  (global $typeof/b (mut i32) (i32.const 1))

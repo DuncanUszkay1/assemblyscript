@@ -8,7 +8,6 @@
  (memory $0 1)
  (data (i32.const 16) "\1a\00\00\00\01\00\00\00\01\00\00\00\1a\00\00\00i\00n\00s\00t\00a\00n\00c\00e\00o\00f\00.\00t\00s\00")
  (table $0 1 funcref)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $instanceof/a (mut i32) (i32.const 0))
  (global $instanceof/b (mut i32) (i32.const 0))
  (global $instanceof/i (mut i32) (i32.const 0))

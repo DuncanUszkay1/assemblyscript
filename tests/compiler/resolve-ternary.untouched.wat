@@ -34,7 +34,6 @@
  (data (i32.const 1808) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
  (table $0 5 funcref)
  (elem (i32.const 1) $start:resolve-ternary~anonymous|0~nonClosure $start:resolve-ternary~anonymous|1~nonClosure $resolve-ternary/g1 $resolve-ternary/g2)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))

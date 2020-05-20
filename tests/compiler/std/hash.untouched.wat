@@ -9,7 +9,6 @@
  (data (i32.const 64) "\04\00\00\00\01\00\00\00\01\00\00\00\04\00\00\00a\00b\00")
  (data (i32.const 96) "\06\00\00\00\01\00\00\00\01\00\00\00\06\00\00\00a\00b\00c\00")
  (table $0 1 funcref)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (export "memory" (memory $0))
  (start $~start)
  (func $~lib/rt/stub/__retain (param $0 i32) (result i32)

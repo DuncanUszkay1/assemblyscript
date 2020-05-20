@@ -6,7 +6,6 @@
  (memory $0 1)
  (data (i32.const 16) "\1c\00\00\00\01\00\00\00\01\00\00\00\1c\00\00\00m\00a\00n\00y\00-\00l\00o\00c\00a\00l\00s\00.\00t\00s\00")
  (table $0 1 funcref)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (export "memory" (memory $0))
  (export "testI32" (func $many-locals/testI32))
  (export "testI8" (func $many-locals/testI8))

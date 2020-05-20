@@ -2,7 +2,6 @@
  (type $none_=>_none (func))
  (memory $0 0)
  (table $0 1 funcref)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $~lib/builtins/i8.MIN_VALUE i32 (i32.const -128))
  (global $~lib/builtins/i8.MAX_VALUE i32 (i32.const 127))
  (global $~lib/builtins/i16.MIN_VALUE i32 (i32.const -32768))

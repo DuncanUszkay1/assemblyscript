@@ -11,7 +11,6 @@
  (data (i32.const 16) ",\00\00\00\01\00\00\00\01\00\00\00,\00\00\00f\00u\00n\00c\00t\00i\00o\00n\00-\00e\00x\00p\00r\00e\00s\00s\00i\00o\00n\00.\00t\00s\00")
  (table $0 12 funcref)
  (elem (i32.const 1) $start:function-expression~anonymous|0~nonClosure $start:function-expression~anonymous|1~nonClosure $start:function-expression~someName~nonClosure $start:function-expression~anonymous|2~nonClosure $start:function-expression~anonymous|3~nonClosure $start:function-expression~anonymous|4~nonClosure $start:function-expression~anonymous|5~nonClosure $function-expression/testOmittedReturn1~anonymous|0~nonClosure $function-expression/testOmittedReturn2~anonymous|0~nonClosure $function-expression/testOmittedReturn3~anonymous|0~nonClosure $function-expression/testNullable~anonymous|0~nonClosure)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $function-expression/f1 (mut i32) (i32.const 1))
  (global $~argumentsLength (mut i32) (i32.const 0))
  (global $function-expression/f2 (mut i32) (i32.const 2))

@@ -50,7 +50,6 @@
  (data (i32.const 8384) "\06\00\00\00\01\00\00\00\01\00\00\00\06\00\00\00r\00e\00m\00")
  (data (i32.const 8416) "\06\00\00\00\01\00\00\00\01\00\00\00\06\00\00\00p\00o\00w\00")
  (table $0 1 funcref)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $~lib/ASC_SHRINK_LEVEL i32 (i32.const 0))
  (global $resolve-binary/a (mut i32) (i32.const 0))
  (global $resolve-binary/f (mut f64) (f64.const 0))

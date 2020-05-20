@@ -24,7 +24,6 @@
  (data (i32.const 352) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00")
  (data (i32.const 416) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s\00")
  (table $0 1 funcref)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $std/staticarray/arr1 i32 (i32.const 32))
  (global $std/staticarray/arr2 i32 (i32.const 256))
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))

@@ -423,11 +423,9 @@ export class Compiler extends DiagnosticEmitter {
     if (options.isWasm64) {
       module.addGlobal(BuiltinNames.heap_base, NativeType.I64, true, module.i64(0));
       module.addGlobal(BuiltinNames.rtti_base, NativeType.I64, true, module.i64(0));
-      module.addGlobal(BuiltinNames.global_closure, NativeType.I64, true, module.i64(-1));
     } else {
       module.addGlobal(BuiltinNames.heap_base, NativeType.I32, true, module.i32(0));
       module.addGlobal(BuiltinNames.rtti_base, NativeType.I32, true, module.i32(0));
-      module.addGlobal(BuiltinNames.global_closure, NativeType.I32, true, module.i32(-1));
     }
 
     // compile entry file(s) while traversing reachable elements

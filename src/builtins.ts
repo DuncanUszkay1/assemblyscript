@@ -575,7 +575,6 @@ export namespace BuiltinNames {
   export const rtti_base = "~lib/rt/__rtti_base";
   export const visit_globals = "~lib/rt/__visit_globals";
   export const visit_members = "~lib/rt/__visit_members";
-  export const global_closure = "~lib/closure/__global_closure";
 
   // std/number.ts
   export const isNaN = "~lib/number/isNaN";

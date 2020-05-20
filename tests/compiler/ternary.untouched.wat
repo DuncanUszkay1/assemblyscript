@@ -2,7 +2,6 @@
  (type $none_=>_none (func))
  (memory $0 0)
  (table $0 1 funcref)
- (global $~lib/closure/__global_closure (mut i32) (i32.const -1))
  (global $ternary/a (mut i32) (i32.const 0))
  (export "memory" (memory $0))
  (start $~start)
