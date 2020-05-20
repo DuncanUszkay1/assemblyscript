@@ -8148,7 +8148,8 @@ export class Compiler extends DiagnosticEmitter {
         prototype,
         null,
         prototype.isAnonymous ? signature.toClosureSignature() : signature,
-        contextualTypeArguments
+        contextualTypeArguments,
+        prototype.isAnonymous ? this.program.options.usizeType : null
       );
       if (!this.compileFunction(instance)) return this.module.unreachable();
     // otherwise compile like a normal function
@@ -8494,7 +8495,7 @@ export class Compiler extends DiagnosticEmitter {
       }
       case ElementKind.CLOSEDLOCAL: {
         let closedLocal = <ClosedLocal>target;
-        let contextLocal = flow.lookupLocal(CommonNames.this_) || actualFunction.addLocal(Type.i32, CommonNames.this_, null);
+        let contextLocal = assert(flow.lookupLocal(CommonNames.this_));
 
         // TODO: replace this with a class field access, once we are able to construct the class before
         // compiling

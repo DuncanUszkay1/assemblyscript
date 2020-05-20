@@ -1107,7 +1107,7 @@
   end
  )
  (func $closure/testParam~inner (param $0 i32) (param $1 i32) (result i32)
-  local.get $1
+  local.get $0
   i32.load offset=4
  )
  (func $closure/complexCreateClosure~anonymous|0 (param $0 i32) (param $1 i32) (result i32)

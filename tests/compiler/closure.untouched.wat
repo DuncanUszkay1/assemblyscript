@@ -1539,8 +1539,7 @@
   end
  )
  (func $closure/testParam~inner (param $0 i32) (param $1 i32) (result i32)
-  (local $2 i32)
-  local.get $1
+  local.get $0
   i32.load offset=4
  )
  (func $~lib/closure|3#constructor (param $0 i32) (result i32)
@@ -1624,8 +1623,7 @@
   local.get $5
  )
  (func $closure/testVar~inner (param $0 i32) (param $1 i32) (result i32)
-  (local $2 i32)
-  local.get $1
+  local.get $0
   i32.load offset=4
  )
  (func $~lib/closure|4#constructor (param $0 i32) (result i32)
@@ -2302,7 +2300,6 @@
   local.get $3
  )
  (func $closure/runInline~anonymous|0 (param $0 i32) (result i32)
-  (local $1 i32)
   local.get $0
   i32.load offset=4
   local.get $0
