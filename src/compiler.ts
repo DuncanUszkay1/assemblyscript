@@ -6654,13 +6654,16 @@ export class Compiler extends DiagnosticEmitter {
         return module.unreachable();
       }
     }
+    //Once we get here, we have a function reference. With the new scheme, this function
+    //could possibly be a closure. So here we check to see if it's a closure, then apply
+    //the appropriate call logic
     var returnType = signature.returnType;
     var tempFunctionReferenceLocal = this.currentFlow.getTempLocal(Type.i32);
     return module.block(null, [
       module.local_set(tempFunctionReferenceLocal.index, indexArg),
       this.ifClosure(
         module.local_get(tempFunctionReferenceLocal.index, NativeType.I32),
-        this.compileCallIndirect(
+        this.compileCallIndirect( //If this is a closure
           assert(signature).toClosureSignature(), // FIXME: asc can't see this yet
           module.block(null, [
             module.load(
@@ -6680,7 +6683,7 @@ export class Compiler extends DiagnosticEmitter {
           ),
           contextualType == Type.void
         ),
-        this.compileCallIndirect(
+        this.compileCallIndirect( //If this function isn't a closure
           assert(signature), // FIXME: asc can't see this yet
           module.local_get(tempFunctionReferenceLocal.index, NativeType.I32),
           expression.arguments,
