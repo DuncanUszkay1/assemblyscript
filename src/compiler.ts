@@ -3548,25 +3548,21 @@ export class Compiler extends DiagnosticEmitter {
       }
       var toSignature = toType.signatureReference
       var fromSignature = fromType.signatureReference
-      if(toSignature && fromSignature && fromSignature.externalEquals(toSignature)) {
-        if(fromType.is(TypeFlags.CLOSURE)) {
-          // When we convert from the closure type into a function pointer, we first
-          // update the local copy of the scope with the newest values
-          var tempResult = this.currentFlow.getTempLocal(fromType);
-          var convertExpr = module.block(null, [
-            module.local_set(
-              tempResult.index,
-              expr
-            ),
-            this.injectClosedLocals(tempResult),
-            this.getClosureReference(module.local_get(tempResult.index, Type.i32.toNativeType()))
-          ], toType.toNativeType())
+      if(toSignature && fromSignature && fromSignature.externalEquals(toSignature) && fromType.is(TypeFlags.CLOSURE)) {
+        // When we convert from the closure type into a function pointer, we first
+        // update the local copy of the scope with the newest values
+        var tempResult = this.currentFlow.getTempLocal(fromType);
+        var convertExpr = module.block(null, [
+          module.local_set(
+            tempResult.index,
+            expr
+          ),
+          this.injectClosedLocals(tempResult),
+          this.getClosureReference(module.local_get(tempResult.index, Type.i32.toNativeType()))
+        ], toType.toNativeType())
 
-          //this.currentFlow.freeTempLocal(tempResult);
-          return convertExpr;
-        } else { //todo, make you sure can't somehow pass an instance method here
-          return expr;
-        }
+        //this.currentFlow.freeTempLocal(tempResult);
+        return convertExpr;
       }
       if (fromType.isAssignableTo(toType)) { // downcast or same
         assert(fromType.kind == toType.kind);
