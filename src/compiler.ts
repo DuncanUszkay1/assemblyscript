@@ -8159,8 +8159,7 @@ export class Compiler extends DiagnosticEmitter {
     }
 
     // if this anonymous function turns out to be a non-closure, recompile a version
-    // of the function without context, and ignore the other index. Since the index is ignore
-    // the closure version of this function will never be used, and will be optimized out
+    // of the function without context, deleting the previous function 
     if (instance.closedLocals.size == 0 && instance.prototype.isAnonymous) {
       this.module.removeFunction(instance.internalName)
       instance = new Function(
