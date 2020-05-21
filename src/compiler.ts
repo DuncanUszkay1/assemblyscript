@@ -3546,9 +3546,9 @@ export class Compiler extends DiagnosticEmitter {
         }
         fromType = fromType.nonNullableType;
       }
-      var toSignature = toType.signatureReference
-      var fromSignature = fromType.signatureReference
-      if(toSignature && fromSignature && fromSignature.externalEquals(toSignature) && fromType.is(TypeFlags.CLOSURE)) {
+      var toSignature = toType.signatureReference;
+      var fromSignature = fromType.signatureReference;
+      if (toSignature !== null && fromSignature !== null && fromSignature.externalEquals(toSignature) && fromType.is(TypeFlags.CLOSURE)) {
         // When we convert from the closure type into a function pointer, we first
         // update the local copy of the scope with the newest values
         var tempResult = this.currentFlow.getTempLocal(fromType);
@@ -6411,21 +6411,23 @@ export class Compiler extends DiagnosticEmitter {
   ): ExpressionRef {
     var module = this.module;
     var type = closureContextLocal.type;
-    var locals = type.locals!;
+    var locals = assert(type.locals);
     let _values = Map_values(locals);
     var exprs = new Array<ExpressionRef>(_values.length);
+    assert(type.is(TypeFlags.REFERENCE));
+    var closureClass = assert(type.classReference);
     for (let i = 0, k = _values.length; i < k; ++i) {
       let local = unchecked(_values[i]);
-      let closureClass= type.classReference!
+      let nativeType = local.type.toNativeType();
       exprs[i] = module.store(
         local.type.byteSize,
         module.local_get(closureContextLocal.index, NativeType.I32),
-        module.local_get(local.index, local.type.toNativeType()),
-        local.type.toNativeType(),
+        module.local_get(local.index, nativeType),
+        nativeType,
         closureClass.offsetof(local.name)
-      )
+      );
     }
-    return module.block(null, exprs)
+    return module.block(null, exprs);
   }
 
   /** Compiles a call expression according to the specified context. */
@@ -6529,7 +6531,7 @@ export class Compiler extends DiagnosticEmitter {
       case ElementKind.LOCAL: {
         let local = <Local>target;
         signature = local.type.signatureReference!;
-        if(local.type.is(TypeFlags.CLOSURE)) {
+        if (local.type.is(TypeFlags.CLOSURE)) {
           // If we're calling a local we know to be a closure, then we must still be in the creator functions
           // scope. Because of this, we should update the values of locals that are still available
           return module.block(null, [
@@ -6548,7 +6550,7 @@ export class Compiler extends DiagnosticEmitter {
               module.local_get(local.index, this.options.nativeSizeType),
               contextualType == Type.void
             )
-          ], signature.returnType.toNativeType())
+          ], signature.returnType.toNativeType());
         }
         if (signature) {
           if (local.is(CommonFlags.INLINED)) {
@@ -7355,8 +7357,8 @@ export class Compiler extends DiagnosticEmitter {
 
     var retainInstance = this.program.retainInstance;
     this.compileFunction(retainInstance);
-    if (type && type.isFunction) {
-      var exprLocal = this.currentFlow.getTempLocal(type)
+    if (type !== null && type.isFunction) {
+      var exprLocal = this.currentFlow.getTempLocal(type);
       var functionRetainCall = module.block(null, [
         module.local_set(exprLocal.index, expr),
         module.drop(
@@ -7373,14 +7375,14 @@ export class Compiler extends DiagnosticEmitter {
           )
         ),
         module.local_get(exprLocal.index, type.toNativeType())
-      ], type.toNativeType())
+      ], type.toNativeType());
 
-      //this.currentFlow.freeTempLocal(exprLocal)
+      //this.currentFlow.freeTempLocal(exprLocal);
 
-      return functionRetainCall
+      return functionRetainCall;
     }
 
-    return module.call(retainInstance.internalName, [ expr ], this.options.nativeSizeType)
+    return module.call(retainInstance.internalName, [ expr ], this.options.nativeSizeType);
   }
 
   /** Makes a release call, releasing the expression's value. Changes the current type to void.*/
@@ -7390,8 +7392,8 @@ export class Compiler extends DiagnosticEmitter {
     var releaseInstance = this.program.releaseInstance;
     this.compileFunction(releaseInstance);
 
-    if (type && type.isFunction) {
-      var exprLocal = this.currentFlow.getTempLocal(type)
+    if (type !== null && type.isFunction) {
+      var exprLocal = this.currentFlow.getTempLocal(type);
       var functionReleaseCall = module.block(null, [
         module.local_set(exprLocal.index, expr),
         module.call(
@@ -7405,12 +7407,12 @@ export class Compiler extends DiagnosticEmitter {
           ],
           NativeType.None
         )
-      ], NativeType.None)
+      ], NativeType.None);
 
       // TODO: fix a bug in which this free causes some overwrites
-      //this.currentFlow.freeTempLocal(exprLocal)
+      //this.currentFlow.freeTempLocal(exprLocal);
 
-      return functionReleaseCall
+      return functionReleaseCall;
     }
     return this.module.call(releaseInstance.internalName, [ expr ], NativeType.None);
   }

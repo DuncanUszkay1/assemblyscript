@@ -185,7 +185,7 @@ export class Type {
   }
 
   get isFunction(): bool {
-    return this.signatureReference !== null && this.classReference == null
+    return this.signatureReference !== null && !this.classReference;
   }
 
   /** Computes the sign-extending shift in the target type. */
@@ -673,7 +673,7 @@ export class Signature {
       return false;
     }
 
-    return this.externalEquals(other)
+    return this.externalEquals(other);
   }
 
   /** Tests if a value of this function type is assignable to a target of the specified function type. */
@@ -743,15 +743,15 @@ export class Signature {
   }
 
   toClosureSignature(): Signature {
-    var closureSignature = this.clone()
-    closureSignature.thisType = this.program.options.usizeType
-    return closureSignature
+    var closureSignature = this.clone();
+    closureSignature.thisType = this.program.options.usizeType;
+    return closureSignature;
   }
 
   // Reverses toClosureSignature, for when we recompile a function with the context argument
   // Not convinced this is the right way to go about getting the original unmodified signature, but it works
   toAnonymousSignature(): Signature {
-    var normalSignature = this.clone()
+    var normalSignature = this.clone();
     normalSignature.thisType = null;
     return normalSignature;
   }
@@ -774,7 +774,7 @@ export class Signature {
       }
       clone.parameterNames = cloneParameterNames;
     }
-    clone.requiredParameters = this.requiredParameters
+    clone.requiredParameters = this.requiredParameters;
     return clone;
   }
 }
