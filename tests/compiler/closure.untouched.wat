@@ -1716,7 +1716,7 @@
   i32.load offset=8
   i32.add
   local.get $0
-  i32.load offset=16
+  i32.load offset=12
   i32.sub
  )
  (func $~lib/closure|5#constructor (param $0 i32) (result i32)
@@ -1786,7 +1786,7 @@
   i32.load offset=8
   i32.sub
   local.get $0
-  i32.load offset=16
+  i32.load offset=12
   i32.add
  )
  (func $~lib/closure|6#constructor (param $0 i32) (result i32)
@@ -2306,7 +2306,7 @@
   i32.load offset=8
   i32.add
   local.get $0
-  i32.load offset=16
+  i32.load offset=12
   i32.add
  )
  (func $~lib/closure|9#constructor (param $0 i32) (result i32)

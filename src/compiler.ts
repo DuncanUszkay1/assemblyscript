@@ -3559,7 +3559,7 @@ export class Compiler extends DiagnosticEmitter {
           ),
           this.injectClosedLocals(tempResult),
           this.getClosureReference(module.local_get(tempResult.index, Type.i32.toNativeType()))
-        ], toType.toNativeType())
+        ], toType.toNativeType());
 
         //this.currentFlow.freeTempLocal(tempResult);
         return convertExpr;
@@ -6656,16 +6656,16 @@ export class Compiler extends DiagnosticEmitter {
         return module.unreachable();
       }
     }
-    //Once we get here, we have a function reference. With the new scheme, this function
-    //could possibly be a closure. So here we check to see if it's a closure, then apply
-    //the appropriate call logic
+    // Once we get here, we have a function reference. With the new scheme, this function
+    // could possibly be a closure. So here we check to see if it's a closure, then apply
+    // the appropriate call logic
     var returnType = signature.returnType;
     var tempFunctionReferenceLocal = this.currentFlow.getTempLocal(Type.i32);
     return module.block(null, [
       module.local_set(tempFunctionReferenceLocal.index, indexArg),
       this.ifClosure(
         module.local_get(tempFunctionReferenceLocal.index, NativeType.I32),
-        this.compileCallIndirect( //If this is a closure
+        this.compileCallIndirect( // If this is a closure
           assert(signature).toClosureSignature(), // FIXME: asc can't see this yet
           module.block(null, [
             module.load(
@@ -6685,7 +6685,7 @@ export class Compiler extends DiagnosticEmitter {
           ),
           contextualType == Type.void
         ),
-        this.compileCallIndirect( //If this function isn't a closure
+        this.compileCallIndirect( // If this function isn't a closure
           assert(signature), // FIXME: asc can't see this yet
           module.local_get(tempFunctionReferenceLocal.index, NativeType.I32),
           expression.arguments,
@@ -7359,23 +7359,26 @@ export class Compiler extends DiagnosticEmitter {
     this.compileFunction(retainInstance);
     if (type !== null && type.isFunction) {
       var exprLocal = this.currentFlow.getTempLocal(type);
+      var exprLocalIndex = exprLocal.index;
+      var nativeType = type.toNativeType();
+      var usize = this.options.nativeSizeType;
       var functionRetainCall = module.block(null, [
-        module.local_set(exprLocal.index, expr),
+        module.local_set(exprLocalIndex, expr),
         module.drop(
           module.call(
             retainInstance.internalName,
             [
               this.ifClosure(
-                module.local_get(exprLocal.index, type.toNativeType()),
-                this.getClosurePtr(module.local_get(exprLocal.index, type.toNativeType())),
-                module.i32(0)
+                module.local_get(exprLocalIndex, nativeType),
+                this.getClosurePtr(module.local_get(exprLocalIndex, nativeType)),
+                usize == NativeType.I32 ? module.i32(0) : module.i64(0)
               )
             ],
-            this.options.nativeSizeType
+            usize
           )
         ),
-        module.local_get(exprLocal.index, type.toNativeType())
-      ], type.toNativeType());
+        module.local_get(exprLocalIndex, nativeType)
+      ], nativeType);
 
       //this.currentFlow.freeTempLocal(exprLocal);
 
@@ -7394,15 +7397,16 @@ export class Compiler extends DiagnosticEmitter {
 
     if (type !== null && type.isFunction) {
       var exprLocal = this.currentFlow.getTempLocal(type);
+      var exprLocalIndex = exprLocal.index;
       var functionReleaseCall = module.block(null, [
-        module.local_set(exprLocal.index, expr),
+        module.local_set(exprLocalIndex, expr),
         module.call(
           releaseInstance.internalName,
           [
             this.ifClosure(
-              module.local_get(exprLocal.index, type.toNativeType()),
-              this.getClosurePtr(module.local_get(exprLocal.index, NativeType.I32)),
-              module.i32(0)
+              module.local_get(exprLocalIndex, type.toNativeType()),
+              this.getClosurePtr(module.local_get(exprLocalIndex, NativeType.I32)),
+              this.options.nativeSizeType == NativeType.I32 ? module.i32(0) : module.i64(0)
             )
           ],
           NativeType.None
@@ -8164,7 +8168,7 @@ export class Compiler extends DiagnosticEmitter {
     // if this anonymous function turns out to be a non-closure, recompile a version
     // of the function without context, deleting the previous function
     if (instance.closedLocals.size == 0 && instance.prototype.isAnonymous) {
-      this.module.removeFunction(instance.internalName)
+      this.module.removeFunction(instance.internalName);
       instance = new Function(
         instance.prototype.name + "~nonClosure",
         instance.prototype,
@@ -8172,7 +8176,7 @@ export class Compiler extends DiagnosticEmitter {
         instance.signature.toAnonymousSignature(),
         contextualTypeArguments
       );
-      this.compileFunction(instance)
+      this.compileFunction(instance);
     }
     this.currentType = instance.signature.type;
 
@@ -8181,37 +8185,40 @@ export class Compiler extends DiagnosticEmitter {
     if(index < 0) return this.module.unreachable();
 
     if(instance.closedLocals.size > 0) {
-      //Create field declarations for the function and each closed local
+      // Create field declarations for the function and each closed local
       var members = Array<DeclarationStatement>(instance.closedLocals.size + 1);
       members[0] = this.program.makeNativeMember("__functionPtr", "u32")
       for (let _values = Map_values(instance.closedLocals), i = 0, k = _values.length; i < k; ++i) {
         let local = unchecked(_values[i]);
-        members[i + 1] = this.program.makeNativeMember(local.name, local.type.intType.toString())
+        members[i + 1] = this.program.makeNativeMember(local.name, local.type.intType.toString());
       }
 
-      //Create a native class prototype with a dummy syntax tree, similar to native functions
+      // Create a native class prototype with a dummy syntax tree, similar to native functions
       var closureClassPrototype = assert(this.program.makeNativeClassPrototype(
         "closure|" + this.program.nextClassId.toString(),
         members
       ));
 
-      //Resolve this prototype to get the class
+      // Resolve this prototype to get the class
       var closureClass = this.resolver.resolveClass(closureClassPrototype, null)!;
 
-      //Compile this class to get the type
+      // Compile this class to get the type
       this.compileClass(closureClass);
 
-      //Append the appropriate signature and flags for this closure type, then set it to currentType
+      // Append the appropriate signature and flags for this closure type, then set it to currentType
       this.currentType = closureClass.type.asClosure(instance.signature)
 
-      //create a local which will hold our closure class instance
+      // create a local which will hold our closure class instance
       var tempLocal = flow.getAutoreleaseLocal(this.currentType);
+      var tempLocalIndex = tempLocal.index;
 
-      //copied closed locals into type
+      // copied closed locals into type
       this.currentType.locals = instance.closedLocals;
 
+      var usize = this.options.nativeSizeType;
+
       var closureExpr = this.module.flatten([
-        this.module.local_set( //Allocate memory for the closure
+        this.module.local_set( // Allocate memory for the closure
           tempLocal.index,
           this.makeRetain(
             this.module.call(this.program.allocInstance.internalName, [
@@ -8220,15 +8227,15 @@ export class Compiler extends DiagnosticEmitter {
             ], NativeType.I32)
           )
         ),
-        this.module.store( //Store the function pointer at the first index
+        this.module.store( // Store the function pointer at the first index
           4,
-          this.module.local_get(tempLocal.index, this.options.nativeSizeType),
+          this.module.local_get(tempLocalIndex, usize),
           this.module.i32(index),
           NativeType.I32,
           0
         ),
-        this.module.local_get(tempLocal.index, this.options.nativeSizeType) //load the closure locals index
-      ], this.options.nativeSizeType);
+        this.module.local_get(tempLocalIndex, usize) // load the closure locals index
+      ], usize);
 
       //flow.freeTempLocal(tempLocal);
 
@@ -8244,16 +8251,17 @@ export class Compiler extends DiagnosticEmitter {
     elseExpr: ExpressionRef
   ): ExpressionRef {
     var module = this.module;
+    var wasm64 = this.options.nativeSizeType == NativeType.I64
 
     return module.if(
       module.binary(
-        BinaryOp.EqI32,
+        wasm64 ? BinaryOp.EqI64 : BinaryOp.EqI32,
         module.binary(
-          BinaryOp.AndI32,
+          wasm64 ? BinaryOp.AndI64 : BinaryOp.AndI32,
           indexExpr,
-          module.i32(CLOSURE_TAG)
+          wasm64 ? module.i64(CLOSURE_TAG) : module.i32(CLOSURE_TAG)
         ),
-        module.i32(CLOSURE_TAG)
+        wasm64 ? module.i64(CLOSURE_TAG) : module.i32(CLOSURE_TAG)
       ),
       thenExpr,
       elseExpr
@@ -8262,25 +8270,27 @@ export class Compiler extends DiagnosticEmitter {
 
   private getClosurePtr(closureExpr: ExpressionRef): ExpressionRef {
     var module = this.module;
+    var wasm64 = this.options.nativeSizeType == NativeType.I64
 
     return module.binary(
-      BinaryOp.ShlI32,
+      wasm64 ? BinaryOp.ShlI64 : BinaryOp.ShlI32,
       closureExpr,
-      module.i32(4)
+      wasm64 ? module.i64(4) : module.i32(4)
     )
   }
 
   private getClosureReference(closureExpr: ExpressionRef): ExpressionRef {
     var module = this.module;
+    var wasm64 = this.options.nativeSizeType == NativeType.I64
 
     return module.binary(
-      BinaryOp.OrI32,
+      wasm64 ? BinaryOp.OrI64 : BinaryOp.OrI32,
       module.binary(
-        BinaryOp.ShrI32,
+        wasm64 ? BinaryOp.ShrI64 : BinaryOp.ShrI32,
         closureExpr,
-        module.i32(4)
+        wasm64 ? module.i64(4) : module.i32(4)
       ),
-      module.i32(CLOSURE_TAG)
+      wasm64 ? module.i64(CLOSURE_TAG) : module.i32(CLOSURE_TAG)
     )
   }
 
@@ -8504,7 +8514,7 @@ export class Compiler extends DiagnosticEmitter {
         return module.load(
           closedLocal.type.byteSize,
           true,
-          this.module.local_get(contextLocal.index, NativeType.I32),
+          this.module.local_get(contextLocal.index, this.options.nativeSizeType),
           closedLocal.type.toNativeType(),
           closedLocal.offset
         );
@@ -8914,8 +8924,7 @@ export class Compiler extends DiagnosticEmitter {
             program.options.isWasm64
               ? module.i64(0)
               : module.i32(0)
-          ], expression),
-          program.options.isWasm64 ? Type.i32 : Type.i64
+          ], expression)
         )
       )
     );

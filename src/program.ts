@@ -688,7 +688,7 @@ export class Program extends DiagnosticEmitter {
       null,
       CommonFlags.INSTANCE,
       this.nativeSource.range
-    )
+    );
   }
 
   makeNativeClassDeclaration(name: string, members: DeclarationStatement[]): ClassDeclaration {
@@ -701,7 +701,7 @@ export class Program extends DiagnosticEmitter {
       null,
       0,
       this.nativeSource.range
-    )
+    );
   }
 
   makeNativeClassPrototype(name: string, members: DeclarationStatement[]): ClassPrototype | null {
@@ -710,7 +710,7 @@ export class Program extends DiagnosticEmitter {
       this.nativeFile,
       [],
       []
-    )
+    );
   }
 
   /** Gets the (possibly merged) program element linked to the specified declaration. */
@@ -3283,7 +3283,7 @@ export class FunctionPrototype extends DeclaredElement {
 
   get isAnonymous(): bool {
     var parent = this.parent;
-    return parent.kind == ElementKind.FUNCTION
+    return parent.kind == ElementKind.FUNCTION;
   }
 
   /** Creates a clone of this prototype that is bound to a concrete class instead. */
@@ -3485,7 +3485,7 @@ export class Function extends TypedElement {
         return null;
       }
       if (parentResult.kind == ElementKind.LOCAL) {
-        let local = changetype<Local>(parentResult)
+        let local = changetype<Local>(parentResult);
         if (this.closedLocals.has(local.name)) return assert(this.closedLocals.get(local.name));
         let mask = local.type.byteSize - 1;
         let memoryOffset = this.nextGlobalClosureOffset;

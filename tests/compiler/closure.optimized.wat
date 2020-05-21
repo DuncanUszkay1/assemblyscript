@@ -1117,12 +1117,12 @@
   i32.load offset=8
   i32.add
   local.get $0
-  i32.load offset=16
+  i32.load offset=12
   i32.sub
  )
  (func $closure/complexCreateClosure~anonymous|1 (param $0 i32) (param $1 i32) (result i32)
   local.get $0
-  i32.load offset=16
+  i32.load offset=12
   local.get $0
   i32.load offset=4
   local.get $0
@@ -1308,7 +1308,7 @@
  )
  (func $closure/runInline~anonymous|0 (param $0 i32) (result i32)
   local.get $0
-  i32.load offset=16
+  i32.load offset=12
   local.get $0
   i32.load offset=4
   local.get $0
