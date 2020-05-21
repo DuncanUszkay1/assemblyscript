@@ -3557,7 +3557,7 @@ export class Compiler extends DiagnosticEmitter {
             expr
           ),
           this.injectClosedLocals(tempResult),
-          this.getClosureReference(module.local_get(tempResult.index, Type.i32.toNativeType()))
+          this.getClosureReference(module.local_get(tempResult.index, fromType.toNativeType()))
         ], toType.toNativeType());
 
         //this.currentFlow.freeTempLocal(tempResult);
@@ -6419,7 +6419,7 @@ export class Compiler extends DiagnosticEmitter {
       let nativeType = local.type.toNativeType();
       exprs[i] = module.store(
         local.type.byteSize,
-        module.local_get(closureContextLocal.index, NativeType.I32),
+        module.local_get(closureContextLocal.index, this.options.nativeSizeType),
         module.local_get(local.index, nativeType),
         nativeType,
         closureClass.offsetof(local.name)
@@ -6658,11 +6658,12 @@ export class Compiler extends DiagnosticEmitter {
     // could possibly be a closure. So here we check to see if it's a closure, then apply
     // the appropriate call logic
     var returnType = signature.returnType;
-    var tempFunctionReferenceLocal = this.currentFlow.getTempLocal(Type.i32);
+    var tempFunctionReferenceLocal = this.currentFlow.getTempLocal(this.options.usizeType);
+    var usize = this.options.nativeSizeType;
     return module.block(null, [
       module.local_set(tempFunctionReferenceLocal.index, indexArg),
       this.ifClosure(
-        module.local_get(tempFunctionReferenceLocal.index, NativeType.I32),
+        module.local_get(tempFunctionReferenceLocal.index, usize),
         this.compileCallIndirect( // If this is a closure
           assert(signature).toClosureSignature(), // FIXME: asc can't see this yet
           module.block(null, [
@@ -6670,22 +6671,22 @@ export class Compiler extends DiagnosticEmitter {
               4,
               true,
               this.getClosurePtr(
-                module.local_get(tempFunctionReferenceLocal.index, NativeType.I32),
+                module.local_get(tempFunctionReferenceLocal.index, usize),
               ),
-              NativeType.I32,
+              usize,
               0
             ),
           ], this.options.nativeSizeType),
           expression.arguments,
           expression,
           this.getClosurePtr(
-            module.local_get(tempFunctionReferenceLocal.index, NativeType.I32),
+            module.local_get(tempFunctionReferenceLocal.index, usize),
           ),
           contextualType == Type.void
         ),
         this.compileCallIndirect( // If this function isn't a closure
           assert(signature), // FIXME: asc can't see this yet
-          module.local_get(tempFunctionReferenceLocal.index, NativeType.I32),
+          module.local_get(tempFunctionReferenceLocal.index, usize),
           expression.arguments,
           expression,
           0,
@@ -7396,14 +7397,15 @@ export class Compiler extends DiagnosticEmitter {
     if (type !== null && type.isFunction) {
       var exprLocal = this.currentFlow.getTempLocal(type);
       var exprLocalIndex = exprLocal.index;
+      var nativeType = type.toNativeType()
       var functionReleaseCall = module.block(null, [
         module.local_set(exprLocalIndex, expr),
         module.call(
           releaseInstance.internalName,
           [
             this.ifClosure(
-              module.local_get(exprLocalIndex, type.toNativeType()),
-              this.getClosurePtr(module.local_get(exprLocalIndex, NativeType.I32)),
+              module.local_get(exprLocalIndex, nativeType),
+              this.getClosurePtr(module.local_get(exprLocalIndex, nativeType)),
               this.options.nativeSizeType == NativeType.I32 ? module.i32(0) : module.i64(0)
             )
           ],
@@ -8182,10 +8184,14 @@ export class Compiler extends DiagnosticEmitter {
 
     if(index < 0) return this.module.unreachable();
 
+    var usize = this.options.usizeType;
+    var nativeUsize = this.options.nativeSizeType;
+    var wasm64 = nativeUsize == NativeType.I64;
+
     if(instance.closedLocals.size > 0) {
       // Create field declarations for the function and each closed local
       var members = Array<DeclarationStatement>(instance.closedLocals.size + 1);
-      members[0] = this.program.makeNativeMember("__functionPtr", "u32")
+      members[0] = this.program.makeNativeMember("__functionPtr", usize.toString())
       for (let _values = Map_values(instance.closedLocals), i = 0, k = _values.length; i < k; ++i) {
         let local = unchecked(_values[i]);
         members[i + 1] = this.program.makeNativeMember(local.name, local.type.intType.toString());
@@ -8213,34 +8219,33 @@ export class Compiler extends DiagnosticEmitter {
       // copied closed locals into type
       this.currentType.locals = instance.closedLocals;
 
-      var usize = this.options.nativeSizeType;
 
       var closureExpr = this.module.flatten([
         this.module.local_set( // Allocate memory for the closure
-          tempLocal.index,
+          tempLocalIndex,
           this.makeRetain(
             this.module.call(this.program.allocInstance.internalName, [
-              this.module.i32(closureClass.type.byteSize),
-              this.module.i32(closureClass.id)
-            ], NativeType.I32)
+              wasm64 ? this.module.i64(closureClass.type.byteSize) : this.module.i32(closureClass.type.byteSize),
+              wasm64 ? this.module.i64(closureClass.id) : this.module.i32(closureClass.id)
+            ], nativeUsize)
           )
         ),
         this.module.store( // Store the function pointer at the first index
           4,
-          this.module.local_get(tempLocalIndex, usize),
-          this.module.i32(index),
-          NativeType.I32,
+          this.module.local_get(tempLocalIndex, nativeUsize),
+          wasm64 ? this.module.i64(index) : this.module.i32(index),
+          nativeUsize,
           0
         ),
-        this.module.local_get(tempLocalIndex, usize) // load the closure locals index
-      ], usize);
+        this.module.local_get(tempLocalIndex, nativeUsize) // load the closure locals index
+      ], nativeUsize);
 
       //flow.freeTempLocal(tempLocal);
 
       return closureExpr;
     }
 
-    return this.module.i32(index);
+    return wasm64 ? this.module.i64(index) : this.module.i32(index);
   }
 
   private ifClosure(
