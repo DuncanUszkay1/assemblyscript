@@ -3487,8 +3487,11 @@ export class Function extends TypedElement {
       if(parentResult.kind == ElementKind.LOCAL) {
         let local = changetype<Local>(parentResult)
         if(this.closedLocals.has(local.name)) return assert(this.closedLocals.get(local.name))
-        var closedLocal = local.close(this.nextGlobalClosureOffset);
-        this.nextGlobalClosureOffset += local.type.byteSize;
+        let mask = local.type.byteSize - 1;
+        let memoryOffset = this.nextGlobalClosureOffset;
+        if (memoryOffset & mask) memoryOffset = (memoryOffset | mask) + 1;
+        var closedLocal = local.close(memoryOffset);
+        this.nextGlobalClosureOffset += this.nextGlobalClosureOffset;
         this.closedLocals.set(local.name, closedLocal)
         return closedLocal;
       }
