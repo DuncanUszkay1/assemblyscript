@@ -2784,8 +2784,7 @@ export class Resolver extends DiagnosticEmitter {
       prototype,
       typeArguments,
       signature,
-      ctxTypes,
-      prototype.isAnonymous ? this.program.options.usizeType : null
+      ctxTypes
     );
     prototype.setResolvedInstance(instanceKey, instance);
     return instance;

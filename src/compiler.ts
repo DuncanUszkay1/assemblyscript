@@ -8149,8 +8149,7 @@ export class Compiler extends DiagnosticEmitter {
         prototype,
         null,
         prototype.isAnonymous ? signature.toClosureSignature() : signature,
-        contextualTypeArguments,
-        prototype.isAnonymous ? this.program.options.usizeType : null
+        contextualTypeArguments
       );
       if (!this.compileFunction(instance)) return this.module.unreachable();
     // otherwise compile like a normal function

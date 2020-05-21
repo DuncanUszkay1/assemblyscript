@@ -3384,8 +3384,6 @@ export class Function extends TypedElement {
     signature: Signature, // pre-resolved
     /** Contextual type arguments inherited from its parent class, if any. */
     contextualTypeArguments: Map<string,Type> | null = null,
-    /** Context Argument */
-    contextArgument: Type | null = null
   ) {
     super(
       ElementKind.FUNCTION,
@@ -3405,11 +3403,11 @@ export class Function extends TypedElement {
     this.type = program.options.usizeType.asFunction(signature);
     if (!prototype.is(CommonFlags.AMBIENT)) {
       let localIndex = 0;
-      if (this.is(CommonFlags.INSTANCE) || contextArgument) {
+      if (signature.thisType) {
         let local = new Local(
           CommonNames.this_,
           localIndex++,
-          contextArgument || assert(signature.thisType),
+          signature.thisType,
           this
         );
         this.localsByName.set(CommonNames.this_, local);
