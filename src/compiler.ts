@@ -6528,6 +6528,7 @@ export class Compiler extends DiagnosticEmitter {
       // indirect call: index argument with signature (non-generic, can't be inlined)
       case ElementKind.LOCAL: {
         let local = <Local>target;
+        let nativeSizeType = this.options.nativeSizeType;
         signature = assert(local.type.signatureReference);
         if (local.type.is(TypeFlags.CLOSURE)) {
           // If we're calling a local we know to be a closure, then we must still be in the creator functions
@@ -6539,13 +6540,13 @@ export class Compiler extends DiagnosticEmitter {
               module.load(
                 local.type.byteSize,
                 local.type.is(TypeFlags.SIGNED),
-                module.local_get(local.index, this.options.nativeSizeType),
+                module.local_get(local.index, nativeSizeType),
                 this.options.nativeSizeType,
                 0
               ),
               expression.arguments,
               expression,
-              module.local_get(local.index, this.options.nativeSizeType),
+              module.local_get(local.index, nativeSizeType),
               contextualType == Type.void
             )
           ], signature.returnType.toNativeType());
