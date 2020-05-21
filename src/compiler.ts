@@ -8435,7 +8435,7 @@ export class Compiler extends DiagnosticEmitter {
           // compiling
           return module.load(
             local.type.byteSize,
-            true,
+            local.type.is(TypeFlags.SIGNED),
             this.module.local_get(contextLocal.index, this.options.nativeSizeType),
             local.type.toNativeType(),
             localClosureContextOffset
