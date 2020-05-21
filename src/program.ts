@@ -3491,7 +3491,7 @@ export class Function extends TypedElement {
         let memoryOffset = this.nextGlobalClosureOffset;
         if (memoryOffset & mask) memoryOffset = (memoryOffset | mask) + 1;
         var closedLocal = local.close(memoryOffset);
-        this.nextGlobalClosureOffset += this.nextGlobalClosureOffset;
+        this.nextGlobalClosureOffset = memoryOffset + local.type.byteSize;
         this.closedLocals.set(local.name, closedLocal);
         return closedLocal;
       }
