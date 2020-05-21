@@ -671,35 +671,36 @@ export class Program extends DiagnosticEmitter {
     );
   }
 
+  // TODO: make these more generic, purpose built for closures atm
   makeNativeMember(
     name: string,
     type: string
   ): DeclarationStatement {
     return Node.createFieldDeclaration(
-      Node.createIdentifierExpression(name, this.nativeSource.range), //name: IdentifierExpression,
+      Node.createIdentifierExpression(name, this.nativeSource.range),
       Node.createNamedType(
-        Node.createSimpleTypeName(type, this.nativeSource.range), //name: TypeName,
-        null,//typeArguments: TypeNode[] | null,
-        false,//isNullable: bool,
-        this.nativeSource.range,//range: Range
-      ), //type: TypeNode | null,
-      null,//initializer: Expression | null,
-      null,//decorators: DecoratorNode[] | null,
-      CommonFlags.INSTANCE,//flags: CommonFlags,
-      this.nativeSource.range//range: Range
+        Node.createSimpleTypeName(type, this.nativeSource.range),,
+        null,
+        false,
+        this.nativeSource.range,
+      ),
+      null,
+      null,
+      CommonFlags.INSTANCE,
+      this.nativeSource.range
     )
   }
 
   makeNativeClassDeclaration(name: string, members: DeclarationStatement[]): ClassDeclaration {
     return Node.createClassDeclaration(
-      Node.createIdentifierExpression(name, this.nativeSource.range), //identifier: IdentifierExpression,
-      null,//typeParameters: TypeParameterNode[] | null,
-      null,//extendsType: NamedTypeNode | null, // can't be a function
-      null,//implementsTypes: NamedTypeNode[] | null, // can't be functions
-      members,//members: DeclarationStatement[],
-      null,//decorators: DecoratorNode[] | null,
-      0,//flags: CommonFlags,
-      this.nativeSource.range//range: Range
+      Node.createIdentifierExpression(name, this.nativeSource.range),
+      null,
+      null,
+      null,
+      members,
+      null,
+      0,
+      this.nativeSource.range
     )
   }
 
@@ -3383,7 +3384,7 @@ export class Function extends TypedElement {
     /** Concrete signature. */
     signature: Signature, // pre-resolved
     /** Contextual type arguments inherited from its parent class, if any. */
-    contextualTypeArguments: Map<string,Type> | null = null,
+    contextualTypeArguments: Map<string,Type> | null = null
   ) {
     super(
       ElementKind.FUNCTION,

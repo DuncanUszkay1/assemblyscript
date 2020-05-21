@@ -644,7 +644,7 @@ export class Signature {
       : getDefaultParameterName(index);
   }
 
-  // Check to see if this signature is equivalent to the caller, so ignore the this type
+  // Check to see if this signature is equivalent to the caller, ignoring the this type
   externalEquals(other: Signature): bool {
     // check rest parameter
     if (this.hasRest != other.hasRest) return false;
