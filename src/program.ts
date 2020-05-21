@@ -3475,24 +3475,24 @@ export class Function extends TypedElement {
     var locals = this.localsByName;
     if (locals.has(name)) return assert(locals.get(name));
     var parentResult = this.parent.lookup(name);
-    if(parentResult !== null && this.parent.kind == ElementKind.FUNCTION) {
+    if (parentResult !== null && this.parent.kind == ElementKind.FUNCTION) {
       var parentFunction = <Function>this.parent;
-      if(parentFunction.closedLocals.size > 0) { //TODO allow nested closure definitions
+      if (parentFunction.closedLocals.size > 0) { //TODO allow nested closure definitions
         this.program.error(
           DiagnosticCode.Not_implemented,
           this.identifierNode.range, this.identifierNode.text
         );
         return null;
       }
-      if(parentResult.kind == ElementKind.LOCAL) {
+      if (parentResult.kind == ElementKind.LOCAL) {
         let local = changetype<Local>(parentResult)
-        if(this.closedLocals.has(local.name)) return assert(this.closedLocals.get(local.name))
+        if (this.closedLocals.has(local.name)) return assert(this.closedLocals.get(local.name));
         let mask = local.type.byteSize - 1;
         let memoryOffset = this.nextGlobalClosureOffset;
         if (memoryOffset & mask) memoryOffset = (memoryOffset | mask) + 1;
         var closedLocal = local.close(memoryOffset);
         this.nextGlobalClosureOffset += this.nextGlobalClosureOffset;
-        this.closedLocals.set(local.name, closedLocal)
+        this.closedLocals.set(local.name, closedLocal);
         return closedLocal;
       }
     }
