@@ -80,7 +80,6 @@ import {
   FunctionTarget,
   Global,
   Local,
-  ClosedLocal,
   EnumValue,
   Property,
   VariableLikeElement,
@@ -5912,7 +5911,6 @@ export class Compiler extends DiagnosticEmitter {
         // fall-through
       }
       case ElementKind.LOCAL:
-      case ElementKind.CLOSEDLOCAL:
       case ElementKind.FIELD: {
         targetType = (<VariableLikeElement>target).type;
         if (target.hasDecorator(DecoratorFlags.UNSAFE)) this.checkUnsafe(expression);
@@ -6022,6 +6020,14 @@ export class Compiler extends DiagnosticEmitter {
     switch (target.kind) {
       case ElementKind.LOCAL: {
         let local = <Local>target;
+        if (local.closureContextOffset) {
+          // TODO: ability to update closed over locals
+          this.error(
+            DiagnosticCode.Not_implemented,
+            valueExpression.range
+          );
+          return module.unreachable();
+        }
         if (flow.isLocalFlag(local.index, LocalFlags.CONSTANT, true)) {
           this.error(
             DiagnosticCode.Cannot_assign_to_0_because_it_is_a_constant_or_a_read_only_property,
@@ -6031,14 +6037,6 @@ export class Compiler extends DiagnosticEmitter {
           return module.unreachable();
         }
         return this.makeLocalAssignment(local, valueExpr, valueType, tee);
-      }
-      case ElementKind.CLOSEDLOCAL: {
-        // TODO: ability to update closed over locals
-        this.error(
-          DiagnosticCode.Not_implemented,
-          valueExpression.range
-        );
-        return module.unreachable();
       }
       case ElementKind.GLOBAL: {
         let global = <Global>target;
@@ -8429,6 +8427,20 @@ export class Compiler extends DiagnosticEmitter {
         let local = <Local>target;
         let localType = local.type;
         assert(localType != Type.void);
+        var localClosureContextOffset = local.closureContextOffset;
+        if (localClosureContextOffset !== null) {
+          let contextLocal = assert(flow.lookupLocal(CommonNames.this_));
+
+          // TODO: replace this with a class field access, once we are able to construct the class before
+          // compiling
+          return module.load(
+            local.type.byteSize,
+            true,
+            this.module.local_get(contextLocal.index, this.options.nativeSizeType),
+            local.type.toNativeType(),
+            localClosureContextOffset
+          );
+        }
         if (local.is(CommonFlags.INLINED)) {
           return this.compileInlineConstant(local, contextualType, constraints);
         }
@@ -8504,20 +8516,6 @@ export class Compiler extends DiagnosticEmitter {
         let index = this.ensureFunctionTableEntry(functionInstance);
         this.currentType = functionInstance.signature.type;
         return module.i32(index);
-      }
-      case ElementKind.CLOSEDLOCAL: {
-        let closedLocal = <ClosedLocal>target;
-        let contextLocal = assert(flow.lookupLocal(CommonNames.this_));
-
-        // TODO: replace this with a class field access, once we are able to construct the class before
-        // compiling
-        return module.load(
-          closedLocal.type.byteSize,
-          true,
-          this.module.local_get(contextLocal.index, this.options.nativeSizeType),
-          closedLocal.type.toNativeType(),
-          closedLocal.offset
-        );
       }
     }
     this.error(

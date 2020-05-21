@@ -1290,7 +1290,6 @@ export class Resolver extends DiagnosticEmitter {
       case ElementKind.GLOBAL: if (!this.ensureResolvedLazyGlobal(<Global>target, reportMode)) return null;
       case ElementKind.ENUMVALUE:
       case ElementKind.LOCAL:
-      case ElementKind.CLOSEDLOCAL:
       case ElementKind.FIELD: { // someVar.prop
         let variableLikeElement = <VariableLikeElement>target;
         let type = variableLikeElement.type;

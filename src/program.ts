@@ -2444,8 +2444,7 @@ export enum ElementKind {
   /** A {@link TypeDefinition}.  */
   TYPEDEFINITION,
   /** An {@link IndexSignature}. */
-  INDEXSIGNATURE,
-  CLOSEDLOCAL
+  INDEXSIGNATURE
 }
 
 /** Indicates built-in decorators that are present. */
@@ -3180,7 +3179,9 @@ export class Local extends VariableLikeElement {
     /** Parent function. */
     parent: Function,
     /** Declaration reference. */
-    declaration: VariableLikeDeclarationStatement = parent.program.makeNativeVariableDeclaration(name)
+    declaration: VariableLikeDeclarationStatement = parent.program.makeNativeVariableDeclaration(name),
+    /** Offset of this variable within closure context, if it's value is held there */
+    public closureContextOffset: usize | null = null,
   ) {
     super(
       ElementKind.LOCAL,
@@ -3191,28 +3192,18 @@ export class Local extends VariableLikeElement {
     this.index = index;
     assert(type != Type.void);
     this.setType(type);
+    this.closureContextOffset = closureContextOffset;
   }
 
-  close(offset: usize): ClosedLocal {
-    return new ClosedLocal(this, offset);
-  }
-}
-
-/** a closed-over local variable. */
-export class ClosedLocal extends VariableLikeElement {
-  //TODO once class is precompiled, we won't need this
-  offset: usize;
-  index: i32;
-  constructor(local: Local, offset: usize) {
-    super(
-      ElementKind.CLOSEDLOCAL,
-      local.name,
-      local,
-      <VariableLikeDeclarationStatement>local.declaration
+  close(offset: usize): Local {
+    return new Local(
+      this.name,
+      this.index,
+      this.type,
+      <Function>this.parent,
+      <VariableLikeDeclarationStatement>this.declaration,
+      offset
     );
-    this.type = local.type;
-    this.index = local.index;
-    this.offset = offset;
   }
 }
 
@@ -3346,7 +3337,7 @@ export class Function extends TypedElement {
   /** Concrete type arguments. */
   typeArguments: Type[] | null;
   /** List of all closed locals discovered so far */
-  closedLocals: Map<string, ClosedLocal> = new Map();
+  closedLocals: Map<string, Local> = new Map();
   /** Next global closure offset to use, assuming that classes are packed as c-structs in the order given */
   /** This is temporary- once we have a ScopeAnalyzer, then the closure class will be defined before we */
   /** start compiling, and we can just insert a field access */

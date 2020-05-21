@@ -8,7 +8,7 @@ import {
   FunctionTarget,
   Program,
   DecoratorFlags,
-  ClosedLocal
+  Local
 } from "./program";
 
 import {
@@ -117,7 +117,7 @@ export class Type {
   /** Underlying signature reference, if a function type. */
   signatureReference: Signature | null;
   /** closed over locals */
-  locals: Map<string, ClosedLocal> | null;
+  locals: Map<string, Local> | null;
   /** Respective non-nullable type, if nullable. */
   nonNullableType: Type;
   /** Cached nullable type, if non-nullable. */
