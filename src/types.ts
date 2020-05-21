@@ -669,7 +669,7 @@ export class Signature {
     var otherThisType = other.thisType;
     if (thisThisType !== null) {
       if (otherThisType === null || !thisThisType.equals(otherThisType)) return false;
-    } else if (otherThisType) {
+    } else if (otherThisType !== null) {
       return false;
     }
 

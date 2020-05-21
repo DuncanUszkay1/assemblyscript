@@ -3548,7 +3548,11 @@ export class Compiler extends DiagnosticEmitter {
       }
       var toSignature = toType.signatureReference
       var fromSignature = fromType.signatureReference
-      if(toSignature && fromSignature && fromSignature.externalEquals(toSignature) && fromType.is(TypeFlags.CLOSURE)) {
+      if(toSignature !== null &&
+        fromSignature !== null &&
+        fromSignature.externalEquals(toSignature) &&
+        fromType.is(TypeFlags.CLOSURE)
+      ) {
         // When we convert from the closure type into a function pointer, we first
         // update the local copy of the scope with the newest values
         var tempResult = this.currentFlow.getTempLocal(fromType);
@@ -7355,7 +7359,7 @@ export class Compiler extends DiagnosticEmitter {
 
     var retainInstance = this.program.retainInstance;
     this.compileFunction(retainInstance);
-    if (type && type.isFunction) {
+    if (type !== null && type.isFunction) {
       var exprLocal = this.currentFlow.getTempLocal(type)
       var functionRetainCall = module.block(null, [
         module.local_set(exprLocal.index, expr),
@@ -7390,7 +7394,7 @@ export class Compiler extends DiagnosticEmitter {
     var releaseInstance = this.program.releaseInstance;
     this.compileFunction(releaseInstance);
 
-    if (type && type.isFunction) {
+    if (type !== null && type.isFunction) {
       var exprLocal = this.currentFlow.getTempLocal(type)
       var functionReleaseCall = module.block(null, [
         module.local_set(exprLocal.index, expr),

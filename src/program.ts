@@ -679,7 +679,7 @@ export class Program extends DiagnosticEmitter {
     return Node.createFieldDeclaration(
       Node.createIdentifierExpression(name, this.nativeSource.range),
       Node.createNamedType(
-        Node.createSimpleTypeName(type, this.nativeSource.range),,
+        Node.createSimpleTypeName(type, this.nativeSource.range),
         null,
         false,
         this.nativeSource.range,
@@ -3404,7 +3404,7 @@ export class Function extends TypedElement {
     this.type = program.options.usizeType.asFunction(signature);
     if (!prototype.is(CommonFlags.AMBIENT)) {
       let localIndex = 0;
-      if (signature.thisType) {
+      if (signature.thisType !== null) {
         let local = new Local(
           CommonNames.this_,
           localIndex++,
@@ -3475,7 +3475,7 @@ export class Function extends TypedElement {
     var locals = this.localsByName;
     if (locals.has(name)) return assert(locals.get(name));
     var parentResult = this.parent.lookup(name);
-    if(parentResult && this.parent.kind == ElementKind.FUNCTION) {
+    if(parentResult !== null && this.parent.kind == ElementKind.FUNCTION) {
       var parentFunction = <Function>this.parent;
       if(parentFunction.closedLocals.size > 0) { //TODO allow nested closure definitions
         this.program.error(
