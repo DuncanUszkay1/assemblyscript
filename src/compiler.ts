@@ -6530,7 +6530,7 @@ export class Compiler extends DiagnosticEmitter {
       // indirect call: index argument with signature (non-generic, can't be inlined)
       case ElementKind.LOCAL: {
         let local = <Local>target;
-        signature = local.type.signatureReference!;
+        signature = assert(local.type.signatureReference);
         if (local.type.is(TypeFlags.CLOSURE)) {
           // If we're calling a local we know to be a closure, then we must still be in the creator functions
           // scope. Because of this, we should update the values of locals that are still available
@@ -8200,7 +8200,7 @@ export class Compiler extends DiagnosticEmitter {
       ));
 
       // Resolve this prototype to get the class
-      var closureClass = this.resolver.resolveClass(closureClassPrototype, null)!;
+      var closureClass = assert(this.resolver.resolveClass(closureClassPrototype, null));
 
       // Compile this class to get the type
       this.compileClass(closureClass);

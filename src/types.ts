@@ -185,7 +185,7 @@ export class Type {
   }
 
   get isFunction(): bool {
-    return this.signatureReference !== null && !this.classReference;
+    return this.signatureReference !== null && this.classReference === null;
   }
 
   /** Computes the sign-extending shift in the target type. */
