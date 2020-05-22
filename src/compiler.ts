@@ -6431,7 +6431,6 @@ export class Compiler extends DiagnosticEmitter {
     let _values = Map_values(locals);
     var exprs = new Array<ExpressionRef>(_values.length);
     assert(type.is(TypeFlags.REFERENCE));
-    var closureClass = assert(type.classReference);
     for (let i = 0, k = _values.length; i < k; ++i) {
       let local = unchecked(_values[i]);
       let nativeType = local.type.toNativeType();
@@ -6440,7 +6439,7 @@ export class Compiler extends DiagnosticEmitter {
         module.local_get(closureContextLocal.index, this.options.nativeSizeType),
         module.local_get(local.index, nativeType),
         nativeType,
-        closureClass.offsetof(local.name)
+        assert(local.closureContextOffset)
       );
     }
     return module.block(null, exprs);
@@ -8208,28 +8207,9 @@ export class Compiler extends DiagnosticEmitter {
     var wasm64 = nativeUsize == NativeType.I64;
 
     if(instance.closedLocals.size > 0) {
-      // Create field declarations for the function and each closed local
-      var members = Array<DeclarationStatement>(instance.closedLocals.size + 1);
-      members[0] = this.program.makeNativeMember("__functionPtr", usize.toString())
-      for (let _values = Map_values(instance.closedLocals), i = 0, k = _values.length; i < k; ++i) {
-        let local = unchecked(_values[i]);
-        members[i + 1] = this.program.makeNativeMember(local.name, local.type.intType.toString());
-      }
-
-      // Create a native class prototype with a dummy syntax tree, similar to native functions
-      var closureClassPrototype = assert(this.program.makeNativeClassPrototype(
-        "closure|" + this.program.nextClassId.toString(),
-        members
-      ));
-
-      // Resolve this prototype to get the class
-      var closureClass = assert(this.resolver.resolveClass(closureClassPrototype, null));
-
-      // Compile this class to get the type
-      this.compileClass(closureClass);
-
       // Append the appropriate signature and flags for this closure type, then set it to currentType
-      this.currentType = closureClass.type.asClosure(instance.signature)
+      this.currentType = Type.closure32;
+      this.currentType.signatureReference = instance.signature;
 
       // create a local which will hold our closure class instance
       var tempLocal = flow.getAutoreleaseLocal(this.currentType);
@@ -8238,14 +8218,15 @@ export class Compiler extends DiagnosticEmitter {
       // copied closed locals into type
       this.currentType.locals = instance.closedLocals;
 
+      const closureSize = instance.nextGlobalClosureOffset
 
       var closureExpr = this.module.flatten([
         this.module.local_set( // Allocate memory for the closure
           tempLocalIndex,
           this.makeRetain(
             this.module.call(this.program.allocInstance.internalName, [
-              wasm64 ? this.module.i64(closureClass.type.byteSize) : this.module.i32(closureClass.type.byteSize),
-              wasm64 ? this.module.i64(closureClass.id) : this.module.i32(closureClass.id)
+              wasm64 ? this.module.i64(closureSize) : this.module.i32(closureSize),
+              wasm64 ? this.module.i64(0) : this.module.i32(0)
             ], nativeUsize)
           )
         ),

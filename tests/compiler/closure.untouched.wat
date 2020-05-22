@@ -1,8 +1,8 @@
 (module
  (type $i32_=>_i32 (func (param i32) (result i32)))
- (type $i32_i32_=>_none (func (param i32 i32)))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_=>_none (func (param i32)))
+ (type $i32_i32_=>_none (func (param i32 i32)))
  (type $none_=>_i32 (func (result i32)))
  (type $none_=>_none (func))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
@@ -18,7 +18,7 @@
  (data (i32.const 64) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00")
  (data (i32.const 128) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s\00")
  (data (i32.const 176) "\14\00\00\00\01\00\00\00\01\00\00\00\14\00\00\00c\00l\00o\00s\00u\00r\00e\00.\00t\00s\00")
- (data (i32.const 224) "\n\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
+ (data (i32.const 224) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
  (table $0 9 funcref)
  (elem (i32.const 1) $closure/testParam~inner $closure/testVar~inner $closure/complexCreateClosure~anonymous|0 $closure/complexCreateClosure~anonymous|1 $closure/nestedExecutionTest~anonymous|0 $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0 $closure/returnOverBoundary~anonymous|0~nonClosure)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
@@ -27,7 +27,7 @@
  (global $~lib/gc/gc.auto (mut i32) (i32.const 1))
  (global $~argumentsLength (mut i32) (i32.const 0))
  (global $~lib/rt/__rtti_base i32 (i32.const 224))
- (global $~lib/heap/__heap_base i32 (i32.const 308))
+ (global $~lib/heap/__heap_base i32 (i32.const 252))
  (export "memory" (memory $0))
  (export "__alloc" (func $~lib/rt/tlsf/__alloc))
  (export "__retain" (func $~lib/rt/pure/__retain))
@@ -1544,49 +1544,13 @@
   local.get $0
   i32.load offset=4
  )
- (func $~lib/closure|3#constructor (param $0 i32) (result i32)
-  local.get $0
-  i32.eqz
-  if
-   i32.const 8
-   i32.const 3
-   call $~lib/rt/tlsf/__alloc
-   call $~lib/rt/pure/__retain
-   local.set $0
-  end
-  local.get $0
-  i32.const 0
-  i32.store
-  local.get $0
-  i32.const 0
-  i32.store offset=4
-  local.get $0
- )
- (func $~lib/closure|3#get:__functionPtr (param $0 i32) (result i32)
-  local.get $0
-  i32.load
- )
- (func $~lib/closure|3#set:__functionPtr (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store
- )
- (func $~lib/closure|3#get:$local1 (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=4
- )
- (func $~lib/closure|3#set:$local1 (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=4
- )
  (func $closure/testParam (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
-  i32.const 4
-  i32.const 3
+  i32.const 8
+  i32.const 0
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
   local.set $2
@@ -1628,42 +1592,6 @@
   local.get $0
   i32.load offset=4
  )
- (func $~lib/closure|4#constructor (param $0 i32) (result i32)
-  local.get $0
-  i32.eqz
-  if
-   i32.const 8
-   i32.const 4
-   call $~lib/rt/tlsf/__alloc
-   call $~lib/rt/pure/__retain
-   local.set $0
-  end
-  local.get $0
-  i32.const 0
-  i32.store
-  local.get $0
-  i32.const 0
-  i32.store offset=4
-  local.get $0
- )
- (func $~lib/closure|4#get:__functionPtr (param $0 i32) (result i32)
-  local.get $0
-  i32.load
- )
- (func $~lib/closure|4#set:__functionPtr (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store
- )
- (func $~lib/closure|4#get:$local0 (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=4
- )
- (func $~lib/closure|4#set:$local0 (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=4
- )
  (func $closure/testVar (result i32)
   (local $0 i32)
   (local $1 i32)
@@ -1672,8 +1600,8 @@
   (local $4 i32)
   i32.const 0
   local.set $0
-  i32.const 4
-  i32.const 4
+  i32.const 8
+  i32.const 0
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
   local.set $1
@@ -1721,66 +1649,6 @@
   i32.load offset=12
   i32.sub
  )
- (func $~lib/closure|5#constructor (param $0 i32) (result i32)
-  local.get $0
-  i32.eqz
-  if
-   i32.const 16
-   i32.const 5
-   call $~lib/rt/tlsf/__alloc
-   call $~lib/rt/pure/__retain
-   local.set $0
-  end
-  local.get $0
-  i32.const 0
-  i32.store
-  local.get $0
-  i32.const 0
-  i32.store offset=4
-  local.get $0
-  i32.const 0
-  i32.store offset=8
-  local.get $0
-  i32.const 0
-  i32.store offset=12
-  local.get $0
- )
- (func $~lib/closure|5#get:__functionPtr (param $0 i32) (result i32)
-  local.get $0
-  i32.load
- )
- (func $~lib/closure|5#set:__functionPtr (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store
- )
- (func $~lib/closure|5#get:foo (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=4
- )
- (func $~lib/closure|5#set:foo (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=4
- )
- (func $~lib/closure|5#get:bar (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=8
- )
- (func $~lib/closure|5#set:bar (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=8
- )
- (func $~lib/closure|5#get:baz (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=12
- )
- (func $~lib/closure|5#set:baz (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=12
- )
  (func $closure/complexCreateClosure~anonymous|1 (param $0 i32) (param $1 i32) (result i32)
   local.get $0
   i32.load offset=4
@@ -1790,66 +1658,6 @@
   local.get $0
   i32.load offset=12
   i32.add
- )
- (func $~lib/closure|6#constructor (param $0 i32) (result i32)
-  local.get $0
-  i32.eqz
-  if
-   i32.const 16
-   i32.const 6
-   call $~lib/rt/tlsf/__alloc
-   call $~lib/rt/pure/__retain
-   local.set $0
-  end
-  local.get $0
-  i32.const 0
-  i32.store
-  local.get $0
-  i32.const 0
-  i32.store offset=4
-  local.get $0
-  i32.const 0
-  i32.store offset=8
-  local.get $0
-  i32.const 0
-  i32.store offset=12
-  local.get $0
- )
- (func $~lib/closure|6#get:__functionPtr (param $0 i32) (result i32)
-  local.get $0
-  i32.load
- )
- (func $~lib/closure|6#set:__functionPtr (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store
- )
- (func $~lib/closure|6#get:bar (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=4
- )
- (func $~lib/closure|6#set:bar (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=4
- )
- (func $~lib/closure|6#get:baz (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=8
- )
- (func $~lib/closure|6#set:baz (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=8
- )
- (func $~lib/closure|6#get:foo (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=12
- )
- (func $~lib/closure|6#set:foo (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=12
  )
  (func $closure/complexCreateClosure (param $0 i32) (result i32)
   (local $1 i32)
@@ -1868,8 +1676,8 @@
   local.set $2
   i32.const 4
   local.set $3
-  i32.const 4
-  i32.const 5
+  i32.const 16
+  i32.const 0
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
   local.set $4
@@ -1877,10 +1685,9 @@
   i32.const 3
   i32.store
   local.get $4
-  call $~lib/rt/pure/__retain
   local.set $5
-  i32.const 4
-  i32.const 6
+  i32.const 16
+  i32.const 0
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
   local.set $6
@@ -1888,7 +1695,6 @@
   i32.const 4
   i32.store
   local.get $6
-  call $~lib/rt/pure/__retain
   local.set $7
   i32.const 7
   local.set $1
@@ -1930,10 +1736,6 @@
   local.get $4
   call $~lib/rt/pure/__release
   local.get $6
-  call $~lib/rt/pure/__release
-  local.get $5
-  call $~lib/rt/pure/__release
-  local.get $7
   call $~lib/rt/pure/__release
   local.get $10
  )
@@ -2010,54 +1812,6 @@
   call $~lib/rt/pure/__release
   local.get $5
  )
- (func $~lib/closure|7#constructor (param $0 i32) (result i32)
-  local.get $0
-  i32.eqz
-  if
-   i32.const 12
-   i32.const 7
-   call $~lib/rt/tlsf/__alloc
-   call $~lib/rt/pure/__retain
-   local.set $0
-  end
-  local.get $0
-  i32.const 0
-  i32.store
-  local.get $0
-  i32.const 0
-  i32.store offset=4
-  local.get $0
-  i32.const 0
-  i32.store offset=8
-  local.get $0
- )
- (func $~lib/closure|7#get:__functionPtr (param $0 i32) (result i32)
-  local.get $0
-  i32.load
- )
- (func $~lib/closure|7#set:__functionPtr (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store
- )
- (func $~lib/closure|7#get:arg (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=4
- )
- (func $~lib/closure|7#set:arg (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=4
- )
- (func $~lib/closure|7#get:x (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=8
- )
- (func $~lib/closure|7#set:x (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=8
- )
  (func $closure/nestedExecutionTest (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
@@ -2070,8 +1824,8 @@
   local.get $0
   call $closure/complexCreateClosure
   local.set $2
-  i32.const 4
-  i32.const 7
+  i32.const 12
+  i32.const 0
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
   local.set $3
@@ -2079,7 +1833,6 @@
   i32.const 5
   i32.store
   local.get $3
-  call $~lib/rt/pure/__retain
   local.set $4
   local.get $4
   local.get $0
@@ -2112,8 +1865,6 @@
    i32.const 0
   end
   call $~lib/rt/pure/__release
-  local.get $4
-  call $~lib/rt/pure/__release
   local.get $6
  )
  (func $closure/createClosure~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
@@ -2122,50 +1873,14 @@
   local.get $1
   i32.add
  )
- (func $~lib/closure|8#constructor (param $0 i32) (result i32)
-  local.get $0
-  i32.eqz
-  if
-   i32.const 8
-   i32.const 8
-   call $~lib/rt/tlsf/__alloc
-   call $~lib/rt/pure/__retain
-   local.set $0
-  end
-  local.get $0
-  i32.const 0
-  i32.store
-  local.get $0
-  i32.const 0
-  i32.store offset=4
-  local.get $0
- )
- (func $~lib/closure|8#get:__functionPtr (param $0 i32) (result i32)
-  local.get $0
-  i32.load
- )
- (func $~lib/closure|8#set:__functionPtr (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store
- )
- (func $~lib/closure|8#get:arg (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=4
- )
- (func $~lib/closure|8#set:arg (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=4
- )
  (func $closure/createClosure (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
-  i32.const 4
   i32.const 8
+  i32.const 0
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
   local.set $1
@@ -2173,7 +1888,6 @@
   i32.const 6
   i32.store
   local.get $1
-  call $~lib/rt/pure/__retain
   local.set $2
   local.get $2
   local.set $3
@@ -2203,8 +1917,6 @@
   local.get $4
   local.set $5
   local.get $1
-  call $~lib/rt/pure/__release
-  local.get $2
   call $~lib/rt/pure/__release
   local.get $5
  )
@@ -2311,73 +2023,13 @@
   i32.load offset=12
   i32.add
  )
- (func $~lib/closure|9#constructor (param $0 i32) (result i32)
-  local.get $0
-  i32.eqz
-  if
-   i32.const 16
-   i32.const 9
-   call $~lib/rt/tlsf/__alloc
-   call $~lib/rt/pure/__retain
-   local.set $0
-  end
-  local.get $0
-  i32.const 0
-  i32.store
-  local.get $0
-  i32.const 0
-  i32.store offset=4
-  local.get $0
-  i32.const 0
-  i32.store offset=8
-  local.get $0
-  i32.const 0
-  i32.store offset=12
-  local.get $0
- )
- (func $~lib/closure|9#get:__functionPtr (param $0 i32) (result i32)
-  local.get $0
-  i32.load
- )
- (func $~lib/closure|9#set:__functionPtr (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store
- )
- (func $~lib/closure|9#get:arg (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=4
- )
- (func $~lib/closure|9#set:arg (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=4
- )
- (func $~lib/closure|9#get:foo (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=8
- )
- (func $~lib/closure|9#set:foo (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=8
- )
- (func $~lib/closure|9#get:bar (param $0 i32) (result i32)
-  local.get $0
-  i32.load offset=12
- )
- (func $~lib/closure|9#set:bar (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=12
- )
  (func $closure/runInline (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
   (local $6 i32)
-  i32.const 4
-  i32.const 9
+  i32.const 16
+  i32.const 0
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
   local.set $3
@@ -2719,7 +2371,7 @@
      i32.const 8
      i32.sub
      i32.load
-     br_table $switch$1$case$2 $switch$1$case$2 $switch$1$case$4 $switch$1$case$2 $switch$1$case$2 $switch$1$case$2 $switch$1$case$2 $switch$1$case$2 $switch$1$case$2 $switch$1$case$2 $switch$1$default
+     br_table $switch$1$case$2 $switch$1$case$2 $switch$1$case$4 $switch$1$default
     end
     return
    end

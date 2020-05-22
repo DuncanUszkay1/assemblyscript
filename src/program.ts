@@ -671,48 +671,6 @@ export class Program extends DiagnosticEmitter {
     );
   }
 
-  // TODO: make these more generic, purpose built for closures atm
-  makeNativeMember(
-    name: string,
-    type: string
-  ): DeclarationStatement {
-    return Node.createFieldDeclaration(
-      Node.createIdentifierExpression(name, this.nativeSource.range),
-      Node.createNamedType(
-        Node.createSimpleTypeName(type, this.nativeSource.range),
-        null,
-        false,
-        this.nativeSource.range,
-      ),
-      null,
-      null,
-      CommonFlags.INSTANCE,
-      this.nativeSource.range
-    );
-  }
-
-  makeNativeClassDeclaration(name: string, members: DeclarationStatement[]): ClassDeclaration {
-    return Node.createClassDeclaration(
-      Node.createIdentifierExpression(name, this.nativeSource.range),
-      null,
-      null,
-      null,
-      members,
-      null,
-      0,
-      this.nativeSource.range
-    );
-  }
-
-  makeNativeClassPrototype(name: string, members: DeclarationStatement[]): ClassPrototype | null {
-    return this.initializeClass(
-      this.makeNativeClassDeclaration(name, members),
-      this.nativeFile,
-      [],
-      []
-    );
-  }
-
   /** Gets the (possibly merged) program element linked to the specified declaration. */
   getElementByDeclaration(declaration: DeclarationStatement): DeclaredElement | null {
     var elementsByDeclaration = this.elementsByDeclaration;

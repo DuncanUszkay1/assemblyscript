@@ -185,7 +185,7 @@ export class Type {
   }
 
   get isFunction(): bool {
-    return this.signatureReference !== null && this.classReference === null;
+    return this.signatureReference !== null && !this.is(TypeFlags.CLOSURE);
   }
 
   /** Computes the sign-extending shift in the target type. */
@@ -535,6 +535,13 @@ export class Type {
 
   /** Alias of i32 indicating type inference of locals and globals with just an initializer. */
   static readonly auto: Type = new Type(Type.i32.kind, Type.i32.flags, Type.i32.size);
+
+  /** Type of an in-context local */
+  static readonly closure32: Type = new Type(Type.i32.kind,
+    TypeFlags.CLOSURE |
+    TypeFlags.REFERENCE,
+    Type.i32.size
+  );
 }
 
 /** Converts an array of types to an array of native types. */
