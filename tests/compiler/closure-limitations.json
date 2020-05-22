@@ -1,0 +1,10 @@
+{
+  "asc_flags": [
+    "--runtime none"
+  ],
+  "stderr": [
+    "Cannot find name '$local0'.",
+    "AS100: Not implemented.",
+    "EOF"
+  ]
+}

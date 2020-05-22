@@ -279,6 +279,23 @@
   end
   call $~lib/rt/stub/__release
   local.get $3
+  local.set $3
+  local.get $3
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if
+   i32.const 0
+   i32.const 32
+   i32.const 28
+   i32.const 3
+   call $~lib/builtins/abort
+   unreachable
+  else
+   nop
+  end
+  local.get $3
  )
  (func $infer-generic/inferEncapsulatedFunctionMixed<f32,f64> (param $0 i32) (result i32)
   (local $1 i32)
@@ -342,6 +359,23 @@
    i32.const 0
   end
   call $~lib/rt/stub/__release
+  local.get $3
+  local.set $3
+  local.get $3
+  i32.const -2147483648
+  i32.and
+  i32.const -2147483648
+  i32.eq
+  if
+   i32.const 0
+   i32.const 32
+   i32.const 38
+   i32.const 3
+   call $~lib/builtins/abort
+   unreachable
+  else
+   nop
+  end
   local.get $3
  )
  (func $~start

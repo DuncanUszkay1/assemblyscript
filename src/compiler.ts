@@ -2745,6 +2745,24 @@ export class Compiler extends DiagnosticEmitter {
     // Remember that this flow returns
     flow.set(FlowFlags.RETURNS | FlowFlags.TERMINATES);
 
+    // Prevent returning a closure in an exported function, since interop with closures is
+    // not yet supported
+    var returnSignature = returnType.signatureReference;
+    if (returnSignature !== null && flow.parentFunction.is(CommonFlags.EXPORT)) {
+      var returnValueLocalIndex = flow.getTempLocal(returnType).index;
+      var nativeReturnType = returnType.toNativeType();
+      expr = module.flatten([
+        module.local_set(returnValueLocalIndex, expr),
+        this.ifClosure(
+          module.local_get(returnValueLocalIndex, nativeReturnType),
+          this.makeAbort(null, statement), // TODO: throw
+          module.nop()
+        ),
+        module.local_get(returnValueLocalIndex, nativeReturnType)
+      ], nativeReturnType)
+    }
+
+
     // If the last statement anyway, make it the block's return value
     if (isLastInBody && expr != 0 && returnType != Type.void) {
       if (!stmts.length) return expr;
