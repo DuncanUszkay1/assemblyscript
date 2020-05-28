@@ -7,7 +7,7 @@
 
 /** Enum of available diagnostic codes. */
 export enum DiagnosticCode {
-  Not_implemented = 100,
+  Not_implemented_0 = 100,
   Operation_is_unsafe = 101,
   User_defined_0 = 102,
   Feature_0_is_not_enabled = 103,
@@ -173,6 +173,7 @@ export enum DiagnosticCode {
   File_0_not_found = 6054,
   Numeric_separators_are_not_allowed_here = 6188,
   Multiple_consecutive_numeric_separators_are_not_permitted = 6189,
+  Closure_support_is_experimental = 6190,
   _super_must_be_called_before_accessing_this_in_the_constructor_of_a_derived_class = 17009,
   _super_must_be_called_before_accessing_a_property_of_super_in_the_constructor_of_a_derived_class = 17011
 }
@@ -180,7 +181,7 @@ export enum DiagnosticCode {
 /** Translates a diagnostic code to its respective string. */
 export function diagnosticCodeToString(code: DiagnosticCode): string {
   switch (code) {
-    case 100: return "Not implemented.";
+    case 100: return "Not implemented: {0}";
     case 101: return "Operation is unsafe.";
     case 102: return "User-defined: {0}";
     case 103: return "Feature '{0}' is not enabled.";
@@ -346,6 +347,7 @@ export function diagnosticCodeToString(code: DiagnosticCode): string {
     case 6054: return "File '{0}' not found.";
     case 6188: return "Numeric separators are not allowed here.";
     case 6189: return "Multiple consecutive numeric separators are not permitted.";
+    case 6190: return "Closure support is experimental.";
     case 17009: return "'super' must be called before accessing 'this' in the constructor of a derived class.";
     case 17011: return "'super' must be called before accessing a property of 'super' in the constructor of a derived class.";
     default: return "";
