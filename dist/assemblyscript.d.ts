@@ -3,9 +3,9 @@ declare module "assemblyscript" {
 }
 declare module "assemblyscript/src/common" {
     /**
-     * Common constants.
-     * @module common
-     */ /***/
+     * @fileoverview Common constants used by various parts of the compiler.
+     * @license Apache-2.0
+     */
     /** Indicates traits of a {@link Node} or {@link Element}. */
     export enum CommonFlags {
         /** No flags set. */
@@ -60,12 +60,12 @@ declare module "assemblyscript/src/common" {
         INLINED = 8388608,
         /** Is scoped. */
         SCOPED = 16777216,
-        /** Is a trampoline. */
-        TRAMPOLINE = 33554432,
+        /** Is a stub. */
+        STUB = 33554432,
         /** Is a virtual method. */
         VIRTUAL = 67108864,
         /** Is (part of) a closure. */
-        CLOSURE = 134217728,
+        IN_SCOPE_CLOSURE = 134217728,
         /** Is quoted. */
         QUOTED = 268435456
     }
@@ -89,6 +89,8 @@ declare module "assemblyscript/src/common" {
     export const LIBRARY_PREFIX: string;
     /** Path index suffix. */
     export const INDEX_SUFFIX: string;
+    /** Stub function delimiter. */
+    export const STUB_DELIMITER = "@";
     /** Common names. */
     export namespace CommonNames {
         const EMPTY = "";
@@ -138,6 +140,8 @@ declare module "assemblyscript/src/common" {
         const ASC_TABLE_BASE = "ASC_TABLE_BASE";
         const ASC_OPTIMIZE_LEVEL = "ASC_OPTIMIZE_LEVEL";
         const ASC_SHRINK_LEVEL = "ASC_SHRINK_LEVEL";
+        const ASC_LOW_MEMORY_LIMIT = "ASC_LOW_MEMORY_LIMIT";
+        const ASC_WASI = "ASC_WASI";
         const ASC_FEATURE_SIGN_EXTENSION = "ASC_FEATURE_SIGN_EXTENSION";
         const ASC_FEATURE_MUTABLE_GLOBALS = "ASC_FEATURE_MUTABLE_GLOBALS";
         const ASC_FEATURE_NONTRAPPING_F2I = "ASC_FEATURE_NONTRAPPING_F2I";
@@ -147,6 +151,7 @@ declare module "assemblyscript/src/common" {
         const ASC_FEATURE_EXCEPTION_HANDLING = "ASC_FEATURE_EXCEPTION_HANDLING";
         const ASC_FEATURE_TAIL_CALLS = "ASC_FEATURE_TAIL_CALLS";
         const ASC_FEATURE_REFERENCE_TYPES = "ASC_FEATURE_REFERENCE_TYPES";
+        const ASC_FEATURE_MULTI_VALUE = "ASC_FEATURE_MULTI_VALUE";
         const I8 = "I8";
         const I16 = "I16";
         const I32 = "I32";
@@ -164,13 +169,15 @@ declare module "assemblyscript/src/common" {
         const Anyref = "Anyref";
         const String = "String";
         const Array = "Array";
-        const FixedArray = "FixedArray";
+        const StaticArray = "StaticArray";
         const Set = "Set";
         const Map = "Map";
         const ArrayBufferView = "ArrayBufferView";
         const ArrayBuffer = "ArrayBuffer";
         const Math = "Math";
         const Mathf = "Mathf";
+        const NativeMath = "NativeMath";
+        const NativeMathf = "NativeMathf";
         const Int8Array = "Int8Array";
         const Int16Array = "Int16Array";
         const Int32Array = "Int32Array";
@@ -184,6 +191,8 @@ declare module "assemblyscript/src/common" {
         const Float64Array = "Float64Array";
         const Error = "Error";
         const abort = "abort";
+        const trace = "trace";
+        const seed = "seed";
         const pow = "pow";
         const mod = "mod";
         const alloc = "__alloc";
@@ -195,6 +204,7 @@ declare module "assemblyscript/src/common" {
         const typeinfo = "__typeinfo";
         const instanceof_ = "__instanceof";
         const visit = "__visit";
+        const allocBuffer = "__allocBuffer";
         const allocArray = "__allocArray";
     }
     export { Feature, featureToString } from "assemblyscript/std/assembly/shared/feature";
@@ -203,15 +213,20 @@ declare module "assemblyscript/src/common" {
 }
 declare module "assemblyscript/src/diagnosticMessages.generated" {
     /**
-     * Generated from diagnosticsMessages.json. Do not edit.
-     * @module diagnostics
-     */ /***/
+     * @fileoverview Generated from diagnosticsMessages.json. Do not edit.
+     * @license Apache-2.0
+     */
     /** Enum of available diagnostic codes. */
     export enum DiagnosticCode {
-        Not_implemented = 100,
+        Not_implemented_0 = 100,
         Operation_is_unsafe = 101,
         User_defined_0 = 102,
         Feature_0_is_not_enabled = 103,
+        Low_memory_limit_exceeded_by_static_data_0_1 = 104,
+        Module_requires_at_least_0_pages_of_initial_memory = 105,
+        Module_requires_at_least_0_pages_of_maximum_memory = 106,
+        Shared_memory_requires_maximum_memory_to_be_defined = 107,
+        Shared_memory_requires_feature_threads_to_be_enabled = 108,
         Conversion_from_type_0_to_1_requires_an_explicit_cast = 200,
         Conversion_from_type_0_to_1_will_require_an_explicit_cast_when_switching_between_32_64_bit = 201,
         Type_0_cannot_be_changed_to_type_1 = 202,
@@ -223,12 +238,12 @@ declare module "assemblyscript/src/diagnosticMessages.generated" {
         Unmanaged_classes_cannot_implement_interfaces = 208,
         Invalid_regular_expression_flags = 209,
         Expression_is_never_null = 210,
-        Class_0_is_sealed_and_cannot_be_extended = 211,
+        Class_0_is_final_and_cannot_be_extended = 211,
         Decorator_0_is_not_valid_here = 212,
         Duplicate_decorator = 213,
         Type_0_is_illegal_in_this_context = 214,
         Optional_parameter_must_have_an_initializer = 215,
-        Constructor_of_class_0_must_not_require_any_arguments = 216,
+        Class_0_cannot_declare_a_constructor_when_instantiated_from_an_object_literal = 216,
         Function_0_cannot_be_inlined_into_itself = 217,
         Cannot_access_method_0_without_calling_it_as_it_requires_this_to_be_set = 218,
         Optional_properties_are_not_supported = 219,
@@ -239,11 +254,17 @@ declare module "assemblyscript/src/diagnosticMessages.generated" {
         _0_is_not_a_valid_operator = 224,
         Expression_cannot_be_represented_by_a_type = 225,
         Expression_resolves_to_unusual_type_0 = 226,
+        Array_literal_expected = 227,
+        Function_0_is_virtual_and_will_not_be_inlined = 228,
+        Property_0_only_has_a_setter_and_is_missing_a_getter = 229,
+        _0_keyword_cannot_be_used_here = 230,
+        A_class_with_a_constructor_explicitly_returning_something_else_than_this_must_be_final = 231,
         Type_0_is_cyclic_Module_will_include_deferred_garbage_collection = 900,
         Importing_the_table_disables_some_indirect_call_optimizations = 901,
         Exporting_the_table_disables_some_indirect_call_optimizations = 902,
         Expression_compiles_to_a_dynamic_check_at_runtime = 903,
         Indexed_access_may_involve_bounds_checking = 904,
+        Explicitly_returning_constructor_drops_this_allocation = 905,
         Unterminated_string_literal = 1002,
         Identifier_expected = 1003,
         _0_expected = 1005,
@@ -294,6 +315,7 @@ declare module "assemblyscript/src/diagnosticMessages.generated" {
         Binary_digit_expected = 1177,
         Octal_digit_expected = 1178,
         An_implementation_cannot_be_declared_in_ambient_contexts = 1183,
+        The_variable_declaration_of_a_for_of_statement_cannot_have_an_initializer = 1190,
         An_extended_Unicode_escape_value_must_be_between_0x0_and_0x10FFFF_inclusive = 1198,
         Unterminated_Unicode_escape_sequence = 1199,
         Decorators_are_not_valid_here = 1206,
@@ -305,6 +327,7 @@ declare module "assemblyscript/src/diagnosticMessages.generated" {
         Duplicate_identifier_0 = 2300,
         Cannot_find_name_0 = 2304,
         Module_0_has_no_exported_member_1 = 2305,
+        An_interface_can_only_extend_an_interface = 2312,
         Generic_type_0_requires_1_type_argument_s = 2314,
         Type_0_is_not_generic = 2315,
         Type_0_is_not_assignable_to_type_1 = 2322,
@@ -313,6 +336,7 @@ declare module "assemblyscript/src/diagnosticMessages.generated" {
         _super_can_only_be_referenced_in_a_derived_class = 2335,
         Super_calls_are_not_permitted_outside_constructors_or_in_nested_functions_inside_constructors = 2337,
         Property_0_does_not_exist_on_type_1 = 2339,
+        Property_0_is_private_and_only_accessible_within_class_1 = 2341,
         Cannot_invoke_an_expression_whose_type_lacks_a_call_signature_Type_0_has_no_compatible_call_signatures = 2349,
         This_expression_is_not_constructable = 2351,
         A_function_whose_declared_type_is_not_void_must_return_a_value = 2355,
@@ -321,19 +345,26 @@ declare module "assemblyscript/src/diagnosticMessages.generated" {
         Operator_0_cannot_be_applied_to_types_1_and_2 = 2365,
         A_super_call_must_be_the_first_statement_in_the_constructor = 2376,
         Constructors_for_derived_classes_must_contain_a_super_call = 2377,
+        Getter_and_setter_accessors_do_not_agree_in_visibility = 2379,
         _get_and_set_accessor_must_have_the_same_type = 2380,
+        Overload_signatures_must_all_be_public_private_or_protected = 2385,
         Constructor_implementation_is_missing = 2390,
         Function_implementation_is_missing_or_not_immediately_following_the_declaration = 2391,
         Multiple_constructor_implementations_are_not_allowed = 2392,
         Duplicate_function_implementation = 2393,
+        This_overload_signature_is_not_compatible_with_its_implementation_signature = 2394,
         Individual_declarations_in_merged_declaration_0_must_be_all_exported_or_all_local = 2395,
+        A_class_can_only_implement_an_interface = 2422,
         A_namespace_declaration_cannot_be_located_prior_to_a_class_or_function_with_which_it_is_merged = 2434,
+        Property_0_is_protected_and_only_accessible_within_class_1_and_its_subclasses = 2445,
         The_type_argument_for_type_parameter_0_cannot_be_inferred_from_the_usage_Consider_specifying_the_type_arguments_explicitly = 2453,
         Type_0_has_no_property_1 = 2460,
         The_0_operator_cannot_be_applied_to_type_1 = 2469,
         In_const_enum_declarations_member_initializer_must_be_constant_expression = 2474,
         Export_declaration_conflicts_with_exported_declaration_of_0 = 2484,
         _0_is_referenced_directly_or_indirectly_in_its_own_base_expression = 2506,
+        Cannot_create_an_instance_of_an_abstract_class = 2511,
+        Non_abstract_class_0_does_not_implement_inherited_abstract_member_1_from_2 = 2515,
         Object_is_possibly_null = 2531,
         Cannot_assign_to_0_because_it_is_a_constant_or_a_read_only_property = 2540,
         The_target_of_an_assignment_must_be_a_variable_or_a_property_access = 2541,
@@ -348,25 +379,70 @@ declare module "assemblyscript/src/diagnosticMessages.generated" {
         Namespace_0_has_no_exported_member_1 = 2694,
         Required_type_parameters_may_not_follow_optional_type_parameters = 2706,
         Duplicate_property_0 = 2718,
+        Property_0_is_missing_in_type_1_but_required_in_type_2 = 2741,
         Type_0_has_no_call_signatures = 2757,
         File_0_not_found = 6054,
         Numeric_separators_are_not_allowed_here = 6188,
         Multiple_consecutive_numeric_separators_are_not_permitted = 6189,
+        Closure_support_is_experimental = 6190,
         _super_must_be_called_before_accessing_this_in_the_constructor_of_a_derived_class = 17009,
         _super_must_be_called_before_accessing_a_property_of_super_in_the_constructor_of_a_derived_class = 17011
     }
     /** Translates a diagnostic code to its respective string. */
     export function diagnosticCodeToString(code: DiagnosticCode): string;
 }
-declare module "assemblyscript/src/util/bitset" {
-    /** @module util */ /***/
-    /** Tests if the bit at the specified index is set within a 64-bit map. */
-    export function bitsetIs(map: I64, index: number): boolean;
-    /** Sets or unsets the bit at the specified index within a 64-bit map and returns the new map. */
-    export function bitsetSet(map: I64, index: number, isSet: boolean): I64;
+declare module "assemblyscript/src/util/binary" {
+    /**
+     * @fileoverview Various binary reading and writing utility.
+     * @license Apache-2.0
+     */
+    /** Reads an 8-bit integer from the specified buffer. */
+    export function readI8(buffer: Uint8Array, offset: number): number;
+    /** Writes an 8-bit integer to the specified buffer. */
+    export function writeI8(value: number, buffer: Uint8Array, offset: number): void;
+    /** Reads a 16-bit integer from the specified buffer. */
+    export function readI16(buffer: Uint8Array, offset: number): number;
+    /** Writes a 16-bit integer to the specified buffer. */
+    export function writeI16(value: number, buffer: Uint8Array, offset: number): void;
+    /** Reads a 32-bit integer from the specified buffer. */
+    export function readI32(buffer: Uint8Array, offset: number): number;
+    /** Writes a 32-bit integer to the specified buffer. */
+    export function writeI32(value: number, buffer: Uint8Array, offset: number): void;
+    /** Reads a 64-bit integer from the specified buffer. */
+    export function readI64(buffer: Uint8Array, offset: number): i64;
+    /** Writes a 64-bit integer to the specified buffer. */
+    export function writeI64(value: i64, buffer: Uint8Array, offset: number): void;
+    /** Reads a 32-bit float from the specified buffer. */
+    export function readF32(buffer: Uint8Array, offset: number): number;
+    /** Writes a 32-bit float to the specified buffer. */
+    export function writeF32(value: number, buffer: Uint8Array, offset: number): void;
+    /** Reads a 64-bit float from the specified buffer. */
+    export function readF64(buffer: Uint8Array, offset: number): number;
+    /** Writes a 64-bit float to the specified buffer. */
+    export function writeF64(value: number, buffer: Uint8Array, offset: number): void;
 }
-declare module "assemblyscript/src/util/charcode" {
-    /** @module util */ /***/
+declare module "assemblyscript/src/util/collections" {
+    /**
+     * @fileoverview Various collections utility.
+     * @license Apache-2.0
+     */
+    export function makeArray<V>(original?: Array<V> | null): Array<V>;
+    export function makeSet<V>(original?: Set<V> | null): Set<V>;
+    export function makeMap<K, V>(original?: Map<K, V> | null, overrides?: Map<K, V> | null): Map<K, V>;
+}
+declare module "assemblyscript/src/util/math" {
+    /**
+     * @fileoverview Various math utility.
+     * @license Apache-2.0
+     */
+    /** Tests if `x` is a power of two. */
+    export function isPowerOf2(x: number): boolean;
+}
+declare module "assemblyscript/src/util/text" {
+    /**
+     * @fileoverview Various character and text utility.
+     * @license Apache-2.0
+     */
     /** An enum of named character codes. */
     export const enum CharCode {
         NULL = 0,
@@ -501,20 +577,22 @@ declare module "assemblyscript/src/util/charcode" {
     export function isDecimalDigit(c: number): boolean;
     /** Tests if the specified character code is a valid octal digit. */
     export function isOctalDigit(c: number): boolean;
+    /** Tests if the specified character code is trivially alphanumeric. */
+    export function isTrivialAlphanum(code: number): boolean;
     /** Tests if the specified character code is a valid start of an identifier. */
     export function isIdentifierStart(c: number): boolean;
     /** Tests if the specified character code is a valid keyword character. */
     export function isKeywordCharacter(c: number): boolean;
     /** Tests if the specified character code is a valid part of an identifier. */
     export function isIdentifierPart(c: number): boolean;
-}
-declare module "assemblyscript/src/util/collections" {
-    export function makeArray<V>(original?: Array<V> | null): Array<V>;
-    export function makeSet<V>(original?: Set<V> | null): Set<V>;
-    export function makeMap<K, V>(original?: Map<K, V> | null, overrides?: Map<K, V> | null): Map<K, V>;
+    /** Creates an indentation matching the number of specified levels. */
+    export function indent(sb: string[], level: number): void;
 }
 declare module "assemblyscript/src/util/path" {
-    /** @module util */ /***/
+    /**
+     * @fileoverview Various file path utility.
+     * @license Apache-2.0
+     */
     /**
      * Normalizes the specified path, removing interior placeholders.
      * Expects a posix-compatible relative path (not Windows compatible).
@@ -525,60 +603,23 @@ declare module "assemblyscript/src/util/path" {
     /** Obtains the directory portion of a normalized path. */
     export function dirname(normalizedPath: string): string;
 }
-declare module "assemblyscript/src/util/text" {
-    /** @module util */ /***/
-    /** Creates an indentation matching the number of specified levels. */
-    export function indent(sb: string[], level: number): void;
-}
-declare module "assemblyscript/src/util/binary" {
-    /** @module util */ /***/
-    /** Reads an 8-bit integer from the specified buffer. */
-    export function readI8(buffer: Uint8Array, offset: number): number;
-    /** Writes an 8-bit integer to the specified buffer. */
-    export function writeI8(value: number, buffer: Uint8Array, offset: number): void;
-    /** Reads a 16-bit integer from the specified buffer. */
-    export function readI16(buffer: Uint8Array, offset: number): number;
-    /** Writes a 16-bit integer to the specified buffer. */
-    export function writeI16(value: number, buffer: Uint8Array, offset: number): void;
-    /** Reads a 32-bit integer from the specified buffer. */
-    export function readI32(buffer: Uint8Array, offset: number): number;
-    /** Writes a 32-bit integer to the specified buffer. */
-    export function writeI32(value: number, buffer: Uint8Array, offset: number): void;
-    /** Reads a 64-bit integer from the specified buffer. */
-    export function readI64(buffer: Uint8Array, offset: number): I64;
-    /** Writes a 64-bit integer to the specified buffer. */
-    export function writeI64(value: I64, buffer: Uint8Array, offset: number): void;
-    /** Reads a 32-bit float from the specified buffer. */
-    export function readF32(buffer: Uint8Array, offset: number): number;
-    /** Writes a 32-bit float to the specified buffer. */
-    export function writeF32(value: number, buffer: Uint8Array, offset: number): void;
-    /** Reads a 64-bit float from the specified buffer. */
-    export function readF64(buffer: Uint8Array, offset: number): number;
-    /** Writes a 64-bit float to the specified buffer. */
-    export function writeF64(value: number, buffer: Uint8Array, offset: number): void;
-}
 declare module "assemblyscript/src/util/index" {
     /**
-     * Various compiler utilities.
-     * @module util
-     * @preferred
-     */ /***/
-    export * from "assemblyscript/src/util/bitset";
-    export * from "assemblyscript/src/util/charcode";
+     * @fileoverview Various utility.
+     * @license Apache-2.0
+     */
+    export * from "assemblyscript/src/util/binary";
     export * from "assemblyscript/src/util/collections";
+    export * from "assemblyscript/src/util/math";
     export * from "assemblyscript/src/util/path";
     export * from "assemblyscript/src/util/text";
-    export * from "assemblyscript/src/util/binary";
-    /** Tests if `x` is a power of two. */
-    export function isPowerOf2(x: number): boolean;
 }
 declare module "assemblyscript/src/diagnostics" {
     /**
-     * Shared diagnostic handling inherited by the parser and the compiler.
-     * @module diagnostics
-     * @preferred
-     */ /***/
-    import { Range } from "assemblyscript/src/ast";
+     * @fileoverview Shared diagnostic handling.
+     * @license Apache-2.0
+     */
+    import { Range } from "assemblyscript/src/tokenizer";
     import { DiagnosticCode } from "assemblyscript/src/diagnosticMessages.generated";
     export { DiagnosticCode, diagnosticCodeToString } from "assemblyscript/src/diagnosticMessages.generated";
     /** Indicates the category of a {@link DiagnosticMessage}. */
@@ -622,6 +663,8 @@ declare module "assemblyscript/src/diagnostics" {
         private constructor();
         /** Creates a new diagnostic message of the specified category. */
         static create(code: DiagnosticCode, category: DiagnosticCategory, arg0?: string | null, arg1?: string | null, arg2?: string | null): DiagnosticMessage;
+        /** Tests if this message equals the specified. */
+        equals(other: DiagnosticMessage): boolean;
         /** Adds a source range to this message. */
         withRange(range: Range): this;
         /** Adds a related source range to this message. */
@@ -663,13 +706,17 @@ declare module "assemblyscript/src/diagnostics" {
 }
 declare module "assemblyscript/src/tokenizer" {
     /**
-     * A TypeScript tokenizer modified for AssemblyScript.
+     * @fileoverview A TypeScript tokenizer modified for AssemblyScript.
      *
-     * Skips over trivia and provides a general mark/reset mechanism for the parser to utilize on
-     * ambiguous tokens.
+     * The `Tokenizer` scans over a source file and returns one syntactic token
+     * at a time that the parser will combine to an abstract syntax tree.
      *
-     * @module tokenizer
-     */ /***/
+     * It skips over trivia like comments and whitespace and provides a general
+     * mark/reset mechanism for the parser to utilize on ambiguous tokens, with
+     * one token of lookahead otherwise.
+     *
+     * @license Apache-2.0
+     */
     import { DiagnosticMessage, DiagnosticEmitter } from "assemblyscript/src/diagnostics";
     import { Source, CommentKind } from "assemblyscript/src/ast";
     /** Named token types. */
@@ -808,14 +855,13 @@ declare module "assemblyscript/src/tokenizer" {
         source: Source;
         start: number;
         end: number;
+        debugInfoRef: number;
         constructor(source: Source, start: number, end: number);
         static join(a: Range, b: Range): Range;
+        equals(other: Range): boolean;
         get atStart(): Range;
         get atEnd(): Range;
-        get line(): number;
-        get column(): number;
         toString(): string;
-        debugInfoRef: number;
     }
     /** Handler for intercepting comments while tokenizing. */
     export type CommentHandler = (kind: CommentKind, text: string, range: Range) => void;
@@ -847,18 +893,17 @@ declare module "assemblyscript/src/tokenizer" {
         readRegexpPattern(): string;
         readRegexpFlags(): string;
         testInteger(): boolean;
-        readInteger(): I64;
-        readHexInteger(): I64;
-        readDecimalInteger(): I64;
-        readOctalInteger(): I64;
-        readBinaryInteger(): I64;
+        readInteger(): i64;
+        readHexInteger(): i64;
+        readDecimalInteger(): i64;
+        readOctalInteger(): i64;
+        readBinaryInteger(): i64;
         readFloat(): number;
         readDecimalFloat(): number;
         readHexFloat(): number;
         readHexadecimalEscape(remain?: number): string;
         readUnicodeEscape(): string;
         private readExtendedUnicodeEscape;
-        finish(): void;
     }
     /** Tokenizer state as returned by {@link Tokenizer#mark} and consumed by {@link Tokenizer#reset}. */
     export class State {
@@ -868,16 +913,30 @@ declare module "assemblyscript/src/tokenizer" {
         token: Token;
         /** Current token's position. */
         tokenPos: number;
+        constructor(
+        /** Current position. */
+        pos: number, 
+        /** Current token. */
+        token: Token, 
+        /** Current token's position. */
+        tokenPos: number);
     }
 }
 declare module "assemblyscript/src/ast" {
     /**
-     * Abstract syntax tree representing a source file once parsed.
-     * @module ast
-     */ /***/
+     * @fileoverview Abstract syntax tree representing a source file once parsed.
+     *
+     * Each node in the AST is represented by an instance of a subclass of `Node`,
+     * with its `Node#kind` represented by one of the `NodeKind` constants, which
+     * dependent code typically switches over. The intended way to create a node
+     * is to use the respective `Node.createX` method instead of its constructor.
+     *
+     * Note that the AST does not contain any type information except type names.
+     *
+     * @license Apache-2.0
+     */
     import { CommonFlags } from "assemblyscript/src/common";
     import { Token, Range } from "assemblyscript/src/tokenizer";
-    export { Token, Range };
     /** Indicates the kind of a node. */
     export enum NodeKind {
         SOURCE = 0,
@@ -918,22 +977,22 @@ declare module "assemblyscript/src/ast" {
         EXPORTIMPORT = 35,
         EXPRESSION = 36,
         FOR = 37,
-        IF = 38,
-        IMPORT = 39,
-        RETURN = 40,
-        SWITCH = 41,
-        THROW = 42,
-        TRY = 43,
-        VARIABLE = 44,
-        VOID = 45,
-        WHILE = 46,
-        CLASSDECLARATION = 47,
-        ENUMDECLARATION = 48,
-        ENUMVALUEDECLARATION = 49,
-        FIELDDECLARATION = 50,
-        FUNCTIONDECLARATION = 51,
-        IMPORTDECLARATION = 52,
-        INDEXSIGNATUREDECLARATION = 53,
+        FOROF = 38,
+        IF = 39,
+        IMPORT = 40,
+        RETURN = 41,
+        SWITCH = 42,
+        THROW = 43,
+        TRY = 44,
+        VARIABLE = 45,
+        VOID = 46,
+        WHILE = 47,
+        CLASSDECLARATION = 48,
+        ENUMDECLARATION = 49,
+        ENUMVALUEDECLARATION = 50,
+        FIELDDECLARATION = 51,
+        FUNCTIONDECLARATION = 52,
+        IMPORTDECLARATION = 53,
         INTERFACEDECLARATION = 54,
         METHODDECLARATION = 55,
         NAMESPACEDECLARATION = 56,
@@ -942,46 +1001,49 @@ declare module "assemblyscript/src/ast" {
         DECORATOR = 59,
         EXPORTMEMBER = 60,
         SWITCHCASE = 61,
-        COMMENT = 62
+        INDEXSIGNATURE = 62,
+        COMMENT = 63
     }
-    /** Checks if a node represents a constant value. */
-    export function nodeIsConstantValue(kind: NodeKind): boolean;
     /** Base class of all nodes. */
     export abstract class Node {
-        /** Node kind indicator. */
+        /** Kind of this node. */
         kind: NodeKind;
         /** Source range. */
         range: Range;
-        static createTypeName(name: IdentifierExpression, range: Range): TypeName;
+        constructor(
+        /** Kind of this node. */
+        kind: NodeKind, 
+        /** Source range. */
+        range: Range);
         static createSimpleTypeName(name: string, range: Range): TypeName;
         static createNamedType(name: TypeName, typeArguments: TypeNode[] | null, isNullable: boolean, range: Range): NamedTypeNode;
         static createFunctionType(parameters: ParameterNode[], returnType: TypeNode, explicitThisType: NamedTypeNode | null, isNullable: boolean, range: Range): FunctionTypeNode;
         static createOmittedType(range: Range): NamedTypeNode;
         static createTypeParameter(name: IdentifierExpression, extendsType: NamedTypeNode | null, defaultType: NamedTypeNode | null, range: Range): TypeParameterNode;
-        static createParameter(name: IdentifierExpression, type: TypeNode, initializer: Expression | null, kind: ParameterKind, range: Range): ParameterNode;
+        static createParameter(parameterKind: ParameterKind, name: IdentifierExpression, type: TypeNode, initializer: Expression | null, range: Range): ParameterNode;
         static createDecorator(name: Expression, args: Expression[] | null, range: Range): DecoratorNode;
-        static createComment(text: string, kind: CommentKind, range: Range): CommentNode;
-        static createIdentifierExpression(name: string, range: Range, isQuoted?: boolean): IdentifierExpression;
+        static createComment(commentKind: CommentKind, text: string, range: Range): CommentNode;
+        static createIdentifierExpression(text: string, range: Range, isQuoted?: boolean): IdentifierExpression;
         static createEmptyIdentifierExpression(range: Range): IdentifierExpression;
-        static createArrayLiteralExpression(elements: (Expression | null)[], range: Range): ArrayLiteralExpression;
+        static createArrayLiteralExpression(elementExpressions: (Expression | null)[], range: Range): ArrayLiteralExpression;
         static createAssertionExpression(assertionKind: AssertionKind, expression: Expression, toType: TypeNode | null, range: Range): AssertionExpression;
         static createBinaryExpression(operator: Token, left: Expression, right: Expression, range: Range): BinaryExpression;
-        static createCallExpression(expression: Expression, typeArgs: TypeNode[] | null, args: Expression[], range: Range): CallExpression;
+        static createCallExpression(expression: Expression, typeArguments: TypeNode[] | null, args: Expression[], range: Range): CallExpression;
         static createClassExpression(declaration: ClassDeclaration): ClassExpression;
         static createCommaExpression(expressions: Expression[], range: Range): CommaExpression;
         static createConstructorExpression(range: Range): ConstructorExpression;
-        static createElementAccessExpression(expression: Expression, element: Expression, range: Range): ElementAccessExpression;
+        static createElementAccessExpression(expression: Expression, elementExpression: Expression, range: Range): ElementAccessExpression;
         static createFalseExpression(range: Range): FalseExpression;
         static createFloatLiteralExpression(value: number, range: Range): FloatLiteralExpression;
         static createFunctionExpression(declaration: FunctionDeclaration): FunctionExpression;
         static createInstanceOfExpression(expression: Expression, isType: TypeNode, range: Range): InstanceOfExpression;
-        static createIntegerLiteralExpression(value: I64, range: Range): IntegerLiteralExpression;
-        static createNewExpression(typeName: TypeName, typeArgs: TypeNode[] | null, args: Expression[], range: Range): NewExpression;
+        static createIntegerLiteralExpression(value: i64, range: Range): IntegerLiteralExpression;
+        static createNewExpression(typeName: TypeName, typeArguments: TypeNode[] | null, args: Expression[], range: Range): NewExpression;
         static createNullExpression(range: Range): NullExpression;
         static createObjectLiteralExpression(names: IdentifierExpression[], values: Expression[], range: Range): ObjectLiteralExpression;
         static createParenthesizedExpression(expression: Expression, range: Range): ParenthesizedExpression;
         static createPropertyAccessExpression(expression: Expression, property: IdentifierExpression, range: Range): PropertyAccessExpression;
-        static createRegexpLiteralExpression(pattern: string, flags: string, range: Range): RegexpLiteralExpression;
+        static createRegexpLiteralExpression(pattern: string, patternFlags: string, range: Range): RegexpLiteralExpression;
         static createTernaryExpression(condition: Expression, ifThen: Expression, ifElse: Expression, range: Range): TernaryExpression;
         static createStringLiteralExpression(value: string, range: Range): StringLiteralExpression;
         static createSuperExpression(range: Range): SuperExpression;
@@ -991,84 +1053,130 @@ declare module "assemblyscript/src/ast" {
         static createUnaryPrefixExpression(operator: Token, operand: Expression, range: Range): UnaryPrefixExpression;
         static createBlockStatement(statements: Statement[], range: Range): BlockStatement;
         static createBreakStatement(label: IdentifierExpression | null, range: Range): BreakStatement;
-        static createClassDeclaration(identifier: IdentifierExpression, typeParameters: TypeParameterNode[] | null, extendsType: NamedTypeNode | null, // can't be a function
-        implementsTypes: NamedTypeNode[] | null, // can't be functions
-        members: DeclarationStatement[], decorators: DecoratorNode[] | null, flags: CommonFlags, range: Range): ClassDeclaration;
+        static createClassDeclaration(name: IdentifierExpression, decorators: DecoratorNode[] | null, flags: CommonFlags, typeParameters: TypeParameterNode[] | null, extendsType: NamedTypeNode | null, implementsTypes: NamedTypeNode[] | null, members: DeclarationStatement[], range: Range): ClassDeclaration;
         static createContinueStatement(label: IdentifierExpression | null, range: Range): ContinueStatement;
         static createDoStatement(statement: Statement, condition: Expression, range: Range): DoStatement;
         static createEmptyStatement(range: Range): EmptyStatement;
-        static createEnumDeclaration(name: IdentifierExpression, members: EnumValueDeclaration[], decorators: DecoratorNode[] | null, flags: CommonFlags, range: Range): EnumDeclaration;
-        static createEnumValueDeclaration(name: IdentifierExpression, value: Expression | null, flags: CommonFlags, range: Range): EnumValueDeclaration;
+        static createEnumDeclaration(name: IdentifierExpression, decorators: DecoratorNode[] | null, flags: CommonFlags, values: EnumValueDeclaration[], range: Range): EnumDeclaration;
+        static createEnumValueDeclaration(name: IdentifierExpression, flags: CommonFlags, initializer: Expression | null, range: Range): EnumValueDeclaration;
         static createExportStatement(members: ExportMember[] | null, path: StringLiteralExpression | null, isDeclare: boolean, range: Range): ExportStatement;
         static createExportDefaultStatement(declaration: DeclarationStatement, range: Range): ExportDefaultStatement;
         static createExportImportStatement(name: IdentifierExpression, externalName: IdentifierExpression, range: Range): ExportImportStatement;
-        static createExportMember(name: IdentifierExpression, externalName: IdentifierExpression | null, range: Range): ExportMember;
+        static createExportMember(localName: IdentifierExpression, exportedName: IdentifierExpression | null, range: Range): ExportMember;
         static createExpressionStatement(expression: Expression): ExpressionStatement;
         static createIfStatement(condition: Expression, ifTrue: Statement, ifFalse: Statement | null, range: Range): IfStatement;
-        static createImportStatement(decls: ImportDeclaration[] | null, path: StringLiteralExpression, range: Range): ImportStatement;
-        static createImportStatementWithWildcard(identifier: IdentifierExpression, path: StringLiteralExpression, range: Range): ImportStatement;
+        static createImportStatement(declarations: ImportDeclaration[] | null, path: StringLiteralExpression, range: Range): ImportStatement;
+        static createWildcardImportStatement(namespaceName: IdentifierExpression, path: StringLiteralExpression, range: Range): ImportStatement;
         static createImportDeclaration(foreignName: IdentifierExpression, name: IdentifierExpression | null, range: Range): ImportDeclaration;
-        static createInterfaceDeclaration(name: IdentifierExpression, typeParameters: TypeParameterNode[] | null, extendsType: NamedTypeNode | null, // can't be a function
-        members: DeclarationStatement[], decorators: DecoratorNode[] | null, flags: CommonFlags, range: Range): InterfaceDeclaration;
-        static createFieldDeclaration(name: IdentifierExpression, type: TypeNode | null, initializer: Expression | null, decorators: DecoratorNode[] | null, flags: CommonFlags, range: Range): FieldDeclaration;
+        static createInterfaceDeclaration(name: IdentifierExpression, decorators: DecoratorNode[] | null, flags: CommonFlags, typeParameters: TypeParameterNode[] | null, extendsType: NamedTypeNode | null, implementsTypes: NamedTypeNode[] | null, members: DeclarationStatement[], range: Range): InterfaceDeclaration;
+        static createFieldDeclaration(name: IdentifierExpression, decorators: DecoratorNode[] | null, flags: CommonFlags, type: TypeNode | null, initializer: Expression | null, range: Range): FieldDeclaration;
         static createForStatement(initializer: Statement | null, condition: Expression | null, incrementor: Expression | null, statement: Statement, range: Range): ForStatement;
-        static createFunctionDeclaration(name: IdentifierExpression, typeParameters: TypeParameterNode[] | null, signature: FunctionTypeNode, body: Statement | null, decorators: DecoratorNode[] | null, flags: CommonFlags, arrowKind: ArrowKind, range: Range): FunctionDeclaration;
-        static createIndexSignatureDeclaration(keyType: NamedTypeNode, valueType: TypeNode, range: Range): IndexSignatureDeclaration;
-        static createMethodDeclaration(name: IdentifierExpression, typeParameters: TypeParameterNode[] | null, signature: FunctionTypeNode, body: Statement | null, decorators: DecoratorNode[] | null, flags: CommonFlags, range: Range): MethodDeclaration;
-        static createNamespaceDeclaration(name: IdentifierExpression, members: Statement[], decorators: DecoratorNode[] | null, flags: CommonFlags, range: Range): NamespaceDeclaration;
+        static createForOfStatement(variable: Statement, iterable: Expression, statement: Statement, range: Range): ForOfStatement;
+        static createFunctionDeclaration(name: IdentifierExpression, decorators: DecoratorNode[] | null, flags: CommonFlags, typeParameters: TypeParameterNode[] | null, signature: FunctionTypeNode, body: Statement | null, arrowKind: ArrowKind, range: Range): FunctionDeclaration;
+        static createIndexSignature(keyType: NamedTypeNode, valueType: TypeNode, flags: CommonFlags, range: Range): IndexSignatureNode;
+        static createMethodDeclaration(name: IdentifierExpression, decorators: DecoratorNode[] | null, flags: CommonFlags, typeParameters: TypeParameterNode[] | null, signature: FunctionTypeNode, body: Statement | null, range: Range): MethodDeclaration;
+        static createNamespaceDeclaration(name: IdentifierExpression, decorators: DecoratorNode[] | null, flags: CommonFlags, members: Statement[], range: Range): NamespaceDeclaration;
         static createReturnStatement(value: Expression | null, range: Range): ReturnStatement;
         static createSwitchStatement(condition: Expression, cases: SwitchCase[], range: Range): SwitchStatement;
         static createSwitchCase(label: Expression | null, statements: Statement[], range: Range): SwitchCase;
         static createThrowStatement(value: Expression, range: Range): ThrowStatement;
         static createTryStatement(statements: Statement[], catchVariable: IdentifierExpression | null, catchStatements: Statement[] | null, finallyStatements: Statement[] | null, range: Range): TryStatement;
-        static createTypeDeclaration(name: IdentifierExpression, typeParameters: TypeParameterNode[] | null, alias: TypeNode, decorators: DecoratorNode[] | null, flags: CommonFlags, range: Range): TypeDeclaration;
-        static createVariableStatement(declarations: VariableDeclaration[], decorators: DecoratorNode[] | null, range: Range): VariableStatement;
-        static createVariableDeclaration(name: IdentifierExpression, type: TypeNode | null, initializer: Expression | null, decorators: DecoratorNode[] | null, flags: CommonFlags, range: Range): VariableDeclaration;
+        static createTypeDeclaration(name: IdentifierExpression, decorators: DecoratorNode[] | null, flags: CommonFlags, typeParameters: TypeParameterNode[] | null, type: TypeNode, range: Range): TypeDeclaration;
+        static createVariableStatement(decorators: DecoratorNode[] | null, declarations: VariableDeclaration[], range: Range): VariableStatement;
+        static createVariableDeclaration(name: IdentifierExpression, decorators: DecoratorNode[] | null, flags: CommonFlags, type: TypeNode | null, initializer: Expression | null, range: Range): VariableDeclaration;
         static createVoidStatement(expression: Expression, range: Range): VoidStatement;
         static createWhileStatement(condition: Expression, statement: Statement, range: Range): WhileStatement;
+        /** Tests if this node is a literal of the specified kind. */
+        isLiteralKind(literalKind: LiteralKind): boolean;
+        /** Tests if this node is a literal of a numeric kind (float or integer). */
+        get isNumericLiteral(): boolean;
+        /** Tests whether this node is guaranteed to compile to a constant value. */
+        get compilesToConst(): boolean;
+        /** Checks if this is a call calling a method on super. */
+        get isCallOnSuper(): boolean;
     }
     export abstract class TypeNode extends Node {
         /** Whether nullable or not. */
         isNullable: boolean;
+        constructor(
+        /** Kind of the type node. */
+        kind: NodeKind, 
+        /** Whether nullable or not. */
+        isNullable: boolean, 
+        /** Source range. */
+        range: Range);
         /** Tests if this type has a generic component matching one of the given type parameters. */
         hasGenericComponent(typeParameterNodes: TypeParameterNode[]): boolean;
     }
     /** Represents a type name. */
     export class TypeName extends Node {
-        kind: NodeKind;
         /** Identifier of this part. */
         identifier: IdentifierExpression;
         /** Next part of the type name or `null` if this is the last part. */
         next: TypeName | null;
+        constructor(
+        /** Identifier of this part. */
+        identifier: IdentifierExpression, 
+        /** Next part of the type name or `null` if this is the last part. */
+        next: TypeName | null, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a named type. */
     export class NamedTypeNode extends TypeNode {
-        kind: NodeKind;
         /** Type name. */
         name: TypeName;
         /** Type argument references. */
         typeArguments: TypeNode[] | null;
+        constructor(
+        /** Type name. */
+        name: TypeName, 
+        /** Type argument references. */
+        typeArguments: TypeNode[] | null, 
+        /** Whether nullable or not. */
+        isNullable: boolean, 
+        /** Source range. */
+        range: Range);
+        /** Checks if this type node has type arguments. */
         get hasTypeArguments(): boolean;
     }
     /** Represents a function type. */
     export class FunctionTypeNode extends TypeNode {
-        kind: NodeKind;
-        /** Accepted parameters. */
+        /** Function parameters. */
         parameters: ParameterNode[];
         /** Return type. */
         returnType: TypeNode;
         /** Explicitly provided this type, if any. */
         explicitThisType: NamedTypeNode | null;
+        constructor(
+        /** Function parameters. */
+        parameters: ParameterNode[], 
+        /** Return type. */
+        returnType: TypeNode, 
+        /** Explicitly provided this type, if any. */
+        explicitThisType: NamedTypeNode | null, // can't be a function
+        /** Whether nullable or not. */
+        isNullable: boolean, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a type parameter. */
     export class TypeParameterNode extends Node {
-        kind: NodeKind;
         /** Identifier reference. */
         name: IdentifierExpression;
         /** Extended type reference, if any. */
         extendsType: NamedTypeNode | null;
         /** Default type if omitted, if any. */
         defaultType: NamedTypeNode | null;
+        constructor(
+        /** Identifier reference. */
+        name: IdentifierExpression, 
+        /** Extended type reference, if any. */
+        extendsType: NamedTypeNode | null, // can't be a function
+        /** Default type if omitted, if any. */
+        defaultType: NamedTypeNode | null, // can't be a function
+        /** Source range. */
+        range: Range);
     }
     /** Represents the kind of a parameter. */
     export enum ParameterKind {
@@ -1081,15 +1189,25 @@ declare module "assemblyscript/src/ast" {
     }
     /** Represents a function parameter. */
     export class ParameterNode extends Node {
-        kind: NodeKind;
         /** Parameter kind. */
         parameterKind: ParameterKind;
         /** Parameter name. */
         name: IdentifierExpression;
         /** Parameter type. */
         type: TypeNode;
-        /** Initializer expression, if present. */
+        /** Initializer expression, if any. */
         initializer: Expression | null;
+        constructor(
+        /** Parameter kind. */
+        parameterKind: ParameterKind, 
+        /** Parameter name. */
+        name: IdentifierExpression, 
+        /** Parameter type. */
+        type: TypeNode, 
+        /** Initializer expression, if any. */
+        initializer: Expression | null, 
+        /** Source range. */
+        range: Range);
         /** Implicit field declaration, if applicable. */
         implicitFieldDeclaration: FieldDeclaration | null;
         /** Common flags indicating specific traits. */
@@ -1110,7 +1228,7 @@ declare module "assemblyscript/src/ast" {
         OPERATOR_PREFIX = 4,
         OPERATOR_POSTFIX = 5,
         UNMANAGED = 6,
-        SEALED = 7,
+        FINAL = 7,
         INLINE = 8,
         EXTERNAL = 9,
         BUILTIN = 10,
@@ -1123,41 +1241,61 @@ declare module "assemblyscript/src/ast" {
     }
     /** Represents a decorator. */
     export class DecoratorNode extends Node {
-        kind: NodeKind;
-        /** Built-in kind, if applicable. */
+        /** Built-in decorator kind, or custom. */
         decoratorKind: DecoratorKind;
         /** Name expression. */
         name: Expression;
         /** Argument expressions. */
-        arguments: Expression[] | null;
+        args: Expression[] | null;
+        constructor(
+        /** Built-in decorator kind, or custom. */
+        decoratorKind: DecoratorKind, 
+        /** Name expression. */
+        name: Expression, 
+        /** Argument expressions. */
+        args: Expression[] | null, 
+        /** Source range. */
+        range: Range);
     }
     /** Comment kinds. */
     export enum CommentKind {
         /** Line comment. */
         LINE = 0,
-        /** Triple-slash comment. */
+        /** Triple-slash line comment. */
         TRIPLE = 1,
         /** Block comment. */
         BLOCK = 2
     }
     /** Represents a comment. */
     export class CommentNode extends Node {
-        kind: NodeKind;
         /** Comment kind. */
         commentKind: CommentKind;
         /** Comment text. */
         text: string;
+        constructor(
+        /** Comment kind. */
+        commentKind: CommentKind, 
+        /** Comment text. */
+        text: string, 
+        /** Source range. */
+        range: Range);
     }
     /** Base class of all expression nodes. */
     export abstract class Expression extends Node {
     }
     /** Represents an identifier expression. */
     export class IdentifierExpression extends Expression {
-        kind: NodeKind;
         /** Textual name. */
         text: string;
         /** Whether quoted or not. */
         isQuoted: boolean;
+        constructor(
+        /** Textual name. */
+        text: string, 
+        /** Whether quoted or not. */
+        isQuoted: boolean, 
+        /** Source range. */
+        range: Range);
     }
     /** Indicates the kind of a literal. */
     export enum LiteralKind {
@@ -1168,55 +1306,90 @@ declare module "assemblyscript/src/ast" {
         ARRAY = 4,
         OBJECT = 5
     }
-    /** Checks if the given node represents a numeric (float or integer) literal. */
-    export function isNumericLiteral(node: Expression): boolean;
     /** Base class of all literal expressions. */
     export abstract class LiteralExpression extends Expression {
-        kind: NodeKind;
         /** Specific literal kind. */
         literalKind: LiteralKind;
+        constructor(
+        /** Specific literal kind. */
+        literalKind: LiteralKind, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents an `[]` literal expression. */
     export class ArrayLiteralExpression extends LiteralExpression {
-        literalKind: LiteralKind;
         /** Nested element expressions. */
         elementExpressions: (Expression | null)[];
+        constructor(
+        /** Nested element expressions. */
+        elementExpressions: (Expression | null)[], 
+        /** Source range. */
+        range: Range);
     }
     /** Indicates the kind of an assertion. */
     export enum AssertionKind {
+        /** A prefix assertion, i.e. `<T>expr`. */
         PREFIX = 0,
+        /** An as assertion, i.e. `expr as T`. */
         AS = 1,
-        NONNULL = 2
+        /** A non-null assertion, i.e. `!expr`. */
+        NONNULL = 2,
+        /** A const assertion, i.e. `expr as const`. */
+        CONST = 3
     }
     /** Represents an assertion expression. */
     export class AssertionExpression extends Expression {
-        kind: NodeKind;
         /** Specific kind of this assertion. */
         assertionKind: AssertionKind;
         /** Expression being asserted. */
         expression: Expression;
-        /** Target type. */
+        /** Target type, if applicable. */
         toType: TypeNode | null;
+        constructor(
+        /** Specific kind of this assertion. */
+        assertionKind: AssertionKind, 
+        /** Expression being asserted. */
+        expression: Expression, 
+        /** Target type, if applicable. */
+        toType: TypeNode | null, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a binary expression. */
     export class BinaryExpression extends Expression {
-        kind: NodeKind;
         /** Operator token. */
         operator: Token;
         /** Left-hand side expression */
         left: Expression;
         /** Right-hand side expression. */
         right: Expression;
+        constructor(
+        /** Operator token. */
+        operator: Token, 
+        /** Left-hand side expression */
+        left: Expression, 
+        /** Right-hand side expression. */
+        right: Expression, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a call expression. */
     export class CallExpression extends Expression {
-        kind: NodeKind;
         /** Called expression. Usually an identifier or property access expression. */
         expression: Expression;
         /** Provided type arguments. */
         typeArguments: TypeNode[] | null;
         /** Provided arguments. */
-        arguments: Expression[];
+        args: Expression[];
+        constructor(
+        /** Called expression. Usually an identifier or property access expression. */
+        expression: Expression, 
+        /** Provided type arguments. */
+        typeArguments: TypeNode[] | null, 
+        /** Provided arguments. */
+        args: Expression[], 
+        /** Source range. */
+        range: Range);
         /** Gets the type arguments range for reporting. */
         get typeArgumentsRange(): Range;
         /** Gets the arguments range for reporting. */
@@ -1224,64 +1397,101 @@ declare module "assemblyscript/src/ast" {
     }
     /** Represents a class expression using the 'class' keyword. */
     export class ClassExpression extends Expression {
-        kind: NodeKind;
         /** Inline class declaration. */
         declaration: ClassDeclaration;
+        constructor(
+        /** Inline class declaration. */
+        declaration: ClassDeclaration);
     }
     /** Represents a comma expression composed of multiple expressions. */
     export class CommaExpression extends Expression {
-        kind: NodeKind;
         /** Sequential expressions. */
         expressions: Expression[];
+        constructor(
+        /** Sequential expressions. */
+        expressions: Expression[], 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `constructor` expression. */
     export class ConstructorExpression extends IdentifierExpression {
-        kind: NodeKind;
-        text: string;
+        constructor(
+        /** Source range. */
+        range: Range);
     }
     /** Represents an element access expression, e.g., array access. */
     export class ElementAccessExpression extends Expression {
-        kind: NodeKind;
         /** Expression being accessed. */
         expression: Expression;
         /** Element of the expression being accessed. */
         elementExpression: Expression;
+        constructor(
+        /** Expression being accessed. */
+        expression: Expression, 
+        /** Element of the expression being accessed. */
+        elementExpression: Expression, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a float literal expression. */
     export class FloatLiteralExpression extends LiteralExpression {
-        literalKind: LiteralKind;
         /** Float value. */
         value: number;
+        constructor(
+        /** Float value. */
+        value: number, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a function expression using the 'function' keyword. */
     export class FunctionExpression extends Expression {
-        kind: NodeKind;
         /** Inline function declaration. */
         declaration: FunctionDeclaration;
+        constructor(
+        /** Inline function declaration. */
+        declaration: FunctionDeclaration);
     }
     /** Represents an `instanceof` expression. */
     export class InstanceOfExpression extends Expression {
-        kind: NodeKind;
         /** Expression being asserted. */
         expression: Expression;
         /** Type to test for. */
         isType: TypeNode;
+        constructor(
+        /** Expression being asserted. */
+        expression: Expression, 
+        /** Type to test for. */
+        isType: TypeNode, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents an integer literal expression. */
     export class IntegerLiteralExpression extends LiteralExpression {
-        literalKind: LiteralKind;
         /** Integer value. */
-        value: I64;
+        value: i64;
+        constructor(
+        /** Integer value. */
+        value: i64, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `new` expression. Like a call but with its own kind. */
     export class NewExpression extends Expression {
-        kind: NodeKind;
         /** Type being constructed. */
         typeName: TypeName;
         /** Provided type arguments. */
         typeArguments: TypeNode[] | null;
         /** Provided arguments. */
-        arguments: Expression[];
+        args: Expression[];
+        constructor(
+        /** Type being constructed. */
+        typeName: TypeName, 
+        /** Provided type arguments. */
+        typeArguments: TypeNode[] | null, 
+        /** Provided arguments. */
+        args: Expression[], 
+        /** Source range. */
+        range: Range);
         /** Gets the type arguments range for reporting. */
         get typeArgumentsRange(): Range;
         /** Gets the arguments range for reporting. */
@@ -1289,74 +1499,113 @@ declare module "assemblyscript/src/ast" {
     }
     /** Represents a `null` expression. */
     export class NullExpression extends IdentifierExpression {
-        kind: NodeKind;
-        text: string;
+        constructor(
+        /** Source range. */
+        range: Range);
     }
     /** Represents an object literal expression. */
     export class ObjectLiteralExpression extends LiteralExpression {
-        literalKind: LiteralKind;
         /** Field names. */
         names: IdentifierExpression[];
         /** Field values. */
         values: Expression[];
+        constructor(
+        /** Field names. */
+        names: IdentifierExpression[], 
+        /** Field values. */
+        values: Expression[], 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a parenthesized expression. */
     export class ParenthesizedExpression extends Expression {
-        kind: NodeKind;
         /** Expression in parenthesis. */
         expression: Expression;
+        constructor(
+        /** Expression in parenthesis. */
+        expression: Expression, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a property access expression. */
     export class PropertyAccessExpression extends Expression {
-        kind: NodeKind;
         /** Expression being accessed. */
         expression: Expression;
         /** Property of the expression being accessed. */
         property: IdentifierExpression;
+        constructor(
+        /** Expression being accessed. */
+        expression: Expression, 
+        /** Property of the expression being accessed. */
+        property: IdentifierExpression, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a regular expression literal expression. */
     export class RegexpLiteralExpression extends LiteralExpression {
-        literalKind: LiteralKind;
         /** Regular expression pattern. */
         pattern: string;
         /** Regular expression flags. */
         patternFlags: string;
+        constructor(
+        /** Regular expression pattern. */
+        pattern: string, 
+        /** Regular expression flags. */
+        patternFlags: string, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a ternary expression, i.e., short if notation. */
     export class TernaryExpression extends Expression {
-        kind: NodeKind;
         /** Condition expression. */
         condition: Expression;
         /** Expression executed when condition is `true`. */
         ifThen: Expression;
         /** Expression executed when condition is `false`. */
         ifElse: Expression;
+        constructor(
+        /** Condition expression. */
+        condition: Expression, 
+        /** Expression executed when condition is `true`. */
+        ifThen: Expression, 
+        /** Expression executed when condition is `false`. */
+        ifElse: Expression, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a string literal expression. */
     export class StringLiteralExpression extends LiteralExpression {
-        literalKind: LiteralKind;
         /** String value without quotes. */
         value: string;
+        constructor(
+        /** String value without quotes. */
+        value: string, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `super` expression. */
     export class SuperExpression extends IdentifierExpression {
-        kind: NodeKind;
-        text: string;
+        constructor(
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `this` expression. */
     export class ThisExpression extends IdentifierExpression {
-        kind: NodeKind;
-        text: string;
+        constructor(
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `true` expression. */
     export class TrueExpression extends IdentifierExpression {
-        kind: NodeKind;
-        text: string;
+        constructor(
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `false` expression. */
     export class FalseExpression extends IdentifierExpression {
-        kind: NodeKind;
-        text: string;
+        constructor(
+        /** Source range. */
+        range: Range);
     }
     /** Base class of all unary expressions. */
     export abstract class UnaryExpression extends Expression {
@@ -1364,14 +1613,35 @@ declare module "assemblyscript/src/ast" {
         operator: Token;
         /** Operand expression. */
         operand: Expression;
+        constructor(
+        /** Unary expression kind. */
+        kind: NodeKind, 
+        /** Operator token. */
+        operator: Token, 
+        /** Operand expression. */
+        operand: Expression, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a unary postfix expression, e.g. a postfix increment. */
     export class UnaryPostfixExpression extends UnaryExpression {
-        kind: NodeKind;
+        constructor(
+        /** Operator token. */
+        operator: Token, 
+        /** Operand expression. */
+        operand: Expression, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a unary prefix expression, e.g. a negation. */
     export class UnaryPrefixExpression extends UnaryExpression {
-        kind: NodeKind;
+        constructor(
+        /** Operator token. */
+        operator: Token, 
+        /** Operand expression. */
+        operand: Expression, 
+        /** Source range. */
+        range: Range);
     }
     /** Base class of all statement nodes. */
     export abstract class Statement extends Node {
@@ -1389,39 +1659,61 @@ declare module "assemblyscript/src/ast" {
     }
     /** A top-level source node. */
     export class Source extends Node {
-        kind: NodeKind;
-        parent: null;
         /** Source kind. */
         sourceKind: SourceKind;
         /** Normalized path with file extension. */
         normalizedPath: string;
+        /** Full source text. */
+        text: string;
+        constructor(
+        /** Source kind. */
+        sourceKind: SourceKind, 
+        /** Normalized path with file extension. */
+        normalizedPath: string, 
+        /** Full source text. */
+        text: string);
         /** Path used internally. */
         internalPath: string;
         /** Simple path (last part without extension). */
         simplePath: string;
         /** Contained statements. */
         statements: Statement[];
-        /** Full source text. */
-        text: string;
         /** Source map index. */
         debugInfoIndex: number;
         /** Re-exported sources. */
         exportPaths: string[] | null;
-        /** Constructs a new source node. */
-        constructor(normalizedPath: string, text: string, kind: SourceKind);
         /** Checks if this source represents native code. */
         get isNative(): boolean;
         /** Checks if this source is part of the (standard) library. */
         get isLibrary(): boolean;
+        /** Cached line starts. */
+        private lineCache;
+        /** Rememberd column number. */
+        private lineColumn;
+        /** Determines the line number at the specified position. */
+        lineAt(pos: number): number;
+        /** Gets the column number at the last position queried with `lineAt`. */
+        columnAt(): number;
     }
     /** Base class of all declaration statements. */
     export abstract class DeclarationStatement extends Statement {
         /** Simple name being declared. */
         name: IdentifierExpression;
-        /** Array of decorators. */
+        /** Array of decorators, if any. */
         decorators: DecoratorNode[] | null;
         /** Common flags indicating specific traits. */
         flags: CommonFlags;
+        constructor(
+        /** Declaration node kind. */
+        kind: NodeKind, 
+        /** Simple name being declared. */
+        name: IdentifierExpression, 
+        /** Array of decorators, if any. */
+        decorators: DecoratorNode[] | null, 
+        /** Common flags indicating specific traits. */
+        flags: CommonFlags, 
+        /** Source range. */
+        range: Range);
         /** Tests if this node has the specified flag or flags. */
         is(flag: CommonFlags): boolean;
         /** Tests if this node has one of the specified flags. */
@@ -1429,36 +1721,68 @@ declare module "assemblyscript/src/ast" {
         /** Sets a specific flag or flags. */
         set(flag: CommonFlags): void;
     }
-    /** Represents an index signature declaration. */
-    export class IndexSignatureDeclaration extends DeclarationStatement {
-        kind: NodeKind;
+    /** Represents an index signature. */
+    export class IndexSignatureNode extends Node {
         /** Key type. */
         keyType: NamedTypeNode;
         /** Value type. */
         valueType: TypeNode;
+        /** Common flags indicating specific traits. */
+        flags: CommonFlags;
+        constructor(
+        /** Key type. */
+        keyType: NamedTypeNode, 
+        /** Value type. */
+        valueType: TypeNode, 
+        /** Common flags indicating specific traits. */
+        flags: CommonFlags, 
+        /** Source range. */
+        range: Range);
     }
     /** Base class of all variable-like declaration statements. */
     export abstract class VariableLikeDeclarationStatement extends DeclarationStatement {
-        /** Variable type. */
+        /** Annotated type node, if any. */
         type: TypeNode | null;
-        /** Variable initializer. */
+        /** Initializer expression, if any. */
         initializer: Expression | null;
+        constructor(
+        /** Variable-like declaration node kind. */
+        kind: NodeKind, 
+        /** Simple name being declared. */
+        name: IdentifierExpression, 
+        /** Array of decorators, if any. */
+        decorators: DecoratorNode[] | null, 
+        /** Common flags indicating specific traits. */
+        flags: CommonFlags, 
+        /** Annotated type node, if any. */
+        type: TypeNode | null, 
+        /** Initializer expression, if any. */
+        initializer: Expression | null, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a block statement. */
     export class BlockStatement extends Statement {
-        kind: NodeKind;
         /** Contained statements. */
         statements: Statement[];
+        constructor(
+        /** Contained statements. */
+        statements: Statement[], 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `break` statement. */
     export class BreakStatement extends Statement {
-        kind: NodeKind;
-        /** Target label, if applicable. */
+        /** Target label, if any. */
         label: IdentifierExpression | null;
+        constructor(
+        /** Target label, if any. */
+        label: IdentifierExpression | null, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `class` declaration. */
     export class ClassDeclaration extends DeclarationStatement {
-        kind: NodeKind;
         /** Accepted type parameters. */
         typeParameters: TypeParameterNode[] | null;
         /** Base class type being extended, if any. */
@@ -1467,91 +1791,174 @@ declare module "assemblyscript/src/ast" {
         implementsTypes: NamedTypeNode[] | null;
         /** Class member declarations. */
         members: DeclarationStatement[];
+        constructor(
+        /** Simple name being declared. */
+        name: IdentifierExpression, 
+        /** Array of decorators, if any. */
+        decorators: DecoratorNode[] | null, 
+        /** Common flags indicating specific traits. */
+        flags: CommonFlags, 
+        /** Accepted type parameters. */
+        typeParameters: TypeParameterNode[] | null, 
+        /** Base class type being extended, if any. */
+        extendsType: NamedTypeNode | null, // can't be a function
+        /** Interface types being implemented, if any. */
+        implementsTypes: NamedTypeNode[] | null, // can't be functions
+        /** Class member declarations. */
+        members: DeclarationStatement[], 
+        /** Source range. */
+        range: Range);
+        /** Index signature, if present. */
+        indexSignature: IndexSignatureNode | null;
         get isGeneric(): boolean;
     }
     /** Represents a `continue` statement. */
     export class ContinueStatement extends Statement {
-        kind: NodeKind;
         /** Target label, if applicable. */
         label: IdentifierExpression | null;
+        constructor(
+        /** Target label, if applicable. */
+        label: IdentifierExpression | null, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `do` statement. */
     export class DoStatement extends Statement {
-        kind: NodeKind;
         /** Statement being looped over. */
         statement: Statement;
         /** Condition when to repeat. */
         condition: Expression;
+        constructor(
+        /** Statement being looped over. */
+        statement: Statement, 
+        /** Condition when to repeat. */
+        condition: Expression, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents an empty statement, i.e., a semicolon terminating nothing. */
     export class EmptyStatement extends Statement {
-        kind: NodeKind;
+        constructor(
+        /** Source range. */
+        range: Range);
     }
     /** Represents an `enum` declaration. */
     export class EnumDeclaration extends DeclarationStatement {
-        kind: NodeKind;
         /** Enum value declarations. */
         values: EnumValueDeclaration[];
+        constructor(
+        /** Simple name being declared. */
+        name: IdentifierExpression, 
+        /** Array of decorators, if any. */
+        decorators: DecoratorNode[] | null, 
+        /** Common flags indicating specific traits. */
+        flags: CommonFlags, 
+        /** Enum value declarations. */
+        values: EnumValueDeclaration[], 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a value of an `enum` declaration. */
     export class EnumValueDeclaration extends VariableLikeDeclarationStatement {
-        kind: NodeKind;
-        /** Value expression. */
-        value: Expression | null;
+        constructor(
+        /** Simple name being declared. */
+        name: IdentifierExpression, 
+        /** Common flags indicating specific traits. */
+        flags: CommonFlags, 
+        /** Initializer expression, if any. */
+        initializer: Expression | null, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents an `export import` statement of an interface. */
-    export class ExportImportStatement extends Node {
-        kind: NodeKind;
+    export class ExportImportStatement extends Statement {
         /** Identifier being imported. */
         name: IdentifierExpression;
         /** Identifier being exported. */
         externalName: IdentifierExpression;
+        constructor(
+        /** Identifier being imported. */
+        name: IdentifierExpression, 
+        /** Identifier being exported. */
+        externalName: IdentifierExpression, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a member of an `export` statement. */
     export class ExportMember extends Node {
-        kind: NodeKind;
         /** Local identifier. */
         localName: IdentifierExpression;
         /** Exported identifier. */
         exportedName: IdentifierExpression;
+        constructor(
+        /** Local identifier. */
+        localName: IdentifierExpression, 
+        /** Exported identifier. */
+        exportedName: IdentifierExpression, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents an `export` statement. */
     export class ExportStatement extends Statement {
-        kind: NodeKind;
         /** Array of members if a set of named exports, or `null` if a file export. */
         members: ExportMember[] | null;
         /** Path being exported from, if applicable. */
         path: StringLiteralExpression | null;
-        /** Internal path being referenced, if `path` is set. */
-        internalPath: string | null;
         /** Whether this is a declared export. */
         isDeclare: boolean;
+        constructor(
+        /** Array of members if a set of named exports, or `null` if a file export. */
+        members: ExportMember[] | null, 
+        /** Path being exported from, if applicable. */
+        path: StringLiteralExpression | null, 
+        /** Whether this is a declared export. */
+        isDeclare: boolean, 
+        /** Source range. */
+        range: Range);
+        /** Internal path being referenced, if `path` is set. */
+        internalPath: string | null;
     }
     /** Represents an `export default` statement. */
     export class ExportDefaultStatement extends Statement {
-        kind: NodeKind;
         /** Declaration being exported as default. */
         declaration: DeclarationStatement;
+        constructor(
+        /** Declaration being exported as default. */
+        declaration: DeclarationStatement, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents an expression that is used as a statement. */
     export class ExpressionStatement extends Statement {
-        kind: NodeKind;
         /** Expression being used as a statement.*/
         expression: Expression;
+        constructor(
+        /** Expression being used as a statement.*/
+        expression: Expression);
     }
     /** Represents a field declaration within a `class`. */
     export class FieldDeclaration extends VariableLikeDeclarationStatement {
-        kind: NodeKind;
         /** Parameter index if declared as a constructor parameter, otherwise `-1`. */
         parameterIndex: number;
+        constructor(
+        /** Simple name being declared. */
+        name: IdentifierExpression, 
+        /** Array of decorators, if any. */
+        decorators: DecoratorNode[] | null, 
+        /** Common flags indicating specific traits. */
+        flags: CommonFlags, 
+        /** Annotated type node, if any. */
+        type: TypeNode | null, 
+        /** Initializer expression, if any. */
+        initializer: Expression | null, 
+        /** Parameter index if declared as a constructor parameter, otherwise `-1`. */
+        parameterIndex: number, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `for` statement. */
     export class ForStatement extends Statement {
-        kind: NodeKind;
-        /**
-         * Initializer statement, if present.
-         * Either a {@link VariableStatement} or {@link ExpressionStatement}.
-         */
+        /** Initializer statement, if present. Either a `VariableStatement` or `ExpressionStatement`. */
         initializer: Statement | null;
         /** Condition expression, if present. */
         condition: Expression | null;
@@ -1559,6 +1966,35 @@ declare module "assemblyscript/src/ast" {
         incrementor: Expression | null;
         /** Statement being looped over. */
         statement: Statement;
+        constructor(
+        /** Initializer statement, if present. Either a `VariableStatement` or `ExpressionStatement`. */
+        initializer: Statement | null, 
+        /** Condition expression, if present. */
+        condition: Expression | null, 
+        /** Incrementor expression, if present. */
+        incrementor: Expression | null, 
+        /** Statement being looped over. */
+        statement: Statement, 
+        /** Source range. */
+        range: Range);
+    }
+    /** Represents a `for..of` statement. */
+    export class ForOfStatement extends Statement {
+        /** Variable statement. Either a `VariableStatement` or `ExpressionStatement` of `IdentifierExpression`. */
+        variable: Statement;
+        /** Iterable expression being iterated. */
+        iterable: Expression;
+        /** Statement being looped over. */
+        statement: Statement;
+        constructor(
+        /** Variable statement. Either a `VariableStatement` or `ExpressionStatement` of `IdentifierExpression`. */
+        variable: Statement, 
+        /** Iterable expression being iterated. */
+        iterable: Expression, 
+        /** Statement being looped over. */
+        statement: Statement, 
+        /** Source range. */
+        range: Range);
     }
     /** Indicates the kind of an array function. */
     export const enum ArrowKind {
@@ -1571,7 +2007,6 @@ declare module "assemblyscript/src/ast" {
     }
     /** Represents a `function` declaration. */
     export class FunctionDeclaration extends DeclarationStatement {
-        kind: NodeKind;
         /** Type parameters, if any. */
         typeParameters: TypeParameterNode[] | null;
         /** Function signature. */
@@ -1580,83 +2015,182 @@ declare module "assemblyscript/src/ast" {
         body: Statement | null;
         /** Arrow function kind, if applicable. */
         arrowKind: ArrowKind;
+        constructor(
+        /** Simple name being declared. */
+        name: IdentifierExpression, 
+        /** Array of decorators, if any. */
+        decorators: DecoratorNode[] | null, 
+        /** Common flags indicating specific traits. */
+        flags: CommonFlags, 
+        /** Type parameters, if any. */
+        typeParameters: TypeParameterNode[] | null, 
+        /** Function signature. */
+        signature: FunctionTypeNode, 
+        /** Body statement. Usually a block. */
+        body: Statement | null, 
+        /** Arrow function kind, if applicable. */
+        arrowKind: ArrowKind, 
+        /** Source range. */
+        range: Range);
+        /** Gets if this function is generic. */
         get isGeneric(): boolean;
         /** Clones this function declaration. */
         clone(): FunctionDeclaration;
     }
     /** Represents an `if` statement. */
     export class IfStatement extends Statement {
-        kind: NodeKind;
         /** Condition. */
         condition: Expression;
         /** Statement executed when condition is `true`. */
         ifTrue: Statement;
         /** Statement executed when condition is `false`. */
         ifFalse: Statement | null;
+        constructor(
+        /** Condition. */
+        condition: Expression, 
+        /** Statement executed when condition is `true`. */
+        ifTrue: Statement, 
+        /** Statement executed when condition is `false`. */
+        ifFalse: Statement | null, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents an `import` declaration part of an {@link ImportStatement}. */
     export class ImportDeclaration extends DeclarationStatement {
-        kind: NodeKind;
         /** Identifier being imported. */
         foreignName: IdentifierExpression;
+        constructor(
+        /** Simple name being declared. */
+        name: IdentifierExpression, 
+        /** Identifier being imported. */
+        foreignName: IdentifierExpression, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents an `import` statement. */
     export class ImportStatement extends Statement {
-        kind: NodeKind;
         /** Array of member declarations or `null` if an asterisk import. */
         declarations: ImportDeclaration[] | null;
         /** Name of the local namespace, if an asterisk import. */
         namespaceName: IdentifierExpression | null;
         /** Path being imported from. */
         path: StringLiteralExpression;
+        constructor(
+        /** Array of member declarations or `null` if an asterisk import. */
+        declarations: ImportDeclaration[] | null, 
+        /** Name of the local namespace, if an asterisk import. */
+        namespaceName: IdentifierExpression | null, 
+        /** Path being imported from. */
+        path: StringLiteralExpression, 
+        /** Source range. */
+        range: Range);
         /** Internal path being referenced. */
         internalPath: string;
     }
     /** Represents an `interfarce` declaration. */
     export class InterfaceDeclaration extends ClassDeclaration {
-        kind: NodeKind;
+        constructor(
+        /** Simple name being declared. */
+        name: IdentifierExpression, 
+        /** Array of decorators, if any. */
+        decorators: DecoratorNode[] | null, 
+        /** Common flags indicating specific traits. */
+        flags: CommonFlags, 
+        /** Accepted type parameters. */
+        typeParameters: TypeParameterNode[] | null, 
+        /** Base class type being extended, if any. */
+        extendsType: NamedTypeNode | null, // can't be a function
+        /** Interface types being implemented, if any. */
+        implementsTypes: NamedTypeNode[] | null, // can't be functions
+        /** Class member declarations. */
+        members: DeclarationStatement[], 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a method declaration within a `class`. */
     export class MethodDeclaration extends FunctionDeclaration {
-        kind: NodeKind;
+        constructor(
+        /** Simple name being declared. */
+        name: IdentifierExpression, 
+        /** Array of decorators, if any. */
+        decorators: DecoratorNode[] | null, 
+        /** Common flags indicating specific traits. */
+        flags: CommonFlags, 
+        /** Type parameters, if any. */
+        typeParameters: TypeParameterNode[] | null, 
+        /** Function signature. */
+        signature: FunctionTypeNode, 
+        /** Body statement. Usually a block. */
+        body: Statement | null, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `namespace` declaration. */
     export class NamespaceDeclaration extends DeclarationStatement {
-        kind: NodeKind;
         /** Array of namespace members. */
         members: Statement[];
+        constructor(
+        /** Simple name being declared. */
+        name: IdentifierExpression, 
+        /** Array of decorators, if any. */
+        decorators: DecoratorNode[] | null, 
+        /** Common flags indicating specific traits. */
+        flags: CommonFlags, 
+        /** Array of namespace members. */
+        members: Statement[], 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `return` statement. */
     export class ReturnStatement extends Statement {
-        kind: NodeKind;
         /** Value expression being returned, if present. */
         value: Expression | null;
+        constructor(
+        /** Value expression being returned, if present. */
+        value: Expression | null, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a single `case` within a `switch` statement. */
     export class SwitchCase extends Node {
-        kind: NodeKind;
         /** Label expression. `null` indicates the default case. */
         label: Expression | null;
         /** Contained statements. */
         statements: Statement[];
+        constructor(
+        /** Label expression. `null` indicates the default case. */
+        label: Expression | null, 
+        /** Contained statements. */
+        statements: Statement[], 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `switch` statement. */
     export class SwitchStatement extends Statement {
-        kind: NodeKind;
         /** Condition expression. */
         condition: Expression;
         /** Contained cases. */
         cases: SwitchCase[];
+        constructor(
+        /** Condition expression. */
+        condition: Expression, 
+        /** Contained cases. */
+        cases: SwitchCase[], 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `throw` statement. */
     export class ThrowStatement extends Statement {
-        kind: NodeKind;
         /** Value expression being thrown. */
         value: Expression;
+        constructor(
+        /** Value expression being thrown. */
+        value: Expression, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `try` statement. */
     export class TryStatement extends Statement {
-        kind: NodeKind;
         /** Contained statements. */
         statements: Statement[];
         /** Exception variable name, if a `catch` clause is present. */
@@ -1665,40 +2199,91 @@ declare module "assemblyscript/src/ast" {
         catchStatements: Statement[] | null;
         /** Statements being executed afterwards, if a `finally` clause is present. */
         finallyStatements: Statement[] | null;
+        constructor(
+        /** Contained statements. */
+        statements: Statement[], 
+        /** Exception variable name, if a `catch` clause is present. */
+        catchVariable: IdentifierExpression | null, 
+        /** Statements being executed on catch, if a `catch` clause is present. */
+        catchStatements: Statement[] | null, 
+        /** Statements being executed afterwards, if a `finally` clause is present. */
+        finallyStatements: Statement[] | null, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `type` declaration. */
     export class TypeDeclaration extends DeclarationStatement {
-        kind: NodeKind;
         /** Type parameters, if any. */
         typeParameters: TypeParameterNode[] | null;
         /** Type being aliased. */
         type: TypeNode;
+        constructor(
+        /** Simple name being declared. */
+        name: IdentifierExpression, 
+        /** Array of decorators, if any. */
+        decorators: DecoratorNode[] | null, 
+        /** Common flags indicating specific traits. */
+        flags: CommonFlags, 
+        /** Type parameters, if any. */
+        typeParameters: TypeParameterNode[] | null, 
+        /** Type being aliased. */
+        type: TypeNode, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a variable declaration part of a {@link VariableStatement}. */
     export class VariableDeclaration extends VariableLikeDeclarationStatement {
-        kind: NodeKind;
+        constructor(
+        /** Simple name being declared. */
+        name: IdentifierExpression, 
+        /** Array of decorators, if any. */
+        decorators: DecoratorNode[] | null, 
+        /** Common flags indicating specific traits. */
+        flags: CommonFlags, 
+        /** Annotated type node, if any. */
+        type: TypeNode | null, 
+        /** Initializer expression, if any. */
+        initializer: Expression | null, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a variable statement wrapping {@link VariableDeclaration}s. */
     export class VariableStatement extends Statement {
-        kind: NodeKind;
         /** Array of decorators. */
         decorators: DecoratorNode[] | null;
         /** Array of member declarations. */
         declarations: VariableDeclaration[];
+        constructor(
+        /** Array of decorators. */
+        decorators: DecoratorNode[] | null, 
+        /** Array of member declarations. */
+        declarations: VariableDeclaration[], 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a void statement dropping an expression's value. */
     export class VoidStatement extends Statement {
-        kind: NodeKind;
         /** Expression being dropped. */
         expression: Expression;
+        constructor(
+        /** Expression being dropped. */
+        expression: Expression, 
+        /** Source range. */
+        range: Range);
     }
     /** Represents a `while` statement. */
     export class WhileStatement extends Statement {
-        kind: NodeKind;
         /** Condition expression. */
         condition: Expression;
         /** Statement being looped over. */
         statement: Statement;
+        constructor(
+        /** Condition expression. */
+        condition: Expression, 
+        /** Statement being looped over. */
+        statement: Statement, 
+        /** Source range. */
+        range: Range);
     }
     /** Finds the first decorator matching the specified kind. */
     export function findDecorator(kind: DecoratorKind, decorators: DecoratorNode[] | null): DecoratorNode | null;
@@ -1709,9 +2294,14 @@ declare module "assemblyscript/src/ast" {
 }
 declare module "assemblyscript/src/module" {
     /**
-     * A thin wrapper around Binaryen's C-API.
-     * @module module
-     */ /***/
+     * @fileoverview A thin wrapper around Binaryen's C-API.
+     *
+     * The AssemblyScript compiler utilizes Binaryen's C-API directly. Even
+     * though it currently imports binaryen.js, none of the JS APIs it
+     * provides are used.
+     *
+     * @license Apache-2.0
+     */
     import { Target } from "assemblyscript/src/common";
     export type ModuleRef = number;
     export type FunctionRef = number;
@@ -1723,19 +2313,20 @@ declare module "assemblyscript/src/module" {
     export type RelooperRef = number;
     export type RelooperBlockRef = number;
     export type Index = number;
-    export enum NativeType {
-        None = 0,
-        Unreachable = 1,
-        I32 = 2,
-        I64 = 3,
-        F32 = 4,
-        F64 = 5,
-        V128 = 6,
-        Funcref = 7,
-        Anyref = 8,
-        Nullref = 9,
-        Exnref = 10,
-        Auto = -1
+    export type NativeType = number;
+    export namespace NativeType {
+        const None: NativeType;
+        const Unreachable: NativeType;
+        const I32: NativeType;
+        const I64: NativeType;
+        const F32: NativeType;
+        const F64: NativeType;
+        const V128: NativeType;
+        const Funcref: NativeType;
+        const Anyref: NativeType;
+        const Nullref: NativeType;
+        const Exnref: NativeType;
+        const Auto: NativeType;
     }
     export enum FeatureFlags {
         MVP = 0,
@@ -1748,7 +2339,8 @@ declare module "assemblyscript/src/module" {
         ExceptionHandling = 64,
         TailCall = 128,
         ReferenceTypes = 256,
-        All = 511
+        MultiValue = 512,
+        All = 1023
     }
     export enum ExpressionId {
         Invalid = 0,
@@ -1797,7 +2389,9 @@ declare module "assemblyscript/src/module" {
         Try = 43,
         Throw = 44,
         Rethrow = 45,
-        BrOnExn = 46
+        BrOnExn = 46,
+        TupleMake = 47,
+        TupleExtract = 48
     }
     export enum UnaryOp {
         ClzI32 = 0,
@@ -1867,40 +2461,46 @@ declare module "assemblyscript/src/module" {
         SplatF32x4 = 64,
         SplatF64x2 = 65,
         NotV128 = 66,
-        NegI8x16 = 67,
-        AnyTrueI8x16 = 68,
-        AllTrueI8x16 = 69,
-        NegI16x8 = 70,
-        AnyTrueI16x8 = 71,
-        AllTrueI16x8 = 72,
-        NegI32x4 = 73,
-        AnyTrueI32x4 = 74,
-        AllTrueI32x4 = 75,
-        NegI64x2 = 76,
-        AnyTrueI64x2 = 77,
-        AllTrueI64x2 = 78,
-        AbsF32x4 = 79,
-        NegF32x4 = 80,
-        SqrtF32x4 = 81,
-        AbsF64x2 = 82,
-        NegF64x2 = 83,
-        SqrtF64x2 = 84,
-        TruncSatF32x4ToI32x4 = 85,
-        TruncSatF32x4ToU32x4 = 86,
-        TruncSatF64x2ToI64x2 = 87,
-        TruncSatF64x2ToU64x2 = 88,
-        ConvertI32x4ToF32x4 = 89,
-        ConvertU32x4ToF32x4 = 90,
-        ConvertI64x2ToF64x2 = 91,
-        ConvertU64x2ToF64x2 = 92,
-        WidenLowI8x16ToI16x8 = 93,
-        WidenHighI8x16ToI16x8 = 94,
-        WidenLowU8x16ToU16x8 = 95,
-        WidenHighU8x16ToU16x8 = 96,
-        WidenLowI16x8ToI32x4 = 97,
-        WidenHighI16x8ToI32x4 = 98,
-        WidenLowU16x8ToU32x4 = 99,
-        WidenHighU16x8ToU32x4 = 100
+        AbsI8x16 = 67,
+        NegI8x16 = 68,
+        AnyTrueI8x16 = 69,
+        AllTrueI8x16 = 70,
+        BitmaskI8x16 = 71,
+        AbsI16x8 = 72,
+        NegI16x8 = 73,
+        AnyTrueI16x8 = 74,
+        AllTrueI16x8 = 75,
+        BitmaskI16x8 = 76,
+        AbsI32x4 = 77,
+        NegI32x4 = 78,
+        AnyTrueI32x4 = 79,
+        AllTrueI32x4 = 80,
+        BitmaskI32x4 = 81,
+        NegI64x2 = 82,
+        AnyTrueI64x2 = 83,
+        AllTrueI64x2 = 84,
+        AbsF32x4 = 85,
+        NegF32x4 = 86,
+        SqrtF32x4 = 87,
+        AbsF64x2 = 88,
+        NegF64x2 = 89,
+        SqrtF64x2 = 90,
+        TruncSatF32x4ToI32x4 = 91,
+        TruncSatF32x4ToU32x4 = 92,
+        TruncSatF64x2ToI64x2 = 93,
+        TruncSatF64x2ToU64x2 = 94,
+        ConvertI32x4ToF32x4 = 95,
+        ConvertU32x4ToF32x4 = 96,
+        ConvertI64x2ToF64x2 = 97,
+        ConvertU64x2ToF64x2 = 98,
+        WidenLowI8x16ToI16x8 = 99,
+        WidenHighI8x16ToI16x8 = 100,
+        WidenLowU8x16ToU16x8 = 101,
+        WidenHighU8x16ToU16x8 = 102,
+        WidenLowI16x8ToI32x4 = 103,
+        WidenHighI16x8ToI32x4 = 104,
+        WidenLowU16x8ToU32x4 = 105,
+        WidenHighU16x8ToU32x4 = 106
     }
     export enum BinaryOp {
         AddI32 = 0,
@@ -2065,17 +2665,21 @@ declare module "assemblyscript/src/module" {
         DivF32x4 = 159,
         MinF32x4 = 160,
         MaxF32x4 = 161,
-        AddF64x2 = 162,
-        SubF64x2 = 163,
-        MulF64x2 = 164,
-        DivF64x2 = 165,
-        MinF64x2 = 166,
-        MaxF64x2 = 167,
-        NarrowI16x8ToI8x16 = 168,
-        NarrowU16x8ToU8x16 = 169,
-        NarrowI32x4ToI16x8 = 170,
-        NarrowU32x4ToU16x8 = 171,
-        SwizzleV8x16 = 172
+        PminF32x4 = 162,
+        PmaxF32x4 = 163,
+        AddF64x2 = 164,
+        SubF64x2 = 165,
+        MulF64x2 = 166,
+        DivF64x2 = 167,
+        MinF64x2 = 168,
+        MaxF64x2 = 169,
+        PminF64x2 = 170,
+        PmaxF64x2 = 171,
+        NarrowI16x8ToI8x16 = 172,
+        NarrowU16x8ToU8x16 = 173,
+        NarrowI32x4ToI16x8 = 174,
+        NarrowU32x4ToU16x8 = 175,
+        SwizzleV8x16 = 176
     }
     export enum HostOp {
         MemorySize = 0,
@@ -2140,17 +2744,31 @@ declare module "assemblyscript/src/module" {
         LoadI32ToI64x2 = 8,
         LoadU32ToU64x2 = 9
     }
+    export enum ExpressionRunnerFlags {
+        Default = 0,
+        PreserveSideeffects = 1,
+        TraverseCalls = 2
+    }
     export class MemorySegment {
+        /** Segment data. */
         buffer: Uint8Array;
-        offset: I64;
-        static create(buffer: Uint8Array, offset: I64): MemorySegment;
+        /** Segment offset. */
+        offset: i64;
+        constructor(
+        /** Segment data. */
+        buffer: Uint8Array, 
+        /** Segment offset. */
+        offset: i64);
     }
     export class Module {
+        /** Binaryen module reference. */
         ref: ModuleRef;
+        constructor(
+        /** Binaryen module reference. */
+        ref: ModuleRef);
         private lit;
         static create(): Module;
         static createFrom(buffer: Uint8Array): Module;
-        private constructor();
         i32(value: number): ExpressionRef;
         i64(valueLow: number, valueHigh?: number): ExpressionRef;
         f32(value: number): ExpressionRef;
@@ -2179,6 +2797,7 @@ declare module "assemblyscript/src/module" {
         flatten(stmts: ExpressionRef[], type?: NativeType): ExpressionRef;
         br(label: string | null, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
         drop(expression: ExpressionRef): ExpressionRef;
+        maybeDropCondition(condition: ExpressionRef, result: ExpressionRef): ExpressionRef;
         loop(label: string | null, body: ExpressionRef): ExpressionRef;
         if(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse?: ExpressionRef): ExpressionRef;
         nop(): ExpressionRef;
@@ -2206,6 +2825,8 @@ declare module "assemblyscript/src/module" {
         simd_load(op: SIMDLoadOp, ptr: ExpressionRef, offset: number, align: number): ExpressionRef;
         ref_is_null(expr: ExpressionRef): ExpressionRef;
         ref_func(name: string): ExpressionRef;
+        tuple_make(operands: ExpressionRef[]): ExpressionRef;
+        tuple_extract(tuple: ExpressionRef, index: Index): ExpressionRef;
         addGlobal(name: string, type: NativeType, mutable: boolean, initializer: ExpressionRef): GlobalRef;
         getGlobal(name: string): GlobalRef;
         removeGlobal(name: string): void;
@@ -2256,13 +2877,12 @@ declare module "assemblyscript/src/module" {
         setOneCallerInlineMaxSize(size: Index): void;
         getFeatures(): FeatureFlags;
         setFeatures(featureFlags: FeatureFlags): void;
-        optimize(func?: FunctionRef): void;
+        runPass(pass: string, func?: FunctionRef): void;
         runPasses(passes: string[], func?: FunctionRef): void;
-        private cachedPrecomputeNames;
-        precomputeExpression(expr: ExpressionRef): ExpressionRef;
+        optimize(optimizeLevel: number, shrinkLevel: number, debugInfo?: boolean, usesARC?: boolean): void;
         validate(): boolean;
         interpret(): void;
-        toBinary(sourceMapUrl: string | null): BinaryModule;
+        toBinary(sourceMapUrl?: string | null): BinaryModule;
         toText(): string;
         toAsmjs(): string;
         private cachedStrings;
@@ -2270,6 +2890,8 @@ declare module "assemblyscript/src/module" {
         dispose(): void;
         createRelooper(): number;
         cloneExpression(expr: ExpressionRef, noSideEffects?: boolean, maxDepth?: number): ExpressionRef;
+        copyExpression(expr: ExpressionRef): ExpressionRef;
+        runExpression(expr: ExpressionRef, flags: ExpressionRunnerFlags, maxDepth?: number, maxLoopIterations?: number): ExpressionRef;
         addDebugInfoFile(name: string): Index;
         getDebugInfoFile(index: Index): string | null;
         setDebugLocation(func: FunctionRef, expr: ExpressionRef, fileIndex: Index, lineNumber: Index, columnNumber: Index): void;
@@ -2325,28 +2947,50 @@ declare module "assemblyscript/src/module" {
     export function getHostName(expr: ExpressionRef): string | null;
     export function getFunctionBody(func: FunctionRef): ExpressionRef;
     export function getFunctionName(func: FunctionRef): string | null;
-    export function getFunctionParams(func: FunctionRef): Index;
+    export function getFunctionParams(func: FunctionRef): NativeType;
     export function getFunctionResults(func: FunctionRef): NativeType;
-    export function getFunctionVars(func: FunctionRef): NativeType;
+    export function getFunctionVars(func: FunctionRef): NativeType[];
     export function getGlobalName(global: GlobalRef): string | null;
     export function getGlobalType(global: GlobalRef): NativeType;
     export function isGlobalMutable(global: GlobalRef): boolean;
     export function getGlobalInit(global: GlobalRef): ExpressionRef;
     export function getEventName(event: EventRef): string | null;
     export function getEventAttribute(event: EventRef): number;
-    export function getEventType(event: EventRef): string | null;
-    export function getEventParamCount(event: EventRef): Index;
-    export function getEventParam(event: EventRef, index: Index): NativeType;
+    export function getEventParams(event: EventRef): NativeType;
+    export function getEventResults(event: EventRef): NativeType;
     export class Relooper {
+        /** Module this relooper belongs to. */
         module: Module;
+        /** Binaryen relooper reference. */
         ref: number;
+        constructor(
+        /** Module this relooper belongs to. */
+        module: Module, 
+        /** Binaryen relooper reference. */
+        ref: number);
         static create(module: Module): number;
-        private constructor();
         addBlock(code: ExpressionRef): number;
         addBranch(from: number, to: number, condition?: ExpressionRef, code?: ExpressionRef): void;
         addBlockWithSwitch(code: ExpressionRef, condition: ExpressionRef): number;
         addBranchForSwitch(from: number, to: number, indexes: number[], code?: ExpressionRef): void;
         renderAndDispose(entry: number, labelHelper: Index): ExpressionRef;
+    }
+    /** Builds a switch using a sequence of `br_if`s. */
+    export class SwitchBuilder {
+        private module;
+        private condition;
+        private values;
+        private indexes;
+        private cases;
+        private defaultIndex;
+        /** Creates a new builder using the specified i32 condition. */
+        constructor(module: Module, condition: ExpressionRef);
+        /** Links a case to the specified branch. */
+        addCase(value: number, code: ExpressionRef[]): void;
+        /** Links the default branch. */
+        addDefault(code: ExpressionRef[]): void;
+        /** Renders the switch to a block. */
+        render(localIndex: number, labelPostfix?: string): ExpressionRef;
     }
     export enum SideEffects {
         None = 0,
@@ -2372,6 +3016,11 @@ declare module "assemblyscript/src/module" {
         output: Uint8Array;
         /** Source map, if generated. */
         sourceMap: string | null;
+        constructor(
+        /** WebAssembly binary. */
+        output: Uint8Array, 
+        /** Source map, if generated. */
+        sourceMap: string | null);
     }
     /** Tests if an expression needs an explicit 'unreachable' when it is the terminating statement. */
     export function needsExplicitUnreachable(expr: ExpressionRef): boolean;
@@ -2380,10 +3029,10 @@ declare module "assemblyscript/src/module" {
 }
 declare module "assemblyscript/src/types" {
     /**
-     * Mappings from AssemblyScript types to WebAssembly types.
-     * @module types
-     */ /***/
-    import { Class, FunctionTarget, Program } from "assemblyscript/src/program";
+     * @fileoverview Mappings from AssemblyScript types to WebAssembly types.
+     * @license Apache-2.0
+     */
+    import { Class, FunctionTarget, Program, Local } from "assemblyscript/src/program";
     import { NativeType } from "assemblyscript/src/module";
     /** Indicates the kind of a type. */
     export const enum TypeKind {
@@ -2446,7 +3095,9 @@ declare module "assemblyscript/src/types" {
         /** Is a vector type. */
         VECTOR = 1024,
         /** Is a host type. */
-        HOST = 2048
+        HOST = 2048,
+        /** Is a closure type. */
+        IN_SCOPE_CLOSURE = 4096
     }
     /** Represents a resolved type. */
     export class Type {
@@ -2462,6 +3113,8 @@ declare module "assemblyscript/src/types" {
         classReference: Class | null;
         /** Underlying signature reference, if a function type. */
         signatureReference: Signature | null;
+        /** closed over locals */
+        locals: Map<string, Local> | null;
         /** Respective non-nullable type, if nullable. */
         nonNullableType: Type;
         /** Cached nullable type, if non-nullable. */
@@ -2478,6 +3131,7 @@ declare module "assemblyscript/src/types" {
         get isManaged(): boolean;
         /** Tests if this is a class type explicitly annotated as unmanaged. */
         get isUnmanaged(): boolean;
+        get isFunctionIndex(): boolean;
         /** Computes the sign-extending shift in the target type. */
         computeSmallIntegerShift(targetType: Type): number;
         /** Computes the truncating mask in the target type. */
@@ -2492,6 +3146,8 @@ declare module "assemblyscript/src/types" {
         asFunction(signature: Signature): Type;
         /** Composes the respective nullable type of this type. */
         asNullable(): Type;
+        /** Tests if this type equals the specified. */
+        equals(other: Type): boolean;
         /** Tests if a value of this type is assignable to the target type incl. implicit conversion. */
         isAssignableTo(target: Type, signednessIsRelevant?: boolean): boolean;
         /** Tests if a value of this type is assignable to the target type excl. implicit conversion. */
@@ -2542,6 +3198,8 @@ declare module "assemblyscript/src/types" {
         static readonly void: Type;
         /** Alias of i32 indicating type inference of locals and globals with just an initializer. */
         static readonly auto: Type;
+        /** Type of an in-context local */
+        static readonly closure32: Type;
     }
     /** Converts an array of types to an array of native types. */
     export function typesToNativeTypes(types: Type[]): NativeType[];
@@ -2576,21 +3234,38 @@ declare module "assemblyscript/src/types" {
         asFunctionTarget(program: Program): FunctionTarget;
         /** Gets the known or, alternatively, generic parameter name at the specified index. */
         getParameterName(index: number): string;
+        externalEquals(other: Signature): boolean;
+        /** Tests if this signature equals the specified. */
+        equals(other: Signature): boolean;
         /** Tests if a value of this function type is assignable to a target of the specified function type. */
-        isAssignableTo(target: Signature): boolean;
-        /** Tests to see if a signature equals another signature. */
-        equals(value: Signature): boolean;
+        isAssignableTo(target: Signature, requireSameSize?: boolean): boolean;
         /** Converts this signature to a string. */
         toString(): string;
+        toClosureSignature(): Signature;
+        toAnonymousSignature(): Signature;
+        /** Creates a clone of this signature that is safe to modify. */
+        clone(): Signature;
     }
     /** Gets the cached default parameter name for the specified index. */
     export function getDefaultParameterName(index: number): string;
 }
 declare module "assemblyscript/src/flow" {
     /**
-     * A control flow analyzer.
-     * @module flow
-     */ /***/
+     * @fileoverview A concurrent code flow analyzer.
+     *
+     * Flows keep track of compilation state and can be queried for various
+     * conditions, like whether the current branch always terminates, whether
+     * a local is known to be non-null or whether an expression has possibly
+     * overflown its value range.
+     *
+     * To accomplish this, compilation of each function begins with a clean
+     * flow populated with initial local states etc. While compilation
+     * progresses, statements and expressions update flow state while control
+     * constructs fork, potentially add scoped locals and later merge these
+     * forked branches as necessary.
+     *
+     * @license Apache-2.0
+     */
     import { Type } from "assemblyscript/src/types";
     import { Local, Function, Element } from "assemblyscript/src/program";
     import { ExpressionRef } from "assemblyscript/src/module";
@@ -2611,9 +3286,9 @@ declare module "assemblyscript/src/flow" {
         BREAKS = 16,
         /** This flow always continues. */
         CONTINUES = 32,
-        /** This flow always allocates. Constructors only. */
-        ALLOCATES = 64,
-        /** This flow always calls super. Constructors only. */
+        /** This flow always accesses `this`. Constructors only. */
+        ACCESSES_THIS = 64,
+        /** This flow always calls `super`. Constructors only. */
         CALLS_SUPER = 128,
         /** This flow always terminates (returns, throws or continues). */
         TERMINATES = 256,
@@ -2625,8 +3300,10 @@ declare module "assemblyscript/src/flow" {
         CONDITIONALLY_BREAKS = 2048,
         /** This flow conditionally continues in a child flow. */
         CONDITIONALLY_CONTINUES = 4096,
-        /** This flow conditionally allocates in a child flow. Constructors only. */
-        CONDITIONALLY_ALLOCATES = 8192,
+        /** This flow conditionally accesses `this` in a child flow. Constructors only. */
+        CONDITIONALLY_ACCESSES_THIS = 8192,
+        /** This flow may return a non-this value. Constructors only. */
+        MAY_RETURN_NONTHIS = 16384,
         /** This is a flow with explicitly disabled bounds checking. */
         UNCHECKED_CONTEXT = 32768,
         /** Any categorical flag. */
@@ -2664,20 +3341,21 @@ declare module "assemblyscript/src/flow" {
     }
     /** A control flow evaluator. */
     export class Flow {
+        /** Function this flow belongs to. */
+        parentFunction: Function;
+        /** Creates the parent flow of the specified function. */
+        static createParent(parentFunction: Function): Flow;
+        /** Creates an inline flow within `parentFunction`. */
+        static createInline(parentFunction: Function, inlineFunction: Function): Flow;
+        private constructor();
         /** Parent flow. */
         parent: Flow | null;
         /** Flow flags indicating specific conditions. */
         flags: FlowFlags;
-        /** Function this flow belongs to. */
-        parentFunction: Function;
         /** The label we break to when encountering a continue statement. */
         continueLabel: string | null;
         /** The label we break to when encountering a break statement. */
         breakLabel: string | null;
-        /** The current return type. */
-        returnType: Type;
-        /** The current contextual type arguments. */
-        contextualTypeArguments: Map<string, Type> | null;
         /** Scoped local variables. */
         scopedLocals: Map<string, Local> | null;
         /** Local flags. */
@@ -2686,15 +3364,14 @@ declare module "assemblyscript/src/flow" {
         inlineFunction: Function | null;
         /** The label we break to when encountering a return statement, when inlining. */
         inlineReturnLabel: string | null;
-        /** Creates the parent flow of the specified function. */
-        static create(parentFunction: Function): Flow;
-        /** Creates an inline flow within `parentFunction`. */
-        static createInline(parentFunction: Function, inlineFunction: Function): Flow;
-        private constructor();
         /** Tests if this is an inline flow. */
         get isInline(): boolean;
         /** Gets the actual function being compiled, The inlined function when inlining, otherwise the parent function. */
         get actualFunction(): Function;
+        /** Gets the current return type. */
+        get returnType(): Type;
+        /** Gets the current contextual type arguments. */
+        get contextualTypeArguments(): Map<string, Type> | null;
         /** Tests if this flow has the specified flag or flags. */
         is(flag: FlowFlags): boolean;
         /** Tests if this flow has one of the specified flags. */
@@ -2774,11 +3451,19 @@ declare module "assemblyscript/src/flow" {
 }
 declare module "assemblyscript/src/resolver" {
     /**
-     * Resolve infrastructure to obtain types and elements.
-     * @module resolver
-     */ /***/
+     * @fileoverview Resolve infrastructure to obtain types and elements.
+     *
+     * Similar to the compiler making instructions of expressions, the resolver
+     * obtains metadata of expressions. As such, for each `compileX` method in
+     * the compiler there is one `lookupX` method in the resolver returning the
+     * respective IR element, respectively one `resolveX` method returning the
+     * respective type of an expression. It is also able to make new elements,
+     * like instances of classes given its concrete type arguments.
+     *
+     * @license Apache-2.0
+     */
     import { DiagnosticEmitter } from "assemblyscript/src/diagnostics";
-    import { Program, Element, Class, ClassPrototype, Function, FunctionPrototype } from "assemblyscript/src/program";
+    import { Program, Element, Class, ClassPrototype, Function, FunctionPrototype, Property, PropertyPrototype } from "assemblyscript/src/program";
     import { Flow } from "assemblyscript/src/flow";
     import { TypeNode, TypeName, TypeParameterNode, Node, IdentifierExpression, CallExpression, Expression } from "assemblyscript/src/ast";
     import { Type } from "assemblyscript/src/types";
@@ -2894,7 +3579,7 @@ declare module "assemblyscript/src/resolver" {
         /** Determines the final type of an integer literal given the specified contextual type. */
         determineIntegerLiteralType(
         /** Integer literal value. */
-        intValue: I64, 
+        intValue: i64, 
         /** Contextual type. */
         ctxType: Type): Type;
         /** Looks up the program element the specified assertion expression refers to. */
@@ -3001,22 +3686,29 @@ declare module "assemblyscript/src/resolver" {
         reportNode: Node, 
         /** How to proceed with eventual diagnostics. */
         reportMode?: ReportMode): Class | null;
+        /** Resolves a property prototype. */
+        resolveProperty(
+        /** The prototype of the property. */
+        prototype: PropertyPrototype, 
+        /** How to proceed with eventual diagnostics. */
+        reportMode?: ReportMode): Property | null;
     }
 }
 declare module "assemblyscript/src/parser" {
     /**
-     * A TypeScript parser for the AssemblyScript subset.
-     * @module parser
-     */ /***/
+     * @fileoverview A TypeScript parser for the AssemblyScript subset.
+     *
+     * Takes the tokens produced by the `Tokenizer` and builds an abstract
+     * syntax tree composed of `Node`s wrapped in a `Source` out of it.
+     *
+     * @license Apache-2.0
+     */
     import { CommonFlags } from "assemblyscript/src/common";
-    import { Program } from "assemblyscript/src/program";
     import { Tokenizer, CommentHandler } from "assemblyscript/src/tokenizer";
-    import { DiagnosticEmitter } from "assemblyscript/src/diagnostics";
-    import { Source, TypeNode, TypeName, FunctionTypeNode, Expression, ClassExpression, FunctionExpression, Statement, BlockStatement, BreakStatement, ClassDeclaration, ContinueStatement, DeclarationStatement, DecoratorNode, DoStatement, EnumDeclaration, EnumValueDeclaration, ExportImportStatement, ExportMember, ExportStatement, ExpressionStatement, ForStatement, FunctionDeclaration, IfStatement, ImportDeclaration, ImportStatement, IndexSignatureDeclaration, NamespaceDeclaration, ParameterNode, ReturnStatement, SwitchCase, SwitchStatement, ThrowStatement, TryStatement, TypeDeclaration, TypeParameterNode, VariableStatement, VariableDeclaration, VoidStatement, WhileStatement } from "assemblyscript/src/ast";
+    import { DiagnosticEmitter, DiagnosticMessage } from "assemblyscript/src/diagnostics";
+    import { Node, Source, TypeNode, TypeName, FunctionTypeNode, Expression, ClassExpression, FunctionExpression, Statement, BlockStatement, BreakStatement, ClassDeclaration, ContinueStatement, DecoratorNode, DoStatement, EnumDeclaration, EnumValueDeclaration, ExportImportStatement, ExportMember, ExportStatement, ExpressionStatement, ForOfStatement, FunctionDeclaration, IfStatement, ImportDeclaration, ImportStatement, IndexSignatureNode, NamespaceDeclaration, ParameterNode, ReturnStatement, SwitchCase, SwitchStatement, ThrowStatement, TryStatement, TypeDeclaration, TypeParameterNode, VariableStatement, VariableDeclaration, VoidStatement, WhileStatement } from "assemblyscript/src/ast";
     /** Parser interface. */
     export class Parser extends DiagnosticEmitter {
-        /** Program being created. */
-        program: Program;
         /** Source file names to be requested next. */
         backlog: string[];
         /** Source file names already seen, that is processed or backlogged. */
@@ -3026,11 +3718,13 @@ declare module "assemblyscript/src/parser" {
         /** Optional handler to intercept comments while tokenizing. */
         onComment: CommentHandler | null;
         /** Current file being parsed. */
-        currentSource: Source;
+        currentSource: Source | null;
         /** Dependency map **/
         dependees: Map<string, Source>;
+        /** An array of parsed sources. */
+        sources: Source[];
         /** Constructs a new parser. */
-        constructor(program: Program);
+        constructor(diagnostics?: DiagnosticMessage[] | null, sources?: Source[] | null);
         /** Parses a file and adds its definitions to the program. */
         parseFile(
         /** Source text of the file. */
@@ -3055,8 +3749,8 @@ declare module "assemblyscript/src/parser" {
         /** Parses a function type, as used in type declarations. */
         tryParseFunctionType(tn: Tokenizer): FunctionTypeNode | null;
         parseDecorator(tn: Tokenizer): DecoratorNode | null;
-        parseVariable(tn: Tokenizer, flags: CommonFlags, decorators: DecoratorNode[] | null, startPos: number): VariableStatement | null;
-        parseVariableDeclaration(tn: Tokenizer, parentFlags: CommonFlags, parentDecorators: DecoratorNode[] | null): VariableDeclaration | null;
+        parseVariable(tn: Tokenizer, flags: CommonFlags, decorators: DecoratorNode[] | null, startPos: number, isFor?: boolean): VariableStatement | null;
+        parseVariableDeclaration(tn: Tokenizer, parentFlags: CommonFlags, parentDecorators: DecoratorNode[] | null, isFor?: boolean): VariableDeclaration | null;
         parseEnum(tn: Tokenizer, flags: CommonFlags, decorators: DecoratorNode[] | null, startPos: number): EnumDeclaration | null;
         parseEnumValue(tn: Tokenizer, parentFlags: CommonFlags): EnumValueDeclaration | null;
         parseReturn(tn: Tokenizer): ReturnStatement | null;
@@ -3070,8 +3764,8 @@ declare module "assemblyscript/src/parser" {
         private parseFunctionExpressionCommon;
         parseClassOrInterface(tn: Tokenizer, flags: CommonFlags, decorators: DecoratorNode[] | null, startPos: number): ClassDeclaration | null;
         parseClassExpression(tn: Tokenizer): ClassExpression | null;
-        parseClassMember(tn: Tokenizer, parent: ClassDeclaration): DeclarationStatement | null;
-        parseIndexSignatureDeclaration(tn: Tokenizer, decorators: DecoratorNode[] | null): IndexSignatureDeclaration | null;
+        parseClassMember(tn: Tokenizer, parent: ClassDeclaration): Node | null;
+        parseIndexSignature(tn: Tokenizer, flags: CommonFlags, decorators: DecoratorNode[] | null): IndexSignatureNode | null;
         parseNamespace(tn: Tokenizer, flags: CommonFlags, decorators: DecoratorNode[] | null, startPos: number): NamespaceDeclaration | null;
         parseExport(tn: Tokenizer, startPos: number, isDeclare: boolean): ExportStatement | null;
         parseExportMember(tn: Tokenizer): ExportMember | null;
@@ -3085,7 +3779,8 @@ declare module "assemblyscript/src/parser" {
         parseContinue(tn: Tokenizer): ContinueStatement | null;
         parseDoStatement(tn: Tokenizer): DoStatement | null;
         parseExpressionStatement(tn: Tokenizer): ExpressionStatement | null;
-        parseForStatement(tn: Tokenizer): ForStatement | null;
+        parseForStatement(tn: Tokenizer): Statement | null;
+        parseForOfStatement(tn: Tokenizer, startPos: number, variable: Statement): ForOfStatement | null;
         parseIfStatement(tn: Tokenizer): IfStatement | null;
         parseSwitchStatement(tn: Tokenizer): SwitchStatement | null;
         parseSwitchCase(tn: Tokenizer): SwitchCase | null;
@@ -3133,14 +3828,28 @@ declare module "assemblyscript/src/parser" {
 }
 declare module "assemblyscript/src/program" {
     /**
-     * AssemblyScript's intermediate representation describing a program's elements.
-     * @module program
-     */ /***/
+     * @fileoverview AssemblyScript's intermediate representation.
+     *
+     * The compiler uses Binaryen IR, which is fairly low level, as its
+     * primary intermediate representation, with the following structures
+     * holding any higher level information that cannot be represented by
+     * Binaryen IR alone, for example higher level types.
+     *
+     * Similar to the AST being composed of `Node`s in `Source`s, the IR is
+     * composed of `Element`s in a `Program`. Each class or function is
+     * represented by a "prototype" holding all the relevant information,
+     * including each's concrete instances. If a class or function is not
+     * generic, there is exactly one instance, otherwise there is one for
+     * each concrete set of type arguments.
+     *
+     * @license Apache-2.0
+     */
     import { CommonFlags } from "assemblyscript/src/common";
     import { Options } from "assemblyscript/src/compiler";
     import { DiagnosticMessage, DiagnosticEmitter } from "assemblyscript/src/diagnostics";
     import { Type, Signature } from "assemblyscript/src/types";
-    import { Token, Source, Range, DecoratorNode, DecoratorKind, TypeParameterNode, TypeNode, NamedTypeNode, FunctionTypeNode, ArrowKind, Expression, IdentifierExpression, Statement, ClassDeclaration, DeclarationStatement, EnumDeclaration, EnumValueDeclaration, FieldDeclaration, FunctionDeclaration, InterfaceDeclaration, NamespaceDeclaration, TypeDeclaration, VariableDeclaration, VariableLikeDeclarationStatement } from "assemblyscript/src/ast";
+    import { Token, Range } from "assemblyscript/src/tokenizer";
+    import { Source, DecoratorNode, DecoratorKind, TypeParameterNode, TypeNode, NamedTypeNode, FunctionTypeNode, ArrowKind, Expression, IdentifierExpression, Statement, ClassDeclaration, DeclarationStatement, EnumDeclaration, EnumValueDeclaration, FieldDeclaration, FunctionDeclaration, InterfaceDeclaration, NamespaceDeclaration, TypeDeclaration, VariableDeclaration, VariableLikeDeclarationStatement } from "assemblyscript/src/ast";
     import { Module, FunctionRef } from "assemblyscript/src/module";
     import { Resolver } from "assemblyscript/src/resolver";
     import { Flow } from "assemblyscript/src/flow";
@@ -3191,6 +3900,14 @@ declare module "assemblyscript/src/program" {
     }
     /** Represents an AssemblyScript program. */
     export class Program extends DiagnosticEmitter {
+        /** Compiler options. */
+        options: Options;
+        /** Constructs a new program, optionally inheriting parser diagnostics. */
+        constructor(
+        /** Compiler options. */
+        options: Options, 
+        /** Shared array of diagnostic messages (emitted so far). */
+        diagnostics?: DiagnosticMessage[] | null);
         /** Parser instance. */
         parser: Parser;
         /** Resolver instance. */
@@ -3199,12 +3916,16 @@ declare module "assemblyscript/src/program" {
         sources: Source[];
         /** Diagnostic offset used where successively obtaining the next diagnostic. */
         diagnosticsOffset: number;
-        /** Compiler options. */
-        options: Options;
         /** Special native code source. */
         nativeSource: Source;
         /** Special native code file. */
         nativeFile: File;
+        /** Next class id. */
+        nextClassId: number;
+        /** Next signature id. */
+        nextSignatureId: number;
+        /** An indicator if the program has been initialized. */
+        initialized: boolean;
         /** Files by unique internal name. */
         filesByName: Map<string, File>;
         /** Elements by unique internal name in element space. */
@@ -3219,78 +3940,101 @@ declare module "assemblyscript/src/program" {
         managedClasses: Map<number, Class>;
         /** A set of unique function signatures contained in the program, by id. */
         uniqueSignatures: Signature[];
-        /** ArrayBufferView reference. */
-        arrayBufferViewInstance: Class;
-        /** ArrayBuffer instance reference. */
-        arrayBufferInstance: Class;
-        /** Array prototype reference. */
-        arrayPrototype: ClassPrototype;
-        /** Set prototype reference. */
-        setPrototype: ClassPrototype;
-        /** Map prototype reference. */
-        mapPrototype: ClassPrototype;
-        /** Fixed array prototype reference. */
-        fixedArrayPrototype: ClassPrototype;
-        /** Int8Array prototype. */
-        i8ArrayPrototype: ClassPrototype;
-        /** Int16Array prototype. */
-        i16ArrayPrototype: ClassPrototype;
-        /** Int32Array prototype. */
-        i32ArrayPrototype: ClassPrototype;
-        /** Int64Array prototype. */
-        i64ArrayPrototype: ClassPrototype;
-        /** Uint8Array prototype. */
-        u8ArrayPrototype: ClassPrototype;
-        /** Uint8ClampedArray prototype. */
-        u8ClampedArrayPrototype: ClassPrototype;
-        /** Uint16Array prototype. */
-        u16ArrayPrototype: ClassPrototype;
-        /** Uint32Array prototype. */
-        u32ArrayPrototype: ClassPrototype;
-        /** Uint64Array prototype. */
-        u64ArrayPrototype: ClassPrototype;
-        /** Float32Array prototype. */
-        f32ArrayPrototype: ClassPrototype;
-        /** Float64Array prototype. */
-        f64ArrayPrototype: ClassPrototype;
-        /** String instance reference. */
-        stringInstance: Class;
-        /** Abort function reference, if not explicitly disabled. */
-        abortInstance: Function | null;
-        /** RT `__alloc(size: usize, id: u32): usize` */
-        allocInstance: Function;
-        /** RT `__realloc(ptr: usize, newSize: usize): usize` */
-        reallocInstance: Function;
-        /** RT `__free(ptr: usize): void` */
-        freeInstance: Function;
-        /** RT `__retain(ptr: usize): usize` */
-        retainInstance: Function;
-        /** RT `__release(ptr: usize): void` */
-        releaseInstance: Function;
-        /** RT `__collect(): void` */
-        collectInstance: Function;
-        /** RT `__visit(ptr: usize, cookie: u32): void` */
-        visitInstance: Function;
-        /** RT `__typeinfo(id: u32): RTTIFlags` */
-        typeinfoInstance: Function;
-        /** RT `__instanceof(ptr: usize, superId: u32): bool` */
-        instanceofInstance: Function;
-        /** RT `__allocArray(length: i32, alignLog2: usize, id: u32, data: usize = 0): usize` */
-        allocArrayInstance: Function;
-        /** Next class id. */
-        nextClassId: number;
-        /** Next signature id. */
-        nextSignatureId: number;
-        /** Constructs a new program, optionally inheriting parser diagnostics. */
-        constructor(
-        /** Compiler options. */
-        options: Options, 
-        /** Shared array of diagnostic messages (emitted so far). */
-        diagnostics?: DiagnosticMessage[] | null);
+        /** Gets the standard `ArrayBufferView` instance. */
+        get arrayBufferViewInstance(): Class;
+        private _arrayBufferViewInstance;
+        /** Gets the standard `ArrayBuffer` instance. */
+        get arrayBufferInstance(): Class;
+        private _arrayBufferInstance;
+        /** Gets the standard `Array` prototype. */
+        get arrayPrototype(): ClassPrototype;
+        private _arrayPrototype;
+        /** Gets the standard `StaticArray` prototype. */
+        get staticArrayPrototype(): ClassPrototype;
+        private _staticArrayPrototype;
+        /** Gets the standard `Set` prototype. */
+        get setPrototype(): ClassPrototype;
+        private _setPrototype;
+        /** Gets the standard `Map` prototype. */
+        get mapPrototype(): ClassPrototype;
+        private _mapPrototype;
+        /** Gets the standard `Int8Array` prototype. */
+        get int8ArrayPrototype(): ClassPrototype;
+        private _int8ArrayPrototype;
+        /** Gets the standard `Int16Array` prototype. */
+        get int16ArrayPrototype(): ClassPrototype;
+        private _int16ArrayPrototype;
+        /** Gets the standard `Int32Array` prototype. */
+        get int32ArrayPrototype(): ClassPrototype;
+        private _int32ArrayPrototype;
+        /** Gets the standard `Int64Array` prototype. */
+        get int64ArrayPrototype(): ClassPrototype;
+        private _int64ArrayPrototype;
+        /** Gets the standard `Uint8Array` prototype. */
+        get uint8ArrayPrototype(): ClassPrototype;
+        private _uint8ArrayPrototype;
+        /** Gets the standard `Uint8ClampedArray` prototype. */
+        get uint8ClampedArrayPrototype(): ClassPrototype;
+        private _uint8ClampedArrayPrototype;
+        /** Gets the standard `Uint16Array` prototype. */
+        get uint16ArrayPrototype(): ClassPrototype;
+        private _uint16ArrayPrototype;
+        /** Gets the standard `Uint32Array` prototype. */
+        get uint32ArrayPrototype(): ClassPrototype;
+        private _uint32ArrayPrototype;
+        /** Gets the standard `Uint64Array` prototype. */
+        get uint64ArrayPrototype(): ClassPrototype;
+        private _uint64ArrayPrototype;
+        /** Gets the standard `Float32Array` prototype. */
+        get float32ArrayPrototype(): ClassPrototype;
+        private _float32ArrayPrototype;
+        /** Gets the standard `Float64Array` prototype. */
+        get float64ArrayPrototype(): ClassPrototype;
+        private _float64ArrayPrototype;
+        /** Gets the standard `String` instance. */
+        get stringInstance(): Class;
+        private _stringInstance;
+        /** Gets the standard `abort` instance, if not explicitly disabled. */
+        get abortInstance(): Function | null;
+        /** Gets the runtime `__alloc(size: usize, id: u32): usize` instance. */
+        get allocInstance(): Function;
+        private _allocInstance;
+        /** Gets the runtime `__realloc(ptr: usize, newSize: usize): usize` instance. */
+        get reallocInstance(): Function;
+        private _reallocInstance;
+        /** Gets the runtime `__free(ptr: usize): void` instance. */
+        get freeInstance(): Function;
+        private _freeInstance;
+        /** Gets the runtime `__retain(ptr: usize): usize` instance. */
+        get retainInstance(): Function;
+        private _retainInstance;
+        /** Gets the runtime `__release(ptr: usize): void` instance. */
+        get releaseInstance(): Function;
+        private _releaseInstance;
+        /** Gets the runtime `__collect(): void` instance. */
+        get collectInstance(): Function;
+        private _collectInstance;
+        /** Gets the runtime `__visit(ptr: usize, cookie: u32): void` instance. */
+        get visitInstance(): Function;
+        private _visitInstance;
+        /** Gets the runtime `__typeinfo(id: u32): RTTIFlags` instance. */
+        get typeinfoInstance(): Function;
+        private _typeinfoInstance;
+        /** Gets the runtime `__instanceof(ptr: usize, superId: u32): bool` instance. */
+        get instanceofInstance(): Function;
+        private _instanceofInstance;
+        /** Gets the runtime `__allocBuffer(size: usize, id: u32, data: usize = 0): usize` instance. */
+        get allocBufferInstance(): Function;
+        private _allocBufferInstance;
+        /** Gets the runtime `__allocArray(length: i32, alignLog2: usize, id: u32, data: usize = 0): usize` instance. */
+        get allocArrayInstance(): Function;
+        private _allocArrayInstance;
+        /** Tests whether this is a WASI program. */
+        get isWasi(): boolean;
         /** Obtains the source matching the specified internal path. */
         getSource(internalPath: string): string | null;
         /** Writes a common runtime header to the specified buffer. */
-        writeRuntimeHeader(buffer: Uint8Array, offset: number, classInstance: Class, payloadSize: number): void;
+        writeRuntimeHeader(buffer: Uint8Array, offset: number, id: number, payloadSize: number): void;
         /** Gets the size of a runtime header. */
         get runtimeHeaderSize(): number;
         /** Creates a native variable declaration. */
@@ -3333,7 +4077,9 @@ declare module "assemblyscript/src/program" {
         /** Gets the (possibly merged) program element linked to the specified declaration. */
         getElementByDeclaration(declaration: DeclarationStatement): DeclaredElement | null;
         /** Initializes the program and its elements prior to compilation. */
-        initialize(options: Options): void;
+        initialize(): void;
+        /** Marks virtual members in a base class overloaded in this class. */
+        private markVirtuals;
         /** Requires that a global library element of the specified kind is present and returns it. */
         private require;
         /** Requires that a non-generic global class is present and returns it. */
@@ -3342,6 +4088,8 @@ declare module "assemblyscript/src/program" {
         private lookupFunction;
         /** Requires that a global function is present and returns it. */
         private requireFunction;
+        /** Marks all exports of the specified file as module exports. */
+        private markModuleExports;
         /** Marks an element and its children as a module export. */
         private markModuleExport;
         /** Registers a native type with the program. */
@@ -3349,7 +4097,7 @@ declare module "assemblyscript/src/program" {
         /** Registers the backing class of a native type. */
         private registerWrapperClass;
         /** Registers a constant integer value within the global scope. */
-        registerConstantInteger(name: string, type: Type, value: I64): void;
+        registerConstantInteger(name: string, type: Type, value: i64): void;
         /** Registers a constant float value within the global scope. */
         private registerConstantFloat;
         /** Ensures that the given global element exists. Attempts to merge duplicates. */
@@ -3393,6 +4141,8 @@ declare module "assemblyscript/src/program" {
         private initializeFunction;
         /** Initializes an interface. */
         private initializeInterface;
+        /** Initializes a field of an interface, as a property. */
+        private initializeFieldAsProperty;
         /** Initializes a namespace. */
         private initializeNamespace;
         /** Initializes a `type` definition. */
@@ -3458,8 +4208,8 @@ declare module "assemblyscript/src/program" {
         OPERATOR_POSTFIX = 8,
         /** Is an unmanaged class. */
         UNMANAGED = 16,
-        /** Is a sealed class. */
-        SEALED = 32,
+        /** Is a final class. */
+        FINAL = 32,
         /** Is always inlined. */
         INLINE = 64,
         /** Is using a different external name. */
@@ -3524,7 +4274,13 @@ declare module "assemblyscript/src/program" {
         /** Looks up the element with the specified name relative to this element, like in JS. */
         abstract lookup(name: string): Element | null;
         /** Adds an element as a member of this one. Reports and returns `false` if a duplicate. */
-        add(name: string, element: DeclaredElement): boolean;
+        add(name: string, element: DeclaredElement, localIdentifierIfImport?: IdentifierExpression | null): boolean;
+        /** Checks if this element is public, explicitly or implicitly. */
+        get isPublic(): boolean;
+        /** Checks if this element is implicitly public, i.e. not explicitly declared to be. */
+        get isImplicitlyPublic(): boolean;
+        /** Checks if the visibility of this element equals the specified. */
+        visibilityEquals(other: Element): boolean;
         /** Returns a string representation of this element. */
         toString(): string;
     }
@@ -3552,8 +4308,12 @@ declare module "assemblyscript/src/program" {
         get isDeclaredInLibrary(): boolean;
         /** Gets the associated identifier node. */
         get identifierNode(): IdentifierExpression;
+        /** Gets the signature node, if applicable, along the identifier node. */
+        get identifierAndSignatureRange(): Range;
         /** Gets the assiciated decorator nodes. */
         get decoratorNodes(): DecoratorNode[] | null;
+        /** Checks if this element is a compatible override of the specified. */
+        isCompatibleOverride(base: DeclaredElement): boolean;
     }
     /** Checks if the specified element kind indicates a typed element. */
     export function isTypedElement(kind: ElementKind): boolean;
@@ -3593,7 +4353,7 @@ declare module "assemblyscript/src/program" {
         program: Program, 
         /** Source of this file. */
         source: Source);
-        add(name: string, element: DeclaredElement, isImport?: boolean): boolean;
+        add(name: string, element: DeclaredElement, localIdentifierIfImport?: IdentifierExpression | null): boolean;
         lookupInSelf(name: string): DeclaredElement | null;
         lookup(name: string): Element | null;
         /** Ensures that an element is an export of this file. */
@@ -3603,7 +4363,9 @@ declare module "assemblyscript/src/program" {
         /** Looks up the export of the specified name. */
         lookupExport(name: string): DeclaredElement | null;
         /** Creates an imported namespace from this file. */
-        asImportedNamespace(name: string, parent: Element): Namespace;
+        asImportedNamespace(name: string, parent: Element, localIdentifier: IdentifierExpression): Namespace;
+        /** Recursively copies the exports of this file to the specified namespace. */
+        private copyExportsToNamespace;
     }
     /** A type definition. */
     export class TypeDefinition extends TypedElement {
@@ -3665,7 +4427,7 @@ declare module "assemblyscript/src/program" {
         /** Constant value kind. */
         constantValueKind: ConstantValueKind;
         /** Constant integer value, if applicable. */
-        constantIntegerValue: I64;
+        constantIntegerValue: i64;
         /** Constant float value, if applicable. */
         constantFloatValue: number;
         /** Constructs a new variable-like element. */
@@ -3683,7 +4445,7 @@ declare module "assemblyscript/src/program" {
         /** Gets the associated initializer node. */
         get initializerNode(): Expression | null;
         /** Applies a constant integer value to this element. */
-        setConstantIntegerValue(value: I64, type: Type): void;
+        setConstantIntegerValue(value: i64, type: Type): void;
         /** Applies a constant float value to this element. */
         setConstantFloatValue(value: number, type: Type): void;
         /** @override */
@@ -3741,6 +4503,8 @@ declare module "assemblyscript/src/program" {
     export class Local extends VariableLikeElement {
         /** Zero-based index within the enclosing function. `-1` indicates a virtual local. */
         index: number;
+        /** Offset of this variable within closure context, if it's value is held there */
+        closureContextOffset: number;
         /** Constructs a new local variable. */
         constructor(
         /** Simple name. */
@@ -3752,7 +4516,10 @@ declare module "assemblyscript/src/program" {
         /** Parent function. */
         parent: Function, 
         /** Declaration reference. */
-        declaration?: VariableLikeDeclarationStatement);
+        declaration?: VariableLikeDeclarationStatement, 
+        /** Offset of this variable within closure context, if it's value is held there */
+        closureContextOffset?: number);
+        close(offset: number): Local;
     }
     /** A yet unresolved function prototype. */
     export class FunctionPrototype extends DeclaredElement {
@@ -3760,6 +4527,8 @@ declare module "assemblyscript/src/program" {
         operatorKind: OperatorKind;
         /** Already resolved instances. */
         instances: Map<string, Function> | null;
+        /** Methods overloading this one, if any. These are unbound. */
+        overloads: Set<FunctionPrototype> | null;
         /** Clones of this prototype that are bounds to specific classes. */
         private boundPrototypes;
         /** Constructs a new function prototype. */
@@ -3782,6 +4551,7 @@ declare module "assemblyscript/src/program" {
         get arrowKind(): ArrowKind;
         /** Tests if this prototype is bound to a class. */
         get isBound(): boolean;
+        get hasNestedDefinition(): boolean;
         /** Creates a clone of this prototype that is bound to a concrete class instead. */
         toBound(classInstance: Class): FunctionPrototype;
         /** Gets the resolved instance for the specified instance key, if already resolved. */
@@ -3802,6 +4572,14 @@ declare module "assemblyscript/src/program" {
         localsByIndex: Local[];
         /** List of additional non-parameter locals. */
         additionalLocals: Type[];
+        /** Concrete type arguments. */
+        typeArguments: Type[] | null;
+        /** List of all closed locals discovered so far */
+        closedLocals: Map<string, Local>;
+        /** Next global closure offset to use, assuming that classes are packed as c-structs in the order given */
+        /** This is temporary- once we have a ScopeAnalyzer, then the closure class will be defined before we */
+        /** start compiling, and we can just insert a field access */
+        nextGlobalClosureOffset: number;
         /** Contextual type arguments. */
         contextualTypeArguments: Map<string, Type> | null;
         /** Default control flow. */
@@ -3812,8 +4590,10 @@ declare module "assemblyscript/src/program" {
         ref: FunctionRef;
         /** Function table index, if any. */
         functionTableIndex: number;
-        /** Trampoline function for calling with omitted arguments. */
-        trampoline: Function | null;
+        /** Varargs stub for calling with omitted arguments. */
+        varargsStub: Function | null;
+        /** Virtual stub for calling overloads. */
+        virtualStub: Function | null;
         /** Counting id of inline operations involving this function. */
         nextInlineId: number;
         /** Counting id of anonymous inner functions. */
@@ -3826,10 +4606,14 @@ declare module "assemblyscript/src/program" {
         nameInclTypeParameters: string, 
         /** Respective function prototype. */
         prototype: FunctionPrototype, 
+        /** Concrete type arguments. */
+        typeArguments: Type[] | null, 
         /** Concrete signature. */
         signature: Signature, // pre-resolved
         /** Contextual type arguments inherited from its parent class, if any. */
         contextualTypeArguments?: Map<string, Type> | null);
+        /** Creates a stub for use with this function, i.e. for varargs or virtual calls. */
+        newStub(postfix: string): Function;
         /** Adds a local of the specified type, with an optional name. */
         addLocal(type: Type, name?: string | null, declaration?: VariableDeclaration | null): Local;
         lookup(name: string): Element | null;
@@ -3909,15 +4693,23 @@ declare module "assemblyscript/src/program" {
         getterPrototype: FunctionPrototype | null;
         /** Setter prototype. */
         setterPrototype: FunctionPrototype | null;
+        /** Property instance, if resolved. */
+        instance: Property | null;
+        /** Clones of this prototype that are bound to specific classes. */
+        private boundPrototypes;
         /** Constructs a new property prototype. */
         constructor(
         /** Simple name. */
         name: string, 
-        /** Parent class. */
-        parent: ClassPrototype, 
+        /** Parent element. Either a class prototype or instance. */
+        parent: Element, 
         /** Declaration of the getter or setter introducing the property. */
         firstDeclaration: FunctionDeclaration);
         lookup(name: string): Element | null;
+        /** Tests if this prototype is bound to a class. */
+        get isBound(): boolean;
+        /** Creates a clone of this prototype that is bound to a concrete class instead. */
+        toBound(classInstance: Class): PropertyPrototype;
     }
     /** A resolved property. */
     export class Property extends VariableLikeElement {
@@ -3935,8 +4727,8 @@ declare module "assemblyscript/src/program" {
         parent: Element);
         lookup(name: string): Element | null;
     }
-    /** An resolved index signature. */
-    export class IndexSignature extends VariableLikeElement {
+    /** A resolved index signature. */
+    export class IndexSignature extends TypedElement {
         /** Constructs a new index prototype. */
         constructor(
         /** Parent class. */
@@ -3950,15 +4742,19 @@ declare module "assemblyscript/src/program" {
     /** A yet unresolved class prototype. */
     export class ClassPrototype extends DeclaredElement {
         /** Instance member prototypes. */
-        instanceMembers: Map<string, Element> | null;
+        instanceMembers: Map<string, DeclaredElement> | null;
         /** Base class prototype, if applicable. */
         basePrototype: ClassPrototype | null;
+        /** Interface prototypes, if applicable. */
+        interfacePrototypes: InterfacePrototype[] | null;
         /** Constructor prototype. */
         constructorPrototype: FunctionPrototype | null;
         /** Operator overload prototypes. */
         overloadPrototypes: Map<OperatorKind, FunctionPrototype>;
         /** Already resolved instances. */
         instances: Map<string, Class> | null;
+        /** Classes extending this class. */
+        extendees: Set<ClassPrototype>;
         constructor(
         /** Simple name. */
         name: string, 
@@ -3994,6 +4790,8 @@ declare module "assemblyscript/src/program" {
         typeArguments: Type[] | null;
         /** Base class, if applicable. */
         base: Class | null;
+        /** Implemented interfaces, if applicable. */
+        interfaces: Set<Interface> | null;
         /** Contextual type arguments for fields and methods. */
         contextualTypeArguments: Map<string, Type> | null;
         /** Current member memory offset. */
@@ -4012,6 +4810,10 @@ declare module "assemblyscript/src/program" {
         rttiFlags: number;
         /** Wrapped type, if a wrapper for a basic type. */
         wrappedType: Type | null;
+        /** Classes directly extending this class. */
+        extendees: Set<Class> | null;
+        /** Classes implementing this interface. */
+        implementers: Set<Class> | null;
         /** Gets the unique runtime id of this class. */
         get id(): number;
         /** Tests if this class is of a builtin array type (Array/TypedArray). */
@@ -4028,6 +4830,8 @@ declare module "assemblyscript/src/program" {
         typeArguments?: Type[] | null, _isInterface?: boolean);
         /** Sets the base class. */
         setBase(base: Class): void;
+        /** Adds an interface. */
+        addInterface(iface: Interface): void;
         /** Tests if a value of this class type is assignable to a target of the specified class type. */
         isAssignableTo(target: Class): boolean;
         /** Looks up the operator overload of the specified kind. */
@@ -4047,6 +4851,8 @@ declare module "assemblyscript/src/program" {
         get isAcyclic(): boolean;
         /** Tests if this class potentially forms a reference cycle to another one. */
         private cyclesTo;
+        /** Gets all extendees of this class (that do not have the specified instance member). */
+        getAllExtendees(exceptIfMember?: string | null, out?: Set<Class>): Set<Class>;
     }
     /** A yet unresolved interface. */
     export class InterfacePrototype extends ClassPrototype {
@@ -4056,23 +4862,30 @@ declare module "assemblyscript/src/program" {
     /** A resolved interface. */
     export class Interface extends Class {
         /** Constructs a new interface. */
-        constructor(nameInclTypeParameters: string, prototype: InterfacePrototype, typeArguments?: Type[]);
+        constructor(
+        /** Name incl. type parameters, i.e. `Foo<i32>`. */
+        nameInclTypeParameters: string, 
+        /** The respective class prototype. */
+        prototype: InterfacePrototype, 
+        /** Concrete type arguments, if any. */
+        typeArguments?: Type[] | null);
     }
     /** Mangles the internal name of an element with the specified name that is a child of the given parent. */
     export function mangleInternalName(name: string, parent: Element, isInstance: boolean, asGlobal?: boolean): string;
 }
 declare module "assemblyscript/src/compiler" {
     /**
-     * The AssemblyScript compiler.
-     * @module compiler
-     */ /***/
+     * @fileoverview The AssemblyScript compiler.
+     * @license Apache-2.0
+     */
     import { DiagnosticEmitter } from "assemblyscript/src/diagnostics";
     import { Module, MemorySegment, ExpressionRef, NativeType, GlobalRef } from "assemblyscript/src/module";
     import { Feature, Target } from "assemblyscript/src/common";
     import { Program, ClassPrototype, Class, Element, Enum, Field, Function, Global, Property, VariableLikeElement, File } from "assemblyscript/src/program";
-    import { Flow } from "assemblyscript/src/flow";
+    import { Flow, ConditionKind } from "assemblyscript/src/flow";
     import { Resolver } from "assemblyscript/src/resolver";
-    import { Node, Range, Statement, Expression } from "assemblyscript/src/ast";
+    import { Range } from "assemblyscript/src/tokenizer";
+    import { Node, FunctionTypeNode, Statement, Expression } from "assemblyscript/src/ast";
     import { Type, Signature } from "assemblyscript/src/types";
     /** Compiler options. */
     export class Options {
@@ -4080,10 +4893,16 @@ declare module "assemblyscript/src/compiler" {
         target: Target;
         /** If true, replaces assertions with nops. */
         noAssert: boolean;
+        /** It true, exports the memory to the embedder. */
+        exportMemory: boolean;
         /** If true, imports the memory provided by the embedder. */
         importMemory: boolean;
-        /** If greater than zero, declare memory as shared by setting max memory to sharedMemory. */
-        sharedMemory: number;
+        /** Initial memory size, in pages. */
+        initialMemory: number;
+        /** Maximum memory size, in pages. */
+        maximumMemory: number;
+        /** If true, memory is declared as shared. */
+        sharedMemory: boolean;
         /** If true, imports the function table provided by the embedder. */
         importTable: boolean;
         /** If true, exports the function table. */
@@ -4104,6 +4923,8 @@ declare module "assemblyscript/src/compiler" {
         noUnsafe: boolean;
         /** If true, enables pedantic diagnostics. */
         pedantic: boolean;
+        /** Indicates a very low (<64k) memory limit. */
+        lowMemoryLimit: number;
         /** Hinted optimize level. Not applied by the compiler itself. */
         optimizeLevelHint: number;
         /** Hinted shrink level. Not applied by the compiler itself. */
@@ -4147,7 +4968,9 @@ declare module "assemblyscript/src/compiler" {
         /** Requires the built-in globals visitor. */
         visitGlobals = 4,
         /** Requires the built-in members visitor. */
-        visitMembers = 8
+        visitMembers = 8,
+        /** Requires the setArgumentsLength export. */
+        setArgumentsLength = 16
     }
     /** Exported names of compiler-generated elements. */
     export namespace ExportNames {
@@ -4181,13 +5004,13 @@ declare module "assemblyscript/src/compiler" {
         /** Start function statements. */
         currentBody: ExpressionRef[];
         /** Counting memory offset. */
-        memoryOffset: I64;
+        memoryOffset: i64;
         /** Memory segments being compiled. */
         memorySegments: MemorySegment[];
         /** Map of already compiled static string segments. */
         stringSegments: Map<string, MemorySegment>;
         /** Function table being compiled. First elem is blank. */
-        functionTable: string[];
+        functionTable: Function[];
         /** Arguments length helper global. */
         builtinArgumentsLength: GlobalRef;
         /** Requires runtime features. */
@@ -4200,6 +5023,8 @@ declare module "assemblyscript/src/compiler" {
         lazyLibraryFunctions: Set<Function>;
         /** Pending class-specific instanceof helpers. */
         pendingClassInstanceOf: Set<ClassPrototype>;
+        /** Functions potentially involving a virtual call. */
+        virtualCalls: Set<Function>;
         /** Compiles a {@link Program} to a {@link Module} using the specified options. */
         static compile(program: Program): Module;
         /** Constructs a new compiler for a {@link Program} using the specified options. */
@@ -4247,8 +5072,10 @@ declare module "assemblyscript/src/compiler" {
         addMemorySegment(buffer: Uint8Array, alignment?: number): MemorySegment;
         /** Ensures that a string exists in static memory and returns a pointer to it. Deduplicates. */
         ensureStaticString(stringValue: string): ExpressionRef;
+        /** Writes a series of static values of the specified type to a buffer. */
+        writeStaticBuffer(buf: Uint8Array, pos: number, elementType: Type, values: ExpressionRef[]): number;
         /** Adds a buffer to static memory and returns the created segment. */
-        private addStaticBuffer;
+        addStaticBuffer(elementType: Type, values: ExpressionRef[], id?: number): MemorySegment;
         /** Adds an array header to static memory and returns the created segment. */
         private addStaticArrayHeader;
         /** Ensures that a table entry exists for the specified function and returns its index. */
@@ -4278,6 +5105,7 @@ declare module "assemblyscript/src/compiler" {
         private compileExpressionStatement;
         private compileForStatement;
         private doCompileForStatement;
+        private compileForOfStatement;
         private compileIfStatement;
         private compileReturnStatement;
         private compileSwitchStatement;
@@ -4291,8 +5119,6 @@ declare module "assemblyscript/src/compiler" {
         /** Compiles the value of an inlined constant element. */
         compileInlineConstant(element: VariableLikeElement, contextualType: Type, constraints: Constraints): ExpressionRef;
         compileExpression(expression: Expression, contextualType: Type, constraints?: Constraints): ExpressionRef;
-        /** Compiles and precomputes an expression, possibly yielding a costant value. */
-        precomputeExpression(expression: Expression, contextualType: Type, constraints?: Constraints): ExpressionRef;
         /** Compiles an expression that is about to be returned, taking special care of retaining and setting flow states. */
         private compileReturnedExpression;
         convertExpression(expr: ExpressionRef, 
@@ -4335,6 +5161,7 @@ declare module "assemblyscript/src/compiler" {
         private makeGlobalAssignment;
         /** Makes an assignment to a field, possibly retaining and releasing affected references. */
         private makeFieldAssignment;
+        private injectClosedLocals;
         /** Compiles a call expression according to the specified context. */
         private compileCallExpression;
         private compileCallExpressionBuiltin;
@@ -4348,20 +5175,28 @@ declare module "assemblyscript/src/compiler" {
         /** Compiles a direct call to a concrete function. */
         compileCallDirect(instance: Function, argumentExpressions: Expression[], reportNode: Node, thisArg?: ExpressionRef, constraints?: Constraints): ExpressionRef;
         makeCallInline(instance: Function, operands: ExpressionRef[] | null, thisArg?: ExpressionRef, immediatelyDropped?: boolean): ExpressionRef;
-        /** Gets the trampoline for the specified function. */
-        ensureTrampoline(original: Function): Function;
         /** Makes sure that the arguments length helper global is present. */
-        ensureBuiltinArgumentsLength(): void;
+        ensureArgumentsLength(): void;
+        /** Ensures compilation of the varargs stub for the specified function. */
+        ensureVarargsStub(original: Function): Function;
+        /** Ensures compilation of the virtual stub for the specified function. */
+        ensureVirtualStub(original: Function): Function;
+        /** Finalizes the virtual stub of the specified function. */
+        private finalizeVirtualStub;
         /** Makes a retain call, retaining the expression's value. */
-        makeRetain(expr: ExpressionRef): ExpressionRef;
+        makeRetain(expr: ExpressionRef, type: Type, exprLocalIndex?: number): ExpressionRef;
         /** Makes a release call, releasing the expression's value. Changes the current type to void.*/
-        makeRelease(expr: ExpressionRef): ExpressionRef;
+        makeRelease(expr: ExpressionRef, type: Type, exprLocalIndex?: number): ExpressionRef;
         /** Makes a replace, retaining the new expression's value and releasing the old expression's value, in this order. */
         makeReplace(
         /** New value being assigned. */
         newExpr: ExpressionRef, 
+        /** The type of the new expression. */
+        newType: Type, 
         /** Old value being replaced. */
         oldExpr: ExpressionRef, 
+        /** The type of the old expression. */
+        oldType: Type, 
         /** Whether the new value is already retained. */
         alreadyRetained?: boolean): ExpressionRef;
         /** Makes an autorelease call at the end of the specified `flow`. */
@@ -4434,6 +5269,9 @@ declare module "assemblyscript/src/compiler" {
         private compileCommaExpression;
         private compileElementAccessExpression;
         private compileFunctionExpression;
+        private ifClosure;
+        private getClosurePtr;
+        private getClosureReference;
         /** Makes sure the enclosing source file of the specified expression has been compiled. */
         private maybeCompileEnclosingSource;
         private compileIdentifierExpression;
@@ -4443,6 +5281,8 @@ declare module "assemblyscript/src/compiler" {
         private compileLiteralExpression;
         private compileStringLiteral;
         private compileArrayLiteral;
+        /** Compiles a special `fixed` array literal. */
+        private compileStaticArrayLiteral;
         private compileObjectLiteral;
         private compileNewExpression;
         /** Gets the compiled constructor of the specified class or generates one if none is present. */
@@ -4465,6 +5305,14 @@ declare module "assemblyscript/src/compiler" {
         ensureSmallIntegerWrap(expr: ExpressionRef, type: Type): ExpressionRef;
         /** Adds the debug location of the specified expression at the specified range to the source map. */
         addDebugLocation(expr: ExpressionRef, range: Range): void;
+        /** Checks whether a particular feature is enabled. */
+        checkFeatureEnabled(feature: Feature, reportNode: Node): boolean;
+        /** Checks whether a particular type is supported. */
+        checkTypeSupported(type: Type, reportNode: Node): boolean;
+        /** Checks whether a particular function signature is supported. */
+        checkSignatureSupported(signature: Signature, reportNode: FunctionTypeNode): boolean;
+        /** Evaluates a boolean condition, determining whether it is TRUE, FALSE or UNKNOWN. */
+        evaluateCondition(expr: ExpressionRef): ConditionKind;
         /** Makes a constant zero of the specified type. */
         makeZero(type: Type): ExpressionRef;
         /** Makes a constant one of the specified type. */
@@ -4509,9 +5357,27 @@ declare module "assemblyscript/src/compiler" {
 }
 declare module "assemblyscript/src/builtins" {
     /**
-     * Built-in elements providing WebAssembly core functionality.
-     * @module builtins
-     */ /***/
+     * @fileoverview Built-in elements providing core WebAssembly functionality.
+     *
+     * Each builtin is linked to its definition in std/assembly/builtins.ts.
+     * When its prototype is called, the compiler recognizes the `@builtin`
+     * decorator, looks up the respective handler in the global builtins map
+     * and executes it, with the handler directly emitting WebAssembly code
+     * according to context.
+     *
+     * Builtins can be categorized into core builtins that typically are generic
+     * and emit code directly and aliases calling core builtins with overridden
+     * contexts. The latter is used by inline assembler aliases of WebAssembly
+     * instructions, like `i64.load8_u` deferring to `<i64>load<u8>`.
+     *
+     * The `contextIsExact` modifier is used to force a specific instruction
+     * family. A `i32.store8` deferring to `<i32>store<i8>` for example is
+     * ambiguous in that the input can still be an i32 or an i64, leading to
+     * either an `i32.store8` or an `i64.store8`, so `i32` is forced there.
+     * This behavior is indicated by `from i32/i64` in the comments below.
+     *
+     * @license Apache-2.0
+     */
     import { Compiler } from "assemblyscript/src/compiler";
     import { Expression, CallExpression } from "assemblyscript/src/ast";
     import { Type } from "assemblyscript/src/types";
@@ -4523,6 +5389,9 @@ declare module "assemblyscript/src/builtins" {
         const started = "~started";
         const argumentsLength = "~argumentsLength";
         const setArgumentsLength = "~setArgumentsLength";
+        const abort = "~lib/builtins/abort";
+        const trace = "~lib/builtins/trace";
+        const seed = "~lib/builtins/seed";
         const isInteger = "~lib/builtins/isInteger";
         const isFloat = "~lib/builtins/isFloat";
         const isBoolean = "~lib/builtins/isBoolean";
@@ -4738,8 +5607,11 @@ declare module "assemblyscript/src/builtins" {
         const v128_bitselect = "~lib/builtins/v128.bitselect";
         const v128_any_true = "~lib/builtins/v128.any_true";
         const v128_all_true = "~lib/builtins/v128.all_true";
+        const v128_bitmask = "~lib/builtins/v128.bitmask";
         const v128_min = "~lib/builtins/v128.min";
         const v128_max = "~lib/builtins/v128.max";
+        const v128_pmin = "~lib/builtins/v128.pmin";
+        const v128_pmax = "~lib/builtins/v128.pmax";
         const v128_dot = "~lib/builtins/v128.dot";
         const v128_avgr = "~lib/builtins/v128.avgr";
         const v128_abs = "~lib/builtins/v128.abs";
@@ -4775,6 +5647,7 @@ declare module "assemblyscript/src/builtins" {
         const i8x16_max_s = "~lib/builtins/i8x16.max_s";
         const i8x16_max_u = "~lib/builtins/i8x16.max_u";
         const i8x16_avgr_u = "~lib/builtins/i8x16.avgr_u";
+        const i8x16_abs = "~lib/builtins/i8x16.abs";
         const i8x16_neg = "~lib/builtins/i8x16.neg";
         const i8x16_add_saturate_s = "~lib/builtins/i8x16.add_saturate_s";
         const i8x16_add_saturate_u = "~lib/builtins/i8x16.add_saturate_u";
@@ -4785,6 +5658,7 @@ declare module "assemblyscript/src/builtins" {
         const i8x16_shr_u = "~lib/builtins/i8x16.shr_u";
         const i8x16_any_true = "~lib/builtins/i8x16.any_true";
         const i8x16_all_true = "~lib/builtins/i8x16.all_true";
+        const i8x16_bitmask = "~lib/builtins/i8x16.bitmask";
         const i8x16_eq = "~lib/builtins/i8x16.eq";
         const i8x16_ne = "~lib/builtins/i8x16.ne";
         const i8x16_lt_s = "~lib/builtins/i8x16.lt_s";
@@ -4809,6 +5683,7 @@ declare module "assemblyscript/src/builtins" {
         const i16x8_max_s = "~lib/builtins/i16x8.max_s";
         const i16x8_max_u = "~lib/builtins/i16x8.max_u";
         const i16x8_avgr_u = "~lib/builtins/i16x8.avgr_u";
+        const i16x8_abs = "~lib/builtins/i16x8.abs";
         const i16x8_neg = "~lib/builtins/i16x8.neg";
         const i16x8_add_saturate_s = "~lib/builtins/i16x8.add_saturate_s";
         const i16x8_add_saturate_u = "~lib/builtins/i16x8.add_saturate_u";
@@ -4819,6 +5694,7 @@ declare module "assemblyscript/src/builtins" {
         const i16x8_shr_u = "~lib/builtins/i16x8.shr_u";
         const i16x8_any_true = "~lib/builtins/i16x8.any_true";
         const i16x8_all_true = "~lib/builtins/i16x8.all_true";
+        const i16x8_bitmask = "~lib/builtins/i16x8.bitmask";
         const i16x8_eq = "~lib/builtins/i16x8.eq";
         const i16x8_ne = "~lib/builtins/i16x8.ne";
         const i16x8_lt_s = "~lib/builtins/i16x8.lt_s";
@@ -4848,12 +5724,14 @@ declare module "assemblyscript/src/builtins" {
         const i32x4_max_s = "~lib/builtins/i32x4.max_s";
         const i32x4_max_u = "~lib/builtins/i32x4.max_u";
         const i32x4_dot_i16x8_s = "~lib/builtins/i32x4.dot_i16x8_s";
+        const i32x4_abs = "~lib/builtins/i32x4.abs";
         const i32x4_neg = "~lib/builtins/i32x4.neg";
         const i32x4_shl = "~lib/builtins/i32x4.shl";
         const i32x4_shr_s = "~lib/builtins/i32x4.shr_s";
         const i32x4_shr_u = "~lib/builtins/i32x4.shr_u";
         const i32x4_any_true = "~lib/builtins/i32x4.any_true";
         const i32x4_all_true = "~lib/builtins/i32x4.all_true";
+        const i32x4_bitmask = "~lib/builtins/i32x4.bitmask";
         const i32x4_eq = "~lib/builtins/i32x4.eq";
         const i32x4_ne = "~lib/builtins/i32x4.ne";
         const i32x4_lt_s = "~lib/builtins/i32x4.lt_s";
@@ -4897,6 +5775,8 @@ declare module "assemblyscript/src/builtins" {
         const f32x4_neg = "~lib/builtins/f32x4.neg";
         const f32x4_min = "~lib/builtins/f32x4.min";
         const f32x4_max = "~lib/builtins/f32x4.max";
+        const f32x4_pmin = "~lib/builtins/f32x4.pmin";
+        const f32x4_pmax = "~lib/builtins/f32x4.pmax";
         const f32x4_abs = "~lib/builtins/f32x4.abs";
         const f32x4_sqrt = "~lib/builtins/f32x4.sqrt";
         const f32x4_eq = "~lib/builtins/f32x4.eq";
@@ -4919,6 +5799,8 @@ declare module "assemblyscript/src/builtins" {
         const f64x2_neg = "~lib/builtins/f64x2.neg";
         const f64x2_min = "~lib/builtins/f64x2.min";
         const f64x2_max = "~lib/builtins/f64x2.max";
+        const f64x2_pmin = "~lib/builtins/f64x2.pmin";
+        const f64x2_pmax = "~lib/builtins/f64x2.pmax";
         const f64x2_abs = "~lib/builtins/f64x2.abs";
         const f64x2_sqrt = "~lib/builtins/f64x2.sqrt";
         const f64x2_eq = "~lib/builtins/f64x2.eq";
@@ -4950,6 +5832,7 @@ declare module "assemblyscript/src/builtins" {
         const memory_grow = "~lib/memory/memory.grow";
         const memory_copy = "~lib/memory/memory.copy";
         const memory_fill = "~lib/memory/memory.fill";
+        const memory_data = "~lib/memory/memory.data";
         const Int8Array = "~lib/typedarray/Int8Array";
         const Uint8Array = "~lib/typedarray/Uint8Array";
         const Uint8ClampedArray = "~lib/typedarray/Uint8ClampedArray";
@@ -4961,21 +5844,44 @@ declare module "assemblyscript/src/builtins" {
         const Uint64Array = "~lib/typedarray/Uint64Array";
         const Float32Array = "~lib/typedarray/Float32Array";
         const Float64Array = "~lib/typedarray/Float64Array";
+        const wasiAbort = "~lib/wasi/index/abort";
+        const wasiTrace = "~lib/wasi/index/trace";
+        const wasiSeed = "~lib/wasi/index/seed";
     }
-    /** Compiles a call to a built-in function. */
-    export function compileCall(compiler: Compiler, 
-    /** Respective function prototype. */
-    prototype: FunctionPrototype, 
-    /** Pre-resolved type arguments. */
-    typeArguments: Type[] | null, 
-    /** Operand expressions. */
-    operands: Expression[], 
-    /** Contextual type. */
-    contextualType: Type, 
-    /** Respective call expression. */
-    reportNode: CallExpression, 
-    /** Indicates that contextual type is ASM type. */
-    isAsm?: boolean): ExpressionRef;
+    /** Builtin compilation context. */
+    export class BuiltinContext {
+        /** Compiler reference. */
+        compiler: Compiler;
+        /** Prototype being called. */
+        prototype: FunctionPrototype;
+        /** Provided type arguments. */
+        typeArguments: Type[] | null;
+        /** Provided operands. */
+        operands: Expression[];
+        /** Contextual type. */
+        contextualType: Type;
+        /** Respective call expression. */
+        reportNode: CallExpression;
+        /** Whether originating from inline assembly. */
+        contextIsExact: boolean;
+        constructor(
+        /** Compiler reference. */
+        compiler: Compiler, 
+        /** Prototype being called. */
+        prototype: FunctionPrototype, 
+        /** Provided type arguments. */
+        typeArguments: Type[] | null, 
+        /** Provided operands. */
+        operands: Expression[], 
+        /** Contextual type. */
+        contextualType: Type, 
+        /** Respective call expression. */
+        reportNode: CallExpression, 
+        /** Whether originating from inline assembly. */
+        contextIsExact: boolean);
+    }
+    /** Global builtins map. */
+    export const builtins: Map<string, (ctx: BuiltinContext) => ExpressionRef>;
     /** Compiles the `visit_globals` function. */
     export function compileVisitGlobals(compiler: Compiler): void;
     /** Compiles the `visit_members` function. */
@@ -4987,9 +5893,13 @@ declare module "assemblyscript/src/builtins" {
 }
 declare module "assemblyscript/src/definitions" {
     /**
-     * Definition builders for WebIDL and TypeScript.
-     * @module definitions
-     */ /***/
+     * @fileoverview Builders for various definitions describing a module.
+     *
+     * - TSDBuilder: Creates a TypeScript definition file (.d.ts)
+     * - IDLBuilder: Creates a WebIDL interface definition (.webidl)
+     *
+     * @license Apache-2.0
+     */
     import { Program, Element, Global, Enum, Field, Function, Class, Namespace, Interface, File } from "assemblyscript/src/program";
     import { Type } from "assemblyscript/src/types";
     /** Walker base class. */
@@ -5010,7 +5920,6 @@ declare module "assemblyscript/src/definitions" {
         visitElement(name: string, element: Element): void;
         private visitFunctionInstances;
         private visitClassInstances;
-        private visitPropertyInstances;
         abstract visitGlobal(name: string, element: Global): void;
         abstract visitEnum(name: string, element: Enum): void;
         abstract visitFunction(name: string, element: Function): void;
@@ -5045,7 +5954,6 @@ declare module "assemblyscript/src/definitions" {
         static build(program: Program): string;
         private sb;
         private indentLevel;
-        private unknown;
         /** Constructs a new WebIDL builder. */
         constructor(program: Program, includePrivate?: boolean);
         visitGlobal(name: string, element: Global): void;
@@ -5060,130 +5968,15 @@ declare module "assemblyscript/src/definitions" {
         build(): string;
     }
 }
-declare module "assemblyscript/src/index" {
-    /**
-     * Low-level C-like compiler API.
-     * @module index
-     */ /***/
-    import { Target, Feature } from "assemblyscript/src/common";
-    import { Options } from "assemblyscript/src/compiler";
-    import { DiagnosticMessage, formatDiagnosticMessage } from "assemblyscript/src/diagnostics";
-    import { Module } from "assemblyscript/src/module";
-    import { Program } from "assemblyscript/src/program";
-    /** Creates a new set of compiler options. */
-    export function newOptions(): Options;
-    /** Sets the `target` option. */
-    export function setTarget(options: Options, target: Target): void;
-    /** Sets the `noAssert` option. */
-    export function setNoAssert(options: Options, noAssert: boolean): void;
-    /** Sets the `importMemory` option. */
-    export function setImportMemory(options: Options, importMemory: boolean): void;
-    /** Sets the `sharedMemory` option. */
-    export function setSharedMemory(options: Options, sharedMemory: number): void;
-    /** Sets the `importTable` option. */
-    export function setImportTable(options: Options, importTable: boolean): void;
-    /** Sets the `exportTable` option. */
-    export function setExportTable(options: Options, exportTable: boolean): void;
-    /** Sets the `sourceMap` option. */
-    export function setSourceMap(options: Options, sourceMap: boolean): void;
-    /** Sets the `memoryBase` option. */
-    export function setMemoryBase(options: Options, memoryBase: number): void;
-    /** Sets the `tableBase` option. */
-    export function setTableBase(options: Options, tableBase: number): void;
-    /** Sets a 'globalAliases' value. */
-    export function setGlobalAlias(options: Options, alias: string, name: string): void;
-    /** Sets the `explicitStart` option. */
-    export function setExplicitStart(options: Options, explicitStart: boolean): void;
-    /** Sets the `noUnsafe` option. */
-    export function setNoUnsafe(options: Options, noUnsafe: boolean): void;
-    /** Sign extension operations. */
-    export const FEATURE_SIGN_EXTENSION: Feature;
-    /** Mutable global imports and exports. */
-    export const FEATURE_MUTABLE_GLOBALS: Feature;
-    /** Non-trapping float to int conversion operations. */
-    export const FEATURE_NONTRAPPING_F2I: Feature;
-    /** Bulk memory operations. */
-    export const FEATURE_BULK_MEMORY: Feature;
-    /** SIMD types and operations. */
-    export const FEATURE_SIMD: Feature;
-    /** Threading and atomic operations. */
-    export const FEATURE_THREADS: Feature;
-    /** Exception handling operations. */
-    export const FEATURE_EXCEPTION_HANDLING: Feature;
-    /** Tail call operations. */
-    export const FEATURE_TAIL_CALLS: Feature;
-    /** Reference types. */
-    export const FEATURE_REFERENCE_TYPES: Feature;
-    /** Enables a specific feature. */
-    export function enableFeature(options: Options, feature: Feature): void;
-    /** Disables a specific feature. */
-    export function disableFeature(options: Options, feature: Feature): void;
-    /** Gives the compiler a hint at the optimize levels that will be used later on. */
-    export function setOptimizeLevelHints(options: Options, optimizeLevel: number, shrinkLevel: number): void;
-    /** Sets the `pedantic` option. */
-    export function setPedantic(options: Options, pedantic: boolean): void;
-    /** Creates a new Program. */
-    export function newProgram(options: Options): Program;
-    /** Obtains the next diagnostic message. Returns `null` once complete. */
-    export function nextDiagnostic(program: Program): DiagnosticMessage | null;
-    /** Obtains the source of the given file. */
-    export function getSource(program: Program, internalPath: string): string | null;
-    /** Formats a diagnostic message to a string. */
-    export { formatDiagnosticMessage as formatDiagnostic };
-    /** Tests whether a diagnostic is informatory. */
-    export function isInfo(message: DiagnosticMessage): boolean;
-    /** Tests whether a diagnostic is a warning. */
-    export function isWarning(message: DiagnosticMessage): boolean;
-    /** Tests whether a diagnostic is an error. */
-    export function isError(message: DiagnosticMessage): boolean;
-    /** Parses a source file. If `parser` has been omitted a new one is created. */
-    export function parse(
-    /** Program reference. */
-    program: Program, 
-    /** Source text of the file. */
-    text: string, 
-    /** Normalized path of the file. */
-    path: string, 
-    /** Whether this is an entry file. */
-    isEntry?: boolean): void;
-    /** Obtains the next required file's path. Returns `null` once complete. */
-    export function nextFile(program: Program): string | null;
-    /** Obtains the path of the dependee of a given imported file. */
-    export function getDependee(program: Program, file: string): string | null;
-    /** Compiles the parsed sources to a module. */
-    export function compile(program: Program): Module;
-    /** Builds WebIDL definitions for the specified program. */
-    export function buildIDL(program: Program): string;
-    /** Builds TypeScript definitions for the specified program. */
-    export function buildTSD(program: Program): string;
-    /** Builds a JSON file of a program's runtime type information. */
-    export function buildRTTI(program: Program): string;
-    /** Prefix indicating a library file. */
-    export { LIBRARY_PREFIX } from "assemblyscript/src/common";
-    export * from "assemblyscript/src/ast";
-    export * from "assemblyscript/src/common";
-    export * from "assemblyscript/src/compiler";
-    export * from "assemblyscript/src/definitions";
-    export * from "assemblyscript/src/diagnosticMessages.generated";
-    export * from "assemblyscript/src/diagnostics";
-    export * from "assemblyscript/src/flow";
-    export * from "assemblyscript/src/module";
-    export * from "assemblyscript/src/parser";
-    export * from "assemblyscript/src/program";
-    export * from "assemblyscript/src/resolver";
-    export * from "assemblyscript/src/tokenizer";
-    export * from "assemblyscript/src/types";
-    export * from "assemblyscript/src/util/index";
-}
 declare module "assemblyscript/src/extra/ast" {
     /**
-     * Abstract Syntax Tree extras.
+     * @fileoverview Abstract Syntax Tree extras.
      *
-     * Not needed in a standalone compiler but useful for testing the parser.
+     * Provides serialization of the AssemblyScript AST back to it source form.
      *
-     * @module extra/ast
-     */ /***/
-    import { Node, Source, TypeNode, NamedTypeNode, FunctionTypeNode, TypeName, TypeParameterNode, IdentifierExpression, LiteralExpression, FloatLiteralExpression, IntegerLiteralExpression, StringLiteralExpression, RegexpLiteralExpression, ArrayLiteralExpression, AssertionExpression, BinaryExpression, CallExpression, CommaExpression, ElementAccessExpression, FunctionExpression, NewExpression, ParenthesizedExpression, PropertyAccessExpression, TernaryExpression, UnaryPostfixExpression, UnaryExpression, UnaryPrefixExpression, ClassExpression, ObjectLiteralExpression, Statement, BlockStatement, BreakStatement, ContinueStatement, DoStatement, EmptyStatement, ExportImportStatement, ExportStatement, ExportDefaultStatement, ExpressionStatement, ForStatement, IfStatement, ImportStatement, InstanceOfExpression, ReturnStatement, SwitchStatement, ThrowStatement, TryStatement, VariableStatement, WhileStatement, ClassDeclaration, EnumDeclaration, EnumValueDeclaration, FieldDeclaration, FunctionDeclaration, ImportDeclaration, IndexSignatureDeclaration, InterfaceDeclaration, MethodDeclaration, NamespaceDeclaration, TypeDeclaration, VariableDeclaration, DecoratorNode, ParameterNode, ExportMember, SwitchCase, DeclarationStatement } from "assemblyscript/src/ast";
+     * @license Apache-2.0
+     */
+    import { Node, Source, TypeNode, NamedTypeNode, FunctionTypeNode, TypeName, TypeParameterNode, IdentifierExpression, LiteralExpression, FloatLiteralExpression, IntegerLiteralExpression, StringLiteralExpression, RegexpLiteralExpression, ArrayLiteralExpression, AssertionExpression, BinaryExpression, CallExpression, CommaExpression, ElementAccessExpression, FunctionExpression, NewExpression, ParenthesizedExpression, PropertyAccessExpression, TernaryExpression, UnaryPostfixExpression, UnaryExpression, UnaryPrefixExpression, ClassExpression, ObjectLiteralExpression, BlockStatement, BreakStatement, ContinueStatement, DoStatement, EmptyStatement, ExportImportStatement, ExportStatement, ExportDefaultStatement, ExpressionStatement, ForStatement, ForOfStatement, IfStatement, ImportStatement, InstanceOfExpression, ReturnStatement, SwitchStatement, ThrowStatement, TryStatement, VariableStatement, WhileStatement, DeclarationStatement, ClassDeclaration, EnumDeclaration, EnumValueDeclaration, FieldDeclaration, FunctionDeclaration, ImportDeclaration, InterfaceDeclaration, MethodDeclaration, NamespaceDeclaration, TypeDeclaration, VariableDeclaration, DecoratorNode, ParameterNode, ExportMember, SwitchCase, IndexSignatureNode } from "assemblyscript/src/ast";
     /** An AST builder. */
     export class ASTBuilder {
         /** Rebuilds the textual source from the specified AST, as far as possible. */
@@ -5222,7 +6015,7 @@ declare module "assemblyscript/src/extra/ast" {
         visitUnaryExpression(node: UnaryExpression): void;
         visitUnaryPostfixExpression(node: UnaryPostfixExpression): void;
         visitUnaryPrefixExpression(node: UnaryPrefixExpression): void;
-        visitNodeAndTerminate(statement: Statement): void;
+        visitNodeAndTerminate(node: Node): void;
         visitBlockStatement(node: BlockStatement): void;
         visitBreakStatement(node: BreakStatement): void;
         visitContinueStatement(node: ContinueStatement): void;
@@ -5238,12 +6031,13 @@ declare module "assemblyscript/src/extra/ast" {
         visitExpressionStatement(node: ExpressionStatement): void;
         visitFieldDeclaration(node: FieldDeclaration): void;
         visitForStatement(node: ForStatement): void;
+        visitForOfStatement(node: ForOfStatement): void;
         visitFunctionDeclaration(node: FunctionDeclaration, isDefault?: boolean): void;
         visitFunctionCommon(node: FunctionDeclaration): void;
         visitIfStatement(node: IfStatement): void;
         visitImportDeclaration(node: ImportDeclaration): void;
         visitImportStatement(node: ImportStatement): void;
-        visitIndexSignatureDeclaration(node: IndexSignatureDeclaration): void;
+        visitIndexSignature(node: IndexSignatureNode): void;
         visitInterfaceDeclaration(node: InterfaceDeclaration, isDefault?: boolean): void;
         visitMethodDeclaration(node: MethodDeclaration): void;
         visitNamespaceDeclaration(node: NamespaceDeclaration, isDefault?: boolean): void;
@@ -5263,49 +6057,217 @@ declare module "assemblyscript/src/extra/ast" {
         finish(): string;
     }
 }
-/** @module glue/js */ /***/
+declare module "assemblyscript/src/index" {
+    /**
+     * @license
+     * Copyright 2020 Daniel Wirtz / The AssemblyScript Authors.
+     *
+     * Licensed under the Apache License, Version 2.0 (the "License");
+     * you may not use this file except in compliance with the License.
+     * You may obtain a copy of the License at
+     *
+     *     http://www.apache.org/licenses/LICENSE-2.0
+     *
+     * Unless required by applicable law or agreed to in writing, software
+     * distributed under the License is distributed on an "AS IS" BASIS,
+     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     * See the License for the specific language governing permissions and
+     * limitations under the License.
+     *
+     * SPDX-License-Identifier: Apache-2.0
+     */
+    /**
+     * @fileoverview The C-like and re-exported public compiler interface.
+     *
+     * The intended way to consume the compiler sources is to import this
+     * file, which again exports all relevant functions, classes and constants
+     * as a flat namespace.
+     *
+     * Note though that the compiler sources are written in "portable
+     * AssemblyScript" that can be compiled to both JavaScript with tsc and
+     * to WebAssembly with asc, and as such require additional glue code
+     * depending on the target.
+     *
+     * When compiling to JavaScript `glue/js/index.js` must be included.
+     * When compiling to WebAssembly `glue/wasm/index.ts` must be included.
+     */
+    import { Target, Feature } from "assemblyscript/src/common";
+    import { Options } from "assemblyscript/src/compiler";
+    import { DiagnosticMessage, formatDiagnosticMessage } from "assemblyscript/src/diagnostics";
+    import { Module } from "assemblyscript/src/module";
+    import { Program } from "assemblyscript/src/program";
+    /** Creates a new set of compiler options. */
+    export function newOptions(): Options;
+    /** Sets the `target` option. */
+    export function setTarget(options: Options, target: Target): void;
+    /** Sets the `noAssert` option. */
+    export function setNoAssert(options: Options, noAssert: boolean): void;
+    /** Sets the `exportMemory` option. */
+    export function setExportMemory(options: Options, exportMemory: boolean): void;
+    /** Sets the `importMemory` option. */
+    export function setImportMemory(options: Options, importMemory: boolean): void;
+    /** Sets the `initialMemory` option. */
+    export function setInitialMemory(options: Options, initialMemory: number): void;
+    /** Sets the `maximumMemory` option. */
+    export function setMaximumMemory(options: Options, maximumMemory: number): void;
+    /** Sets the `sharedMemory` option. */
+    export function setSharedMemory(options: Options, sharedMemory: boolean): void;
+    /** Sets the `importTable` option. */
+    export function setImportTable(options: Options, importTable: boolean): void;
+    /** Sets the `exportTable` option. */
+    export function setExportTable(options: Options, exportTable: boolean): void;
+    /** Sets the `sourceMap` option. */
+    export function setSourceMap(options: Options, sourceMap: boolean): void;
+    /** Sets the `memoryBase` option. */
+    export function setMemoryBase(options: Options, memoryBase: number): void;
+    /** Sets the `tableBase` option. */
+    export function setTableBase(options: Options, tableBase: number): void;
+    /** Sets a 'globalAliases' value. */
+    export function setGlobalAlias(options: Options, alias: string, name: string): void;
+    /** Sets the `explicitStart` option. */
+    export function setExplicitStart(options: Options, explicitStart: boolean): void;
+    /** Sets the `noUnsafe` option. */
+    export function setNoUnsafe(options: Options, noUnsafe: boolean): void;
+    /** Sets the `lowMemoryLimit` option. */
+    export function setLowMemoryLimit(options: Options, lowMemoryLimit: number): void;
+    /** Sign extension operations. */
+    export const FEATURE_SIGN_EXTENSION: Feature;
+    /** Mutable global imports and exports. */
+    export const FEATURE_MUTABLE_GLOBALS: Feature;
+    /** Non-trapping float to int conversion operations. */
+    export const FEATURE_NONTRAPPING_F2I: Feature;
+    /** Bulk memory operations. */
+    export const FEATURE_BULK_MEMORY: Feature;
+    /** SIMD types and operations. */
+    export const FEATURE_SIMD: Feature;
+    /** Threading and atomic operations. */
+    export const FEATURE_THREADS: Feature;
+    /** Exception handling operations. */
+    export const FEATURE_EXCEPTION_HANDLING: Feature;
+    /** Tail call operations. */
+    export const FEATURE_TAIL_CALLS: Feature;
+    /** Reference types. */
+    export const FEATURE_REFERENCE_TYPES: Feature;
+    /** Multi value types. */
+    export const FEATURE_MULTI_VALUE: Feature;
+    /** Enables a specific feature. */
+    export function enableFeature(options: Options, feature: Feature): void;
+    /** Disables a specific feature. */
+    export function disableFeature(options: Options, feature: Feature): void;
+    /** Gives the compiler a hint at the optimize levels that will be used later on. */
+    export function setOptimizeLevelHints(options: Options, optimizeLevel: number, shrinkLevel: number): void;
+    /** Sets the `pedantic` option. */
+    export function setPedantic(options: Options, pedantic: boolean): void;
+    /** Creates a new Program. */
+    export function newProgram(options: Options): Program;
+    /** Obtains the next diagnostic message. Returns `null` once complete. */
+    export function nextDiagnostic(program: Program): DiagnosticMessage | null;
+    /** Obtains the source of the given file. */
+    export function getSource(program: Program, internalPath: string): string | null;
+    /** Formats a diagnostic message to a string. */
+    export { formatDiagnosticMessage as formatDiagnostic };
+    /** Tests whether a diagnostic is informatory. */
+    export function isInfo(message: DiagnosticMessage): boolean;
+    /** Tests whether a diagnostic is a warning. */
+    export function isWarning(message: DiagnosticMessage): boolean;
+    /** Tests whether a diagnostic is an error. */
+    export function isError(message: DiagnosticMessage): boolean;
+    /** Parses a source file. If `parser` has been omitted a new one is created. */
+    export function parse(
+    /** Program reference. */
+    program: Program, 
+    /** Source text of the file. */
+    text: string, 
+    /** Normalized path of the file. */
+    path: string, 
+    /** Whether this is an entry file. */
+    isEntry?: boolean): void;
+    /** Obtains the next required file's path. Returns `null` once complete. */
+    export function nextFile(program: Program): string | null;
+    /** Obtains the path of the dependee of a given imported file. */
+    export function getDependee(program: Program, file: string): string | null;
+    /** Initializes the program pre-emptively for transform hooks. */
+    export function initializeProgram(program: Program): void;
+    /** Compiles the parsed sources to a module. */
+    export function compile(program: Program): Module;
+    /** Builds WebIDL definitions for the specified program. */
+    export function buildIDL(program: Program): string;
+    /** Builds TypeScript definitions for the specified program. */
+    export function buildTSD(program: Program): string;
+    export * from "assemblyscript/src/ast";
+    export * from "assemblyscript/src/common";
+    export * from "assemblyscript/src/compiler";
+    export * from "assemblyscript/src/definitions";
+    export * from "assemblyscript/src/diagnostics";
+    export * from "assemblyscript/src/flow";
+    export * from "assemblyscript/src/module";
+    export * from "assemblyscript/src/parser";
+    export * from "assemblyscript/src/program";
+    export * from "assemblyscript/src/resolver";
+    export * from "assemblyscript/src/tokenizer";
+    export * from "assemblyscript/src/types";
+    export * from "assemblyscript/src/extra/ast";
+    import * as util from "assemblyscript/src/util/index";
+    export { util };
+    export * from "assemblyscript/src/util/index";
+}
+/**
+ * @fileoverview Collections glue code for TypeScript.
+ * @license Apache-2.0
+ */
+declare function Map_keys<K, V>(map: Map<K, V>): K[];
+declare function Map_values<K, V>(map: Map<K, V>): V[];
+declare function Set_values<V>(set: Set<V>): V[];
+/**
+ * @fileoverview Floating point glue code for TypeScript.
+ * @license Apache-2.0
+ */
 declare function f32_as_i32(value: number): number;
 declare function i32_as_f32(value: number): number;
-declare function f64_as_i64(value: number): I64;
-declare function i64_as_f64(value: I64): number;
-/** @module glue/js */ /***/
-declare type I64 = {
+declare function f64_as_i64(value: number): i64;
+declare function i64_as_f64(value: i64): number;
+/**
+ * @fileoverview 64-bit integer glue code for TypeScript.
+ * @license Apache-2.0
+ */
+declare type i64 = {
     __Long__: true;
 }; // opaque
-declare const i64_zero: I64;
-declare const i64_one: I64;
-declare function i64_new(lo: number, hi?: number): I64;
-declare function i64_low(value: I64): number;
-declare function i64_high(value: I64): number;
-declare function i64_add(left: I64, right: I64): I64;
-declare function i64_sub(left: I64, right: I64): I64;
-declare function i64_mul(left: I64, right: I64): I64;
-declare function i64_div(left: I64, right: I64): I64;
-declare function i64_div_u(left: I64, right: I64): I64;
-declare function i64_rem(left: I64, right: I64): I64;
-declare function i64_rem_u(left: I64, right: I64): I64;
-declare function i64_and(left: I64, right: I64): I64;
-declare function i64_or(left: I64, right: I64): I64;
-declare function i64_xor(left: I64, right: I64): I64;
-declare function i64_shl(left: I64, right: I64): I64;
-declare function i64_shr(left: I64, right: I64): I64;
-declare function i64_shr_u(left: I64, right: I64): I64;
-declare function i64_not(value: I64): I64;
-declare function i64_eq(left: I64, right: I64): boolean;
-declare function i64_ne(left: I64, right: I64): boolean;
-declare function i64_align(value: I64, alignment: number): I64;
-declare function i64_is_i8(value: I64): boolean;
-declare function i64_is_i16(value: I64): boolean;
-declare function i64_is_i32(value: I64): boolean;
-declare function i64_is_u8(value: I64): boolean;
-declare function i64_is_u16(value: I64): boolean;
-declare function i64_is_u32(value: I64): boolean;
-declare function i64_is_bool(value: I64): boolean;
-declare function i64_is_f32(value: I64): boolean;
-declare function i64_is_f64(value: I64): boolean;
-declare function i64_to_f32(value: I64): number;
-declare function i64_to_f64(value: I64): number;
-declare function i64_to_string(value: I64, unsigned?: boolean): string;
+declare const i64_zero: i64;
+declare const i64_one: i64;
+declare function i64_new(lo: number, hi?: number): i64;
+declare function i64_low(value: i64): number;
+declare function i64_high(value: i64): number;
+declare function i64_add(left: i64, right: i64): i64;
+declare function i64_sub(left: i64, right: i64): i64;
+declare function i64_mul(left: i64, right: i64): i64;
+declare function i64_div(left: i64, right: i64): i64;
+declare function i64_div_u(left: i64, right: i64): i64;
+declare function i64_rem(left: i64, right: i64): i64;
+declare function i64_rem_u(left: i64, right: i64): i64;
+declare function i64_and(left: i64, right: i64): i64;
+declare function i64_or(left: i64, right: i64): i64;
+declare function i64_xor(left: i64, right: i64): i64;
+declare function i64_shl(left: i64, right: i64): i64;
+declare function i64_shr(left: i64, right: i64): i64;
+declare function i64_shr_u(left: i64, right: i64): i64;
+declare function i64_not(value: i64): i64;
+declare function i64_eq(left: i64, right: i64): boolean;
+declare function i64_ne(left: i64, right: i64): boolean;
+declare function i64_gt(left: i64, right: i64): boolean;
+declare function i64_align(value: i64, alignment: number): i64;
+declare function i64_is_i8(value: i64): boolean;
+declare function i64_is_i16(value: i64): boolean;
+declare function i64_is_i32(value: i64): boolean;
+declare function i64_is_u8(value: i64): boolean;
+declare function i64_is_u16(value: i64): boolean;
+declare function i64_is_u32(value: i64): boolean;
+declare function i64_is_bool(value: i64): boolean;
+declare function i64_is_f32(value: i64): boolean;
+declare function i64_is_f64(value: i64): boolean;
+declare function i64_to_f32(value: i64): number;
+declare function i64_to_f64(value: i64): number;
+declare function i64_to_string(value: i64, unsigned?: boolean): string;
 declare module "assemblyscript/std/assembly/shared/feature" {
     /** Indicates specific features to activate. */
     export const enum Feature {
@@ -5328,7 +6290,9 @@ declare module "assemblyscript/std/assembly/shared/feature" {
         /** Tail call operations. */
         TAIL_CALLS = 128,
         /** Reference types. */
-        REFERENCE_TYPES = 256
+        REFERENCE_TYPES = 256,
+        /** Multi value types. */
+        MULTI_VALUE = 512
     }
     /** Gets the name of the specified feature one would specify on the command line. */
     export function featureToString(feature: Feature): string;
@@ -5360,47 +6324,49 @@ declare module "assemblyscript/std/assembly/shared/typeinfo" {
         ARRAYBUFFERVIEW = 1,
         /** Type is an `Array`. */
         ARRAY = 2,
+        /** Type is a `StaticArray`. */
+        STATICARRAY = 4,
         /** Type is a `Set`. */
-        SET = 4,
+        SET = 8,
         /** Type is a `Map`. */
-        MAP = 8,
+        MAP = 16,
         /** Type is inherently acyclic. */
-        ACYCLIC = 16,
+        ACYCLIC = 32,
         /** Value alignment of 1 byte. */
-        VALUE_ALIGN_0 = 32,
+        VALUE_ALIGN_0 = 64,
         /** Value alignment of 2 bytes. */
-        VALUE_ALIGN_1 = 64,
+        VALUE_ALIGN_1 = 128,
         /** Value alignment of 4 bytes. */
-        VALUE_ALIGN_2 = 128,
+        VALUE_ALIGN_2 = 256,
         /** Value alignment of 8 bytes. */
-        VALUE_ALIGN_3 = 256,
+        VALUE_ALIGN_3 = 512,
         /** Value alignment of 16 bytes. */
-        VALUE_ALIGN_4 = 512,
+        VALUE_ALIGN_4 = 1024,
         /** Value is a signed type. */
-        VALUE_SIGNED = 1024,
+        VALUE_SIGNED = 2048,
         /** Value is a float type. */
-        VALUE_FLOAT = 2048,
+        VALUE_FLOAT = 4096,
         /** Value type is nullable. */
-        VALUE_NULLABLE = 4096,
+        VALUE_NULLABLE = 8192,
         /** Value type is managed. */
-        VALUE_MANAGED = 8192,
+        VALUE_MANAGED = 16384,
         /** Key alignment of 1 byte. */
-        KEY_ALIGN_0 = 16384,
+        KEY_ALIGN_0 = 32768,
         /** Key alignment of 2 bytes. */
-        KEY_ALIGN_1 = 32768,
+        KEY_ALIGN_1 = 65536,
         /** Key alignment of 4 bytes. */
-        KEY_ALIGN_2 = 65536,
+        KEY_ALIGN_2 = 131072,
         /** Key alignment of 8 bytes. */
-        KEY_ALIGN_3 = 131072,
+        KEY_ALIGN_3 = 262144,
         /** Key alignment of 16 bytes. */
-        KEY_ALIGN_4 = 262144,
+        KEY_ALIGN_4 = 524288,
         /** Key is a signed type. */
-        KEY_SIGNED = 524288,
+        KEY_SIGNED = 1048576,
         /** Key is a float type. */
-        KEY_FLOAT = 1048576,
+        KEY_FLOAT = 2097152,
         /** Key type is nullable. */
-        KEY_NULLABLE = 2097152,
+        KEY_NULLABLE = 4194304,
         /** Key type is managed. */
-        KEY_MANAGED = 4194304
+        KEY_MANAGED = 8388608
     }
 }
