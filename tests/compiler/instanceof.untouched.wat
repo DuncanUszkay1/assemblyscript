@@ -17,31 +17,137 @@
  (global $instanceof/an (mut i32) (i32.const 0))
  (export "memory" (memory $0))
  (start $~start)
- (func $instanceof/isI32<i32> (; 1 ;) (param $0 i32) (result i32)
+ (func $instanceof/isI32<i32> (param $0 i32) (result i32)
+  i32.const 1
+  drop
   i32.const 1
   return
  )
- (func $instanceof/isI32<f64> (; 2 ;) (param $0 f64) (result i32)
+ (func $instanceof/isI32<f64> (param $0 f64) (result i32)
+  i32.const 0
+  drop
   i32.const 0
   return
  )
- (func $instanceof/isI32<u32> (; 3 ;) (param $0 i32) (result i32)
+ (func $instanceof/isI32<u32> (param $0 i32) (result i32)
+  i32.const 0
+  drop
   i32.const 0
   return
  )
- (func $instanceof/isI32<u16> (; 4 ;) (param $0 i32) (result i32)
+ (func $instanceof/isI32<u16> (param $0 i32) (result i32)
+  i32.const 0
+  drop
   i32.const 0
   return
  )
- (func $~lib/rt/stub/__retain (; 5 ;) (param $0 i32) (result i32)
+ (func $~lib/rt/stub/__retain (param $0 i32) (result i32)
   local.get $0
  )
- (func $~lib/rt/stub/__release (; 6 ;) (param $0 i32)
+ (func $~lib/rt/stub/__release (param $0 i32)
   nop
  )
- (func $start:instanceof (; 7 ;)
+ (func $start:instanceof
   (local $0 i32)
   (local $1 i32)
+  i32.const 1
+  drop
+  i32.const 1
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 1
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 1
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 1
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 1
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 0
+  i32.eqz
+  drop
+  i32.const 1
+  drop
   i32.const 0
   call $instanceof/isI32<i32>
   i32.eqz
@@ -49,7 +155,7 @@
    i32.const 0
    i32.const 32
    i32.const 62
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -61,7 +167,7 @@
    i32.const 0
    i32.const 32
    i32.const 63
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -73,7 +179,7 @@
    i32.const 0
    i32.const 32
    i32.const 64
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -85,7 +191,7 @@
    i32.const 0
    i32.const 32
    i32.const 65
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -98,10 +204,12 @@
    i32.const 0
    i32.const 32
    i32.const 68
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  i32.const 1
+  drop
   i32.const 1
   local.tee $0
   global.get $instanceof/an
@@ -124,12 +232,14 @@
    i32.const 0
    i32.const 32
    i32.const 71
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  i32.const 1
+  drop
  )
- (func $~start (; 8 ;)
+ (func $~start
   call $start:instanceof
  )
 )

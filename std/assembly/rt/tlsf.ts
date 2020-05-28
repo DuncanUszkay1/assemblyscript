@@ -2,8 +2,8 @@ import { AL_BITS, AL_MASK, DEBUG, BLOCK, BLOCK_OVERHEAD, BLOCK_MAXSIZE } from "r
 import { onfree, onalloc, onrealloc } from "./rtrace";
 import { REFCOUNT_MASK } from "./pure";
 
-/////////////////////// The TLSF (Two-Level Segregate Fit) memory allocator ///////////////////////
-//                             see: http://www.gii.upv.es/tlsf/
+// === The TLSF (Two-Level Segregate Fit) memory allocator ===
+// see: http://www.gii.upv.es/tlsf/
 
 // - `ffs(x)` is equivalent to `ctz(x)` with x != 0
 // - `fls(x)` is equivalent to `sizeof(x) * 8 - clz(x) - 1`
@@ -19,12 +19,12 @@ import { REFCOUNT_MASK } from "./pure";
 // @ts-ignore: decorator
 @inline const SL_BITS: u32 = 4;
 // @ts-ignore: decorator
-@inline const SL_SIZE: usize = 1 << <usize>SL_BITS;
+@inline const SL_SIZE: u32 = 1 << SL_BITS;
 
 // @ts-ignore: decorator
-@inline const SB_BITS: usize = <usize>(SL_BITS + AL_BITS);
+@inline const SB_BITS: u32 = SL_BITS + AL_BITS;
 // @ts-ignore: decorator
-@inline const SB_SIZE: usize = 1 << <usize>SB_BITS;
+@inline const SB_SIZE: u32 = 1 << SB_BITS;
 
 // @ts-ignore: decorator
 @inline const FL_BITS: u32 = 31 - SB_BITS;
@@ -130,15 +130,15 @@ import { REFCOUNT_MASK } from "./pure";
 // Root constants. Where stuff is stored inside of the root structure.
 
 // @ts-ignore: decorator
-@inline const SL_START = sizeof<usize>();
+@inline const SL_START: usize = sizeof<usize>();
 // @ts-ignore: decorator
-@inline const SL_END = SL_START + (FL_BITS << alignof<u32>());
+@inline const SL_END: usize = SL_START + (FL_BITS << alignof<u32>());
 // @ts-ignore: decorator
-@inline const HL_START = (SL_END + AL_MASK) & ~AL_MASK;
+@inline const HL_START: usize = (SL_END + AL_MASK) & ~AL_MASK;
 // @ts-ignore: decorator
-@inline const HL_END = HL_START + FL_BITS * SL_SIZE * sizeof<usize>();
+@inline const HL_END: usize = HL_START + FL_BITS * SL_SIZE * sizeof<usize>();
 // @ts-ignore: decorator
-@inline const ROOT_SIZE = HL_END + sizeof<usize>();
+@inline const ROOT_SIZE: usize = HL_END + sizeof<usize>();
 
 // @ts-ignore: decorator
 @lazy export var ROOT: Root;
@@ -174,7 +174,7 @@ import { REFCOUNT_MASK } from "./pure";
 /** Sets the head of the free list for the specified combination of first and second level. */
 // @ts-ignore: decorator
 @inline function SETHEAD(root: Root, fl: usize, sl: u32, head: Block | null): void {
-  store<Block>(
+  store<Block | null>(
     changetype<usize>(root) + (((fl << SL_BITS) + <usize>sl) << alignof<usize>()),
     head,
     HL_START
@@ -433,6 +433,10 @@ function addMemory(root: Root, start: usize, end: usize): bool {
 
 /** Grows memory to fit at least another block of the specified size. */
 function growMemory(root: Root, size: usize): void {
+  if (ASC_LOW_MEMORY_LIMIT) {
+    unreachable();
+    return;
+  }
   // Here, both rounding performed in searchBlock ...
   const halfMaxSize = BLOCK_MAXSIZE >> 1;
   if (size < halfMaxSize) { // don't round last fl
@@ -462,7 +466,7 @@ function prepareSize(size: usize): usize {
 export function maybeInitialize(): Root {
   var root = ROOT;
   if (!root) {
-    const rootOffset = (__heap_base + AL_MASK) & ~AL_MASK;
+    let rootOffset = (__heap_base + AL_MASK) & ~AL_MASK;
     let pagesBefore = memory.size();
     let pagesNeeded = <i32>((((rootOffset + ROOT_SIZE) + 0xffff) & ~0xffff) >>> 16);
     if (pagesNeeded > pagesBefore && memory.grow(pagesNeeded - pagesBefore) < 0) unreachable();
@@ -475,15 +479,21 @@ export function maybeInitialize(): Root {
         SETHEAD(root, fl, sl, null);
       }
     }
-    addMemory(root, (rootOffset + ROOT_SIZE + AL_MASK) & ~AL_MASK, memory.size() << 16);
+    let memStart = (rootOffset + ROOT_SIZE + AL_MASK) & ~AL_MASK;
+    if (ASC_LOW_MEMORY_LIMIT) {
+      const memEnd = <usize>ASC_LOW_MEMORY_LIMIT & ~AL_MASK;
+      if (memStart <= memEnd) addMemory(root, memStart, memEnd);
+      else unreachable(); // low memory limit already exceeded
+    } else {
+      addMemory(root, memStart, memory.size() << 16);
+    }
     ROOT = root;
   }
   return root;
 }
 
 // @ts-ignore: decorator
-@lazy
-var collectLock: bool = false;
+@lazy var collectLock: bool = false;
 
 /** Allocates a block of the specified size. */
 export function allocateBlock(root: Root, size: usize, id: u32): Block {
@@ -510,7 +520,7 @@ export function allocateBlock(root: Root, size: usize, id: u32): Block {
   if (DEBUG) assert((block.mmInfo & ~TAGS_MASK) >= payloadSize); // must fit
   block.gcInfo = 0; // RC=0
   block.rtId = id;
-  block.rtSize = size;
+  block.rtSize = <u32>size;
   removeBlock(root, <Block>block);
   prepareBlock(root, <Block>block, payloadSize);
   if (isDefined(ASC_RTRACE)) onalloc(<Block>block);
@@ -525,7 +535,7 @@ export function reallocateBlock(root: Root, block: Block, size: usize): Block {
   // possibly split and update runtime size if it still fits
   if (payloadSize <= (blockInfo & ~TAGS_MASK)) {
     prepareBlock(root, block, payloadSize);
-    block.rtSize = size;
+    block.rtSize = <u32>size;
     return block;
   }
 
@@ -539,7 +549,7 @@ export function reallocateBlock(root: Root, block: Block, size: usize): Block {
       // TODO: this can yield an intermediate block larger than BLOCK_MAXSIZE, which
       // is immediately split though. does this trigger any assertions / issues?
       block.mmInfo = (blockInfo & TAGS_MASK) | mergeSize;
-      block.rtSize = size;
+      block.rtSize = <u32>size;
       prepareBlock(root, block, payloadSize);
       return block;
     }

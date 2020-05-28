@@ -1,7 +1,7 @@
 ![](https://avatars1.githubusercontent.com/u/28916798?s=64) AssemblyScript
 =================
 
-[![Actions Status](https://github.com/AssemblyScript/assemblyscript/workflows/CI/badge.svg?branch=master&event=push)](https://github.com/AssemblyScript/assemblyscript/actions) [![npm](https://img.shields.io/npm/v/assemblyscript.svg?color=0074C1)](https://www.npmjs.com/package/assemblyscript) [![npm@nightly](https://img.shields.io/npm/v/assemblyscript/nightly.svg?color=0074C1)](https://www.npmjs.com/package/assemblyscript)
+[![Actions Status](https://github.com/AssemblyScript/assemblyscript/workflows/Test/badge.svg?branch=master&event=push)](https://github.com/AssemblyScript/assemblyscript/actions) [![npm](https://img.shields.io/npm/v/assemblyscript.svg?color=0074C1)](https://www.npmjs.com/package/assemblyscript) [![npm@nightly](https://img.shields.io/npm/v/assemblyscript/nightly.svg?color=0074C1)](https://www.npmjs.com/package/assemblyscript)
 
 **AssemblyScript** compiles a strict subset of [TypeScript](http://www.typescriptlang.org) (basically JavaScript with types) to [WebAssembly](http://webassembly.org) using [Binaryen](https://github.com/WebAssembly/binaryen). It generates lean and mean WebAssembly modules while being just an `npm install` away.
 
@@ -54,8 +54,5 @@ Further resources
 * [Development instructions](https://docs.assemblyscript.org/details/development)<br />
   How to set up a development environment (to submit a pull request).
 
-* [Project governance](https://github.com/AssemblyScript/meta)<br />
-  Meta information related to the AssemblyScript project.
-
-* [Media files](./media)<br />
-  Various media files, like logos etc.
+* [Project governance](https://github.com/AssemblyScript/working-group)<br />
+  Discussions, goals, roadmaps, assets, etc. related to development and project organization.

@@ -1,13 +1,14 @@
 /**
- * Mappings from AssemblyScript types to WebAssembly types.
- * @module types
- *//***/
+ * @fileoverview Mappings from AssemblyScript types to WebAssembly types.
+ * @license Apache-2.0
+ */
 
 import {
   Class,
   FunctionTarget,
   Program,
-  DecoratorFlags
+  DecoratorFlags,
+  Local
 } from "./program";
 
 import {
@@ -95,10 +96,10 @@ export const enum TypeFlags {
   /** Is a vector type. */
   VECTOR = 1 << 10,
   /** Is a host type. */
-  HOST = 1 << 11
+  HOST = 1 << 11,
+  /** Is a closure type. */
+  IN_SCOPE_CLOSURE = 1 << 12
 }
-
-const v128_zero = new Uint8Array(16);
 
 /** Represents a resolved type. */
 export class Type {
@@ -108,13 +109,15 @@ export class Type {
   /** Type flags. */
   flags: TypeFlags;
   /** Size in bits. */
-  size: u32;
+  size: i32;
   /** Size in bytes. */
   byteSize: i32;
   /** Underlying class reference, if a class type. */
   classReference: Class | null;
   /** Underlying signature reference, if a function type. */
   signatureReference: Signature | null;
+  /** closed over locals */
+  locals: Map<string, Local> | null;
   /** Respective non-nullable type, if nullable. */
   nonNullableType: Type;
   /** Cached nullable type, if non-nullable. */
@@ -129,10 +132,12 @@ export class Type {
     this.classReference = null;
     this.signatureReference = null;
     this.nonNullableType = this;
+    this.locals = null;
   }
 
   /** Returns the closest int type representing this type. */
   get intType(): Type {
+    if (this == Type.auto) return this; // keep auto as a hint
     switch (this.kind) {
       case TypeKind.I8: return Type.i8;
       case TypeKind.I16: return Type.i16;
@@ -164,6 +169,7 @@ export class Type {
 
   /** Tests if this is a managed type that needs GC hooks. */
   get isManaged(): bool {
+    if (this.isFunctionIndex) return true;
     if (this.is(TypeFlags.INTEGER | TypeFlags.REFERENCE)) {
       let classReference = this.classReference;
       if (classReference) return !classReference.hasDecorator(DecoratorFlags.UNMANAGED);
@@ -178,13 +184,17 @@ export class Type {
     return classReference !== null && classReference.hasDecorator(DecoratorFlags.UNMANAGED);
   }
 
+  get isFunctionIndex(): bool {
+    return this.signatureReference !== null && !this.is(TypeFlags.IN_SCOPE_CLOSURE);
+  }
+
   /** Computes the sign-extending shift in the target type. */
-  computeSmallIntegerShift(targetType: Type): u32 {
+  computeSmallIntegerShift(targetType: Type): i32 {
     return targetType.size - this.size;
   }
 
   /** Computes the truncating mask in the target type. */
-  computeSmallIntegerMask(targetType: Type): u32 {
+  computeSmallIntegerMask(targetType: Type): i32 {
     var size = this.is(TypeFlags.UNSIGNED) ? this.size : this.size - 1;
     return ~0 >>> (targetType.size - size);
   }
@@ -213,14 +223,28 @@ export class Type {
   /** Composes the respective nullable type of this type. */
   asNullable(): Type {
     assert(this.is(TypeFlags.REFERENCE));
-    if (!this.cachedNullableType) {
+    var cachedNullableType = this.cachedNullableType;
+    if (!cachedNullableType) {
       assert(!this.is(TypeFlags.NULLABLE));
-      this.cachedNullableType = new Type(this.kind, this.flags | TypeFlags.NULLABLE, this.size);
-      this.cachedNullableType.nonNullableType = this;
-      this.cachedNullableType.classReference = this.classReference;       // either a class reference
-      this.cachedNullableType.signatureReference = this.signatureReference; // or a function reference
+      this.cachedNullableType = cachedNullableType = new Type(this.kind, this.flags | TypeFlags.NULLABLE, this.size);
+      cachedNullableType.nonNullableType = this;
+      cachedNullableType.classReference = this.classReference;       // either a class reference
+      cachedNullableType.signatureReference = this.signatureReference; // or a function reference
     }
-    return this.cachedNullableType;
+    return cachedNullableType;
+  }
+
+  /** Tests if this type equals the specified. */
+  equals(other: Type): bool {
+    if (this.kind != other.kind) return false;
+    if (this.is(TypeFlags.REFERENCE)) {
+      return (
+        this.classReference == other.classReference &&
+        this.signatureReference == other.signatureReference &&
+        this.is(TypeFlags.NULLABLE) == other.is(TypeFlags.NULLABLE)
+      );
+    }
+    return true;
   }
 
   /** Tests if a value of this type is assignable to the target type incl. implicit conversion. */
@@ -504,6 +528,13 @@ export class Type {
 
   /** Alias of i32 indicating type inference of locals and globals with just an initializer. */
   static readonly auto: Type = new Type(Type.i32.kind, Type.i32.flags, Type.i32.size);
+
+  /** Type of an in-context local */
+  static readonly closure32: Type = new Type(Type.i32.kind,
+    TypeFlags.IN_SCOPE_CLOSURE |
+    TypeFlags.REFERENCE,
+    Type.i32.size
+  );
 }
 
 /** Converts an array of types to an array of native types. */
@@ -571,8 +602,8 @@ export class Signature {
         return this;
       }
     }
-    program.uniqueSignatures.push(this);
     this.id = program.nextSignatureId++;
+    program.uniqueSignatures.push(this);
   }
 
   get nativeParams(): NativeType {
@@ -608,37 +639,63 @@ export class Signature {
   /** Gets the known or, alternatively, generic parameter name at the specified index. */
   getParameterName(index: i32): string {
     var parameterNames = this.parameterNames;
-    return parameterNames && parameterNames.length > index
+    return parameterNames !== null && parameterNames.length > index
       ? parameterNames[index]
       : getDefaultParameterName(index);
   }
 
-  /** Tests if a value of this function type is assignable to a target of the specified function type. */
-  isAssignableTo(target: Signature): bool {
-    return this.equals(target);
+  // Check to see if this signature is equivalent to the caller, ignoring the this type
+  externalEquals(other: Signature): bool {
+    // check rest parameter
+    if (this.hasRest != other.hasRest) return false;
+
+    // check parameter types
+    var thisParameterTypes = this.parameterTypes;
+    var otherParameterTypes = other.parameterTypes;
+    var numParameters = thisParameterTypes.length;
+    if (numParameters != otherParameterTypes.length) return false;
+    for (let i = 0; i < numParameters; ++i) {
+      if (!thisParameterTypes[i].equals(otherParameterTypes[i])) return false;
+    }
+
+    // check return type
+    return this.returnType.equals(other.returnType);
   }
 
-  /** Tests to see if a signature equals another signature. */
-  equals(value: Signature): bool {
-    // TODO: maybe cache results?
+  /** Tests if this signature equals the specified. */
+  equals(other: Signature): bool {
+    // check `this` type
+    var thisThisType = this.thisType;
+    var otherThisType = other.thisType;
+    if (thisThisType !== null) {
+      if (otherThisType === null || !thisThisType.equals(otherThisType)) return false;
+    } else if (otherThisType !== null) {
+      return false;
+    }
+
+    return this.externalEquals(other);
+  }
+
+  /** Tests if a value of this function type is assignable to a target of the specified function type. */
+  isAssignableTo(target: Signature, requireSameSize: bool = false): bool {
 
     // check `this` type
     var thisThisType = this.thisType;
-    var targetThisType = value.thisType;
-    if (thisThisType) {
-      if (!(targetThisType && thisThisType.isAssignableTo(targetThisType))) return false;
+    var targetThisType = target.thisType;
+    if (thisThisType !== null) {
+      if (targetThisType === null || !thisThisType.isAssignableTo(targetThisType)) return false;
     } else if (targetThisType) {
       return false;
     }
 
     // check rest parameter
-    if (this.hasRest != value.hasRest) return false; // TODO
+    if (this.hasRest != target.hasRest) return false; // TODO
 
     // check parameter types
     var thisParameterTypes = this.parameterTypes;
-    var targetParameterTypes = value.parameterTypes;
+    var targetParameterTypes = target.parameterTypes;
     var numParameters = thisParameterTypes.length;
-    if (numParameters != targetParameterTypes.length) return false;
+    if (numParameters != targetParameterTypes.length) return false; // TODO
     for (let i = 0; i < numParameters; ++i) {
       let thisParameterType = thisParameterTypes[i];
       let targetParameterType = targetParameterTypes[i];
@@ -647,7 +704,7 @@ export class Signature {
 
     // check return type
     var thisReturnType = this.returnType;
-    var targetReturnType = value.returnType;
+    var targetReturnType = target.returnType;
     return thisReturnType == targetReturnType || thisReturnType.isAssignableTo(targetReturnType);
   }
 
@@ -684,18 +741,53 @@ export class Signature {
     sb.push(this.returnType.toString());
     return sb.join("");
   }
+
+  toClosureSignature(): Signature {
+    var closureSignature = this.clone();
+    closureSignature.thisType = this.program.options.usizeType;
+    return closureSignature;
+  }
+
+  // Reverses toClosureSignature, for when we recompile a function with the context argument
+  // Not convinced this is the right way to go about getting the original unmodified signature, but it works
+  toAnonymousSignature(): Signature {
+    var normalSignature = this.clone();
+    normalSignature.thisType = null;
+    return normalSignature;
+  }
+
+  /** Creates a clone of this signature that is safe to modify. */
+  clone(): Signature {
+    var parameterTypes = this.parameterTypes;
+    var numParameterTypes = parameterTypes.length;
+    var cloneParameterTypes = new Array<Type>(numParameterTypes);
+    for (let i = 0; i < numParameterTypes; ++i) {
+      cloneParameterTypes[i] = parameterTypes[i];
+    }
+    var clone = new Signature(this.program, cloneParameterTypes, this.returnType, this.thisType);
+    var parameterNames = this.parameterNames;
+    if (parameterNames) {
+      let numParameterNames = parameterNames.length;
+      let cloneParameterNames = new Array<string>(numParameterNames);
+      for (let i = 0; i < numParameterNames; ++i) {
+        cloneParameterNames[i] = parameterNames[i];
+      }
+      clone.parameterNames = cloneParameterNames;
+    }
+    clone.requiredParameters = this.requiredParameters;
+    return clone;
+  }
 }
 
 // helpers
 
 // Cached default parameter names used where names are unknown.
-var cachedDefaultParameterNames: string[] | null = null;
+var cachedDefaultParameterNames: string[] = [];
 
 /** Gets the cached default parameter name for the specified index. */
 export function getDefaultParameterName(index: i32): string {
-  if (!cachedDefaultParameterNames) cachedDefaultParameterNames = [];
   for (let i = cachedDefaultParameterNames.length; i <= index; ++i) {
-    cachedDefaultParameterNames.push("arg$" + i.toString(10));
+    cachedDefaultParameterNames.push("arg$" + i.toString());
   }
   return cachedDefaultParameterNames[index - 1];
 }

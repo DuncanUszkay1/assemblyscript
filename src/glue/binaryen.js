@@ -1,4 +1,9 @@
-const binaryen = global.Binaryen || (global.Binaryen = require("binaryen"));
+/**
+ * @fileoverview Binaryen glue code for JavaScript.
+ * @license Apache-2.0
+ */
+
+const binaryen = global.binaryen || (global.binaryen = require("binaryen"));
 
 module.exports = binaryen;
 

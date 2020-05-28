@@ -2,13 +2,13 @@
 
 import { BLOCK_MAXSIZE } from "./rt/common";
 import { COMPARATOR, SORT } from "./util/sort";
-import { ArrayBufferView } from "./arraybuffer";
 import { joinBooleanArray, joinIntegerArray, joinFloatArray, joinStringArray, joinReferenceArray } from "./util/string";
 import { idof, isArray as builtin_isArray } from "./builtins";
 import { E_INDEXOUTOFRANGE, E_INVALIDLENGTH, E_EMPTYARRAY, E_HOLEYARRAY } from "./util/error";
 
 /** Ensures that the given array has _at least_ the specified backing size. */
 function ensureSize(array: usize, minSize: usize, alignLog2: u32): void {
+  // depends on the fact that Arrays mimic ArrayBufferView
   var oldCapacity = changetype<ArrayBufferView>(array).byteLength;
   if (minSize > <usize>oldCapacity >>> alignLog2) {
     if (minSize > BLOCK_MAXSIZE >>> alignLog2) throw new RangeError(E_INVALIDLENGTH);
@@ -24,12 +24,17 @@ function ensureSize(array: usize, minSize: usize, alignLog2: u32): void {
   }
 }
 
-export class Array<T> extends ArrayBufferView {
+export class Array<T> {
   [key: number]: T;
 
-  // Implementing ArrayBufferView isn't strictly necessary here but is done to allow glue code
+  // Mimicking ArrayBufferView isn't strictly necessary here but is done to allow glue code
   // to work with typed and normal arrays interchangeably. Technically, normal arrays do not need
-  // `dataStart` (equals `data`) and `dataLength` (equals computed `data.byteLength`).
+  // `dataStart` (equals `buffer`) and `byteLength` (equals computed `buffer.byteLength`), but the
+  // block is 16 bytes anyway so it's fine to have a couple extra fields in there.
+
+  private buffer: ArrayBuffer;
+  private dataStart: usize;
+  private byteLength: i32;
 
   // Also note that Array<T> with non-nullable T must guard against uninitialized null values
   // whenever an element is accessed. Otherwise, the compiler wouldn't be able to guarantee
@@ -49,7 +54,13 @@ export class Array<T> extends ArrayBufferView {
   }
 
   constructor(length: i32 = 0) {
-    super(length, alignof<T>());
+    if (<u32>length > <u32>BLOCK_MAXSIZE >>> alignof<T>()) throw new RangeError(E_INVALIDLENGTH);
+    var bufferSize = <usize>length << alignof<T>();
+    var buffer = __alloc(bufferSize, idof<ArrayBuffer>());
+    memory.fill(buffer, 0, bufferSize);
+    this.buffer = changetype<ArrayBuffer>(buffer); // retains
+    this.dataStart = buffer;
+    this.byteLength = <i32>bufferSize;
     this.length_ = length;
   }
 
@@ -91,7 +102,7 @@ export class Array<T> extends ArrayBufferView {
 
   @operator("[]") private __get(index: i32): T {
     if (<u32>index >= <u32>this.length_) throw new RangeError(E_INDEXOUTOFRANGE);
-    var value = this.__unchecked_get(index);
+    var value = this.__uget(index);
     if (isReference<T>()) {
       if (!isNullable<T>()) {
         if (!changetype<usize>(value)) throw new Error(E_HOLEYARRAY);
@@ -100,7 +111,7 @@ export class Array<T> extends ArrayBufferView {
     return value;
   }
 
-  @unsafe @operator("{}") private __unchecked_get(index: i32): T {
+  @unsafe @operator("{}") private __uget(index: i32): T {
     return load<T>(this.dataStart + (<usize>index << alignof<T>()));
   }
 
@@ -110,10 +121,10 @@ export class Array<T> extends ArrayBufferView {
       ensureSize(changetype<usize>(this), index + 1, alignof<T>());
       this.length_ = index + 1;
     }
-    this.__unchecked_set(index, value);
+    this.__uset(index, value);
   }
 
-  @unsafe @operator("{}=") private __unchecked_set(index: i32, value: T): void {
+  @unsafe @operator("{}=") private __uset(index: i32, value: T): void {
     if (isManaged<T>()) {
       let offset = this.dataStart + (<usize>index << alignof<T>());
       let oldRef = load<usize>(offset);
@@ -243,7 +254,8 @@ export class Array<T> extends ArrayBufferView {
     var dataStart = this.dataStart;
     var len = this.length_;
 
-        end   = min<i32>(end, len);
+    end = min<i32>(end, len);
+
     var to    = target < 0 ? max(len + target, 0) : min(target, len);
     var from  = start < 0 ? max(len + start, 0) : min(start, len);
     var last  = end < 0 ? max(len + end, 0) : min(end, len);
@@ -355,7 +367,7 @@ export class Array<T> extends ArrayBufferView {
       base + sizeof<T>(),
       <usize>lastIndex << alignof<T>()
     );
-    store<T>(base + (<usize>lastIndex << alignof<T>()), isReference<T>() ? null : 0);
+    store<T>(base + (<usize>lastIndex << alignof<T>()), changetype<T>(0));
     this.length_ = lastIndex;
     return element; // no need to retain -> is moved
   }
@@ -482,6 +494,64 @@ export class Array<T> extends ArrayBufferView {
     return <string>unreachable();
   }
 
+  flat(): T {
+    if (!isArray<T>()) {
+      ERROR("Cannot call flat() on Array<T> where T is not an Array.");
+    }
+    // Get the length and data start values
+    var length = this.length_;
+    var selfDataStart = this.dataStart;
+
+    // calculate the end size with an initial pass
+    var size = 0;
+    for (let i = 0; i < length; i++) {
+      let child = load<usize>(selfDataStart + (i << alignof<T>()));
+      size += child == 0 ? 0 : load<i32>(child, offsetof<T>("length_"));
+    }
+
+    // calculate the byteLength of the resulting backing ArrayBuffer
+    var byteLength = <usize>size << usize(alignof<valueof<T>>());
+    var dataStart = __alloc(byteLength, idof<ArrayBuffer>());
+
+    // create the return value and initialize it
+    var result = __alloc(offsetof<T>(), idof<T>());
+    store<i32>(result, size, offsetof<T>("length_"));
+
+    // byteLength, dataStart, and buffer are all readonly
+    store<i32>(result, byteLength, offsetof<T>("byteLength"));
+    store<usize>(result, dataStart, offsetof<T>("dataStart"));
+    store<usize>(result, __retain(dataStart), offsetof<T>("buffer"));
+
+    // set the elements
+    var resultOffset: usize = 0;
+    for (let i = 0; i < length; i++) { // for each child
+      let child = load<usize>(selfDataStart + (<usize>i << alignof<T>()));
+
+      // ignore null arrays
+      if (child == 0) continue;
+
+      // copy the underlying buffer data to the result buffer
+      let childDataLength = load<i32>(child, offsetof<T>("byteLength"));
+      memory.copy(
+        dataStart + resultOffset,
+        load<usize>(child, offsetof<T>("dataStart")),
+        <usize>childDataLength
+      );
+
+      // advance the result length
+      resultOffset += childDataLength;
+    }
+
+    // if the `valueof<T>` type is managed, we must call __retain() on each reference
+    if (isManaged<valueof<T>>()) {
+      for (let i = 0; i < size; i++) {
+        __retain(load<usize>(dataStart + (<usize>i << usize(alignof<valueof<T>>()))));
+      }
+    }
+
+    return changetype<T>(result);
+  }
+
   toString(): string {
     return this.join();
   }
@@ -498,6 +568,6 @@ export class Array<T> extends ArrayBufferView {
         cur += sizeof<usize>();
       }
     }
-    // automatically visits ArrayBufferView (.buffer) next
+    __visit(changetype<usize>(this.buffer), cookie);
   }
 }

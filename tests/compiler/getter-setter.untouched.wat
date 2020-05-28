@@ -10,15 +10,15 @@
  (global $getter-setter/Foo._bar (mut i32) (i32.const 0))
  (export "memory" (memory $0))
  (start $~start)
- (func $getter-setter/Foo.bar.get:bar (; 1 ;) (result i32)
+ (func $getter-setter/Foo.get:bar (result i32)
   global.get $getter-setter/Foo._bar
  )
- (func $getter-setter/Foo.bar.set:bar (; 2 ;) (param $0 i32)
+ (func $getter-setter/Foo.set:bar (param $0 i32)
   local.get $0
   global.set $getter-setter/Foo._bar
  )
- (func $start:getter-setter (; 3 ;)
-  call $getter-setter/Foo.bar.get:bar
+ (func $start:getter-setter
+  call $getter-setter/Foo.get:bar
   i32.const 0
   i32.eq
   i32.eqz
@@ -26,13 +26,13 @@
    i32.const 0
    i32.const 32
    i32.const 13
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
   i32.const 1
-  call $getter-setter/Foo.bar.set:bar
-  call $getter-setter/Foo.bar.get:bar
+  call $getter-setter/Foo.set:bar
+  call $getter-setter/Foo.get:bar
   i32.const 1
   i32.eq
   i32.eqz
@@ -40,13 +40,13 @@
    i32.const 0
    i32.const 32
    i32.const 15
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
   i32.const 2
-  call $getter-setter/Foo.bar.set:bar
-  call $getter-setter/Foo.bar.get:bar
+  call $getter-setter/Foo.set:bar
+  call $getter-setter/Foo.get:bar
   i32.const 2
   i32.eq
   i32.eqz
@@ -54,12 +54,12 @@
    i32.const 0
    i32.const 32
    i32.const 16
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $~start (; 4 ;)
+ (func $~start
   call $start:getter-setter
  )
 )

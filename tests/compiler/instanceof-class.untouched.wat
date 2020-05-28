@@ -7,7 +7,7 @@
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (memory $0 1)
  (data (i32.const 16) "&\00\00\00\01\00\00\00\01\00\00\00&\00\00\00i\00n\00s\00t\00a\00n\00c\00e\00o\00f\00-\00c\00l\00a\00s\00s\00.\00t\00s\00")
- (data (i32.const 80) "\07\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\04\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\05\00\00\00")
+ (data (i32.const 80) "\07\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\04\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\05\00\00\00")
  (table $0 1 funcref)
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
@@ -17,7 +17,7 @@
  (global $~lib/heap/__heap_base i32 (i32.const 140))
  (export "memory" (memory $0))
  (start $~start)
- (func $~lib/rt/stub/maybeGrowMemory (; 1 ;) (param $0 i32)
+ (func $~lib/rt/stub/maybeGrowMemory (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -71,7 +71,7 @@
   local.get $0
   global.set $~lib/rt/stub/offset
  )
- (func $~lib/rt/stub/__alloc (; 2 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/stub/__alloc (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -113,6 +113,8 @@
   local.get $6
   local.get $5
   i32.store
+  i32.const 1
+  drop
   local.get $6
   i32.const 1
   i32.store offset=4
@@ -124,10 +126,10 @@
   i32.store offset=12
   local.get $2
  )
- (func $~lib/rt/stub/__retain (; 3 ;) (param $0 i32) (result i32)
+ (func $~lib/rt/stub/__retain (param $0 i32) (result i32)
   local.get $0
  )
- (func $instanceof-class/Parent<i32>#constructor (; 4 ;) (param $0 i32) (result i32)
+ (func $instanceof-class/Parent<i32>#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -139,7 +141,7 @@
   end
   local.get $0
  )
- (func $instanceof-class/Child<i32>#constructor (; 5 ;) (param $0 i32) (result i32)
+ (func $instanceof-class/Child<i32>#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -154,7 +156,7 @@
   local.set $0
   local.get $0
  )
- (func $instanceof-class/Parent<f32>#constructor (; 6 ;) (param $0 i32) (result i32)
+ (func $instanceof-class/Parent<f32>#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -166,7 +168,7 @@
   end
   local.get $0
  )
- (func $instanceof-class/Child<f32>#constructor (; 7 ;) (param $0 i32) (result i32)
+ (func $instanceof-class/Child<f32>#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -181,7 +183,7 @@
   local.set $0
   local.get $0
  )
- (func $start:instanceof-class (; 8 ;)
+ (func $start:instanceof-class
   global.get $~lib/heap/__heap_base
   i32.const 15
   i32.add
@@ -195,9 +197,18 @@
   i32.const 0
   call $instanceof-class/Child<i32>#constructor
   global.set $instanceof-class/a
+  i32.const 1
+  drop
+  i32.const 1
+  drop
+  i32.const 0
+  i32.eqz
+  drop
   i32.const 0
   call $instanceof-class/Child<f32>#constructor
   global.set $instanceof-class/b
+  i32.const 1
+  drop
   global.get $instanceof-class/b
   call $instanceof-class/Child~instanceof
   i32.eqz
@@ -205,15 +216,18 @@
    i32.const 0
    i32.const 32
    i32.const 17
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  i32.const 0
+  i32.eqz
+  drop
  )
- (func $~start (; 9 ;)
+ (func $~start
   call $start:instanceof-class
  )
- (func $~lib/rt/__instanceof (; 10 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/__instanceof (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -253,7 +267,7 @@
   end
   i32.const 0
  )
- (func $instanceof-class/Child~instanceof (; 11 ;) (param $0 i32) (result i32)
+ (func $instanceof-class/Child~instanceof (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if

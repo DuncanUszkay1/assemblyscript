@@ -108,7 +108,7 @@ declare function isDefined(expression: any): bool;
 /** Tests if the specified expression evaluates to a constant value. */
 declare function isConstant(expression: any): bool;
 /** Traps if the specified value is not true-ish, otherwise returns the value. */
-declare function assert<T>(isTrueish: T | null, message?: string): T;
+declare function assert<T>(isTrueish: T, message?: string): T & (object | string | number); // any better way to model `: T != null`?
 /** Parses an integer string to a 64-bit float. */
 declare function parseInt(str: string, radix?: i32): f64;
 /** Parses a floating point string to a 64-bit float. */
@@ -300,3 +300,6 @@ declare interface StringConstructor {
 
 /** Annotates a class as being unmanaged with limited capabilities. */
 declare function unmanaged(constructor: Function): void;
+
+/** Environmental tracing function. */
+declare function trace(msg: string, n?: i32, a0?: f64, a1?: f64, a2?: f64, a3?: f64, a4?: f64): void;

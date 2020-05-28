@@ -19,7 +19,7 @@
  (global $~lib/heap/__heap_base i32 (i32.const 112))
  (export "memory" (memory $0))
  (start $~start)
- (func $~lib/rt/stub/maybeGrowMemory (; 1 ;) (param $0 i32)
+ (func $~lib/rt/stub/maybeGrowMemory (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -73,7 +73,7 @@
   local.get $0
   global.set $~lib/rt/stub/offset
  )
- (func $~lib/rt/stub/__alloc (; 2 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/stub/__alloc (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -115,6 +115,8 @@
   local.get $6
   local.get $5
   i32.store
+  i32.const 1
+  drop
   local.get $6
   i32.const 1
   i32.store offset=4
@@ -126,7 +128,7 @@
   i32.store offset=12
   local.get $2
  )
- (func $~lib/rt/stub/__free (; 3 ;) (param $0 i32)
+ (func $~lib/rt/stub/__free (param $0 i32)
   (local $1 i32)
   local.get $0
   i32.const 0
@@ -143,8 +145,8 @@
   if
    i32.const 0
    i32.const 32
-   i32.const 70
-   i32.const 2
+   i32.const 68
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -152,6 +154,8 @@
   i32.const 16
   i32.sub
   local.set $1
+  i32.const 1
+  drop
   local.get $1
   i32.load offset=4
   i32.const 1
@@ -160,8 +164,8 @@
   if
    i32.const 0
    i32.const 32
-   i32.const 72
-   i32.const 13
+   i32.const 70
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
@@ -176,8 +180,67 @@
    global.set $~lib/rt/stub/offset
   end
  )
- (func $features/simd/test_v128 (; 4 ;)
+ (func $features/simd/test_v128
   (local $0 i32)
+  v128.const i32x4 0x04030201 0x08070605 0x0c0b0a09 0x100f0e0d
+  v128.const i32x4 0x04030201 0x08070605 0x0c0b0a09 0x100f0e0d
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x04030201 0x08070605 0x0c0b0a09 0x100f0e0d
+  v128.const i32x4 0x04030202 0x08070605 0x0c0b0a09 0x100f0e0d
+  i8x16.ne
+  i8x16.any_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x04030201 0x08070605 0x0c0b0a09 0x100f0e0d
+  v128.const i32x4 0x01010101 0x01010101 0x01010101 0x01010101
+  v128.and
+  v128.const i32x4 0x00010001 0x00010001 0x00010001 0x00010001
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x04030201 0x08070605 0x0c0b0a09 0x100f0e0d
+  v128.const i32x4 0x01010101 0x01010101 0x01010101 0x01010101
+  v128.or
+  v128.const i32x4 0x05030301 0x09070705 0x0d0b0b09 0x110f0f0d
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x04030201 0x08070605 0x0c0b0a09 0x100f0e0d
+  v128.const i32x4 0x01010101 0x01010101 0x01010101 0x01010101
+  v128.xor
+  v128.const i32x4 0x05020300 0x09060704 0x0d0a0b08 0x110e0f0c
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x04030201 0x08070605 0x0c0b0a09 0x100f0e0d
+  v128.not
+  v128.const i32x4 0xfbfcfdfe 0xf7f8f9fa 0xf3f4f5f6 0xeff0f1f2
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x04030201 0x08070605 0x0c0b0a09 0x100f0e0d
+  v128.const i32x4 0x0d0e0f10 0x090a0b0c 0x05060708 0x01020304
+  v128.const i32x4 0xff00ff00 0xff00ff00 0xff00ff00 0xff00ff00
+  v128.bitselect
+  v128.const i32x4 0x040e0210 0x080a060c 0x0c060a08 0x10020e04
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
   i32.const 64
   i32.const 0
   call $~lib/rt/stub/__alloc
@@ -189,7 +252,7 @@
   local.get $0
   call $~lib/rt/stub/__free
  )
- (func $features/simd/test_i8x16 (; 5 ;)
+ (func $features/simd/test_i8x16
   (local $0 v128)
   (local $1 v128)
   (local $2 v128)
@@ -210,7 +273,7 @@
    i32.const 0
    i32.const 80
    i32.const 61
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -228,7 +291,7 @@
    i32.const 0
    i32.const 80
    i32.const 63
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -247,7 +310,7 @@
    i32.const 0
    i32.const 80
    i32.const 65
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -264,7 +327,7 @@
    i32.const 0
    i32.const 80
    i32.const 66
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -281,10 +344,55 @@
    i32.const 0
    i32.const 80
    i32.const 67
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
+  v128.const i32x4 0x007f7f00 0x00000000 0x00000000 0x00000000
+  v128.const i32x4 0x00800080 0x00000000 0x00000000 0x00000000
+  i8x16.min_s
+  v128.const i32x4 0x00800080 0x00000000 0x00000000 0x00000000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x007f7f00 0x00000000 0x00000000 0x00000000
+  v128.const i32x4 0x00800080 0x00000000 0x00000000 0x00000000
+  i8x16.min_u
+  v128.const i32x4 0x007f0000 0x00000000 0x00000000 0x00000000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x007f7f00 0x00000000 0x00000000 0x00000000
+  v128.const i32x4 0x00800080 0x00000000 0x00000000 0x00000000
+  i8x16.max_s
+  v128.const i32x4 0x007f7f00 0x00000000 0x00000000 0x00000000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x007f7f00 0x00000000 0x00000000 0x00000000
+  v128.const i32x4 0x00800080 0x00000000 0x00000000 0x00000000
+  i8x16.max_u
+  v128.const i32x4 0x00807f80 0x00000000 0x00000000 0x00000000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x04040201 0x08070605 0x0c0b0a09 0xff800e0d
+  v128.const i32x4 0x04020401 0x08070605 0x0c0b0a09 0xff800e0d
+  i8x16.avgr_u
+  v128.const i32x4 0x04030301 0x08070605 0x0c0b0a09 0xff800e0d
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
   local.get $0
   i8x16.neg
   v128.const i32x4 0xfcfdfeff 0xf8f9fafb 0xf4f5f6f7 0x81f1f2f3
@@ -297,7 +405,7 @@
    i32.const 0
    i32.const 80
    i32.const 108
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -314,7 +422,7 @@
    i32.const 0
    i32.const 80
    i32.const 113
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -331,7 +439,7 @@
    i32.const 0
    i32.const 80
    i32.const 114
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -346,7 +454,7 @@
    i32.const 0
    i32.const 80
    i32.const 115
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -363,7 +471,7 @@
    i32.const 0
    i32.const 80
    i32.const 116
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -380,10 +488,102 @@
    i32.const 0
    i32.const 80
    i32.const 121
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
+  v128.const i32x4 0x7f7f7f7e 0x7f7f7f7f 0x7f7f7f7f 0x7f7f7f7f
+  i32.const 2
+  i8x16.splat
+  i8x16.add_saturate_s
+  i32.const 127
+  i8x16.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0xfffffffe 0xffffffff 0xffffffff 0xffffffff
+  i32.const 2
+  i8x16.splat
+  i8x16.add_saturate_u
+  i32.const -1
+  i8x16.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x80808081 0x80808080 0x80808080 0x80808080
+  i32.const 2
+  i8x16.splat
+  i8x16.sub_saturate_s
+  i32.const -128
+  i8x16.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x00000001 0x00000000 0x00000000 0x00000000
+  i32.const 2
+  i8x16.splat
+  i8x16.sub_saturate_u
+  i32.const 0
+  i8x16.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const 1
+  i8x16.splat
+  i32.const 1
+  i8x16.shl
+  i32.const 2
+  i8x16.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -2
+  i8x16.splat
+  i32.const 1
+  i8x16.shr_s
+  i32.const -1
+  i8x16.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -1
+  i8x16.splat
+  i32.const 1
+  i8x16.shr_u
+  i32.const 127
+  i8x16.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x00000001 0x00000000 0x00000000 0x00000000
+  i8x16.any_true
+  i32.const 0
+  i32.ne
+  i32.const 1
+  i32.eq
+  drop
+  i32.const 1
+  i8x16.splat
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  i32.const 1
+  i32.eq
+  drop
   i32.const 0
   i8x16.splat
   i32.const 1
@@ -412,7 +612,7 @@
    i32.const 0
    i32.const 80
    i32.const 159
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -429,7 +629,7 @@
    i32.const 0
    i32.const 80
    i32.const 160
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -446,7 +646,7 @@
    i32.const 0
    i32.const 80
    i32.const 161
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -463,7 +663,7 @@
    i32.const 0
    i32.const 80
    i32.const 162
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -480,7 +680,7 @@
    i32.const 0
    i32.const 80
    i32.const 163
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -497,7 +697,7 @@
    i32.const 0
    i32.const 80
    i32.const 164
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -514,7 +714,7 @@
    i32.const 0
    i32.const 80
    i32.const 165
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -531,7 +731,7 @@
    i32.const 0
    i32.const 80
    i32.const 166
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -548,7 +748,7 @@
    i32.const 0
    i32.const 80
    i32.const 167
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -565,12 +765,36 @@
    i32.const 0
    i32.const 80
    i32.const 168
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
+  global.get $~lib/builtins/i16.MAX_VALUE
+  i16x8.splat
+  global.get $~lib/builtins/i16.MAX_VALUE
+  i16x8.splat
+  i8x16.narrow_i16x8_s
+  global.get $~lib/builtins/i8.MAX_VALUE
+  i8x16.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  global.get $~lib/builtins/i16.MAX_VALUE
+  i16x8.splat
+  global.get $~lib/builtins/i16.MAX_VALUE
+  i16x8.splat
+  i8x16.narrow_i16x8_u
+  global.get $~lib/builtins/u8.MAX_VALUE
+  i8x16.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
  )
- (func $features/simd/test_i16x8 (; 6 ;)
+ (func $features/simd/test_i16x8
   (local $0 v128)
   (local $1 v128)
   (local $2 v128)
@@ -591,7 +815,7 @@
    i32.const 0
    i32.const 80
    i32.const 175
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -609,7 +833,7 @@
    i32.const 0
    i32.const 80
    i32.const 177
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -628,7 +852,7 @@
    i32.const 0
    i32.const 80
    i32.const 179
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -645,7 +869,7 @@
    i32.const 0
    i32.const 80
    i32.const 180
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -662,10 +886,55 @@
    i32.const 0
    i32.const 80
    i32.const 181
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
+  v128.const i32x4 0x7fff0000 0x00007fff 0x00000000 0x00000000
+  v128.const i32x4 0x00008000 0x00008000 0x00000000 0x00000000
+  i16x8.min_s
+  v128.const i32x4 0x00008000 0x00008000 0x00000000 0x00000000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x7fff0000 0x00007fff 0x00000000 0x00000000
+  v128.const i32x4 0x00008000 0x00008000 0x00000000 0x00000000
+  i16x8.min_u
+  v128.const i32x4 0x00000000 0x00007fff 0x00000000 0x00000000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x7fff0000 0x00007fff 0x00000000 0x00000000
+  v128.const i32x4 0x00008000 0x00008000 0x00000000 0x00000000
+  i16x8.max_s
+  v128.const i32x4 0x7fff0000 0x00007fff 0x00000000 0x00000000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x7fff0000 0x00007fff 0x00000000 0x00000000
+  v128.const i32x4 0x00008000 0x00008000 0x00000000 0x00000000
+  i16x8.max_u
+  v128.const i32x4 0x7fff8000 0x00008000 0x00000000 0x00000000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x00020001 0x00040004 0x00060005 0xffff8000
+  v128.const i32x4 0x00040001 0x00040002 0x00060005 0xffff8000
+  i16x8.avgr_u
+  v128.const i32x4 0x00030001 0x00040003 0x00060005 0xffff8000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
   local.get $0
   i16x8.neg
   v128.const i32x4 0xfffeffff 0xfffcfffd 0xfffafffb 0x8001fff9
@@ -678,7 +947,7 @@
    i32.const 0
    i32.const 80
    i32.const 222
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -695,7 +964,7 @@
    i32.const 0
    i32.const 80
    i32.const 227
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -712,7 +981,7 @@
    i32.const 0
    i32.const 80
    i32.const 228
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -727,7 +996,7 @@
    i32.const 0
    i32.const 80
    i32.const 229
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -744,7 +1013,7 @@
    i32.const 0
    i32.const 80
    i32.const 230
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -761,10 +1030,102 @@
    i32.const 0
    i32.const 80
    i32.const 235
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
+  v128.const i32x4 0x7fff7ffe 0x7fff7fff 0x7fff7fff 0x7fff7fff
+  i32.const 2
+  i16x8.splat
+  i16x8.add_saturate_s
+  i32.const 32767
+  i16x8.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0xfffffffe 0xffffffff 0xffffffff 0xffffffff
+  i32.const 2
+  i16x8.splat
+  i16x8.add_saturate_u
+  i32.const -1
+  i16x8.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x80008001 0x80008000 0x80008000 0x80008000
+  i32.const 2
+  i16x8.splat
+  i16x8.sub_saturate_s
+  i32.const -32768
+  i16x8.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x00000001 0x00000000 0x00000000 0x00000000
+  i32.const 2
+  i16x8.splat
+  i16x8.sub_saturate_u
+  i32.const 0
+  i16x8.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const 1
+  i16x8.splat
+  i32.const 1
+  i16x8.shl
+  i32.const 2
+  i16x8.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -2
+  i16x8.splat
+  i32.const 1
+  i16x8.shr_s
+  i32.const -1
+  i16x8.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -1
+  i16x8.splat
+  i32.const 1
+  i16x8.shr_u
+  i32.const 32767
+  i16x8.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x00000001 0x00000000 0x00000000 0x00000000
+  i16x8.any_true
+  i32.const 0
+  i32.ne
+  i32.const 1
+  i32.eq
+  drop
+  i32.const 1
+  i16x8.splat
+  i16x8.all_true
+  i32.const 0
+  i32.ne
+  i32.const 1
+  i32.eq
+  drop
   i32.const 0
   i16x8.splat
   i32.const 1
@@ -793,7 +1154,7 @@
    i32.const 0
    i32.const 80
    i32.const 273
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -810,7 +1171,7 @@
    i32.const 0
    i32.const 80
    i32.const 274
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -827,7 +1188,7 @@
    i32.const 0
    i32.const 80
    i32.const 275
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -844,7 +1205,7 @@
    i32.const 0
    i32.const 80
    i32.const 276
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -861,7 +1222,7 @@
    i32.const 0
    i32.const 80
    i32.const 277
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -878,7 +1239,7 @@
    i32.const 0
    i32.const 80
    i32.const 278
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -895,7 +1256,7 @@
    i32.const 0
    i32.const 80
    i32.const 279
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -912,7 +1273,7 @@
    i32.const 0
    i32.const 80
    i32.const 280
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -929,7 +1290,7 @@
    i32.const 0
    i32.const 80
    i32.const 281
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -946,12 +1307,84 @@
    i32.const 0
    i32.const 80
    i32.const 282
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
+  global.get $~lib/builtins/i32.MAX_VALUE
+  i32x4.splat
+  global.get $~lib/builtins/i32.MAX_VALUE
+  i32x4.splat
+  i16x8.narrow_i32x4_s
+  global.get $~lib/builtins/i16.MAX_VALUE
+  i16x8.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  global.get $~lib/builtins/i32.MAX_VALUE
+  i32x4.splat
+  global.get $~lib/builtins/i32.MAX_VALUE
+  i32x4.splat
+  i16x8.narrow_i32x4_u
+  global.get $~lib/builtins/u16.MAX_VALUE
+  i16x8.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -1
+  i8x16.splat
+  i32.const 0
+  i8x16.replace_lane 8
+  i16x8.widen_low_i8x16_s
+  i32.const -1
+  i16x8.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -1
+  i8x16.splat
+  i32.const 0
+  i8x16.replace_lane 8
+  i16x8.widen_low_i8x16_u
+  i32.const 255
+  i16x8.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -1
+  i8x16.splat
+  i32.const 0
+  i8x16.replace_lane 0
+  i16x8.widen_high_i8x16_s
+  i32.const -1
+  i16x8.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -1
+  i8x16.splat
+  i32.const 0
+  i8x16.replace_lane 0
+  i16x8.widen_high_i8x16_u
+  i32.const 255
+  i16x8.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
  )
- (func $features/simd/test_i32x4 (; 7 ;)
+ (func $features/simd/test_i32x4
   (local $0 v128)
   (local $1 v128)
   (local $2 v128)
@@ -972,7 +1405,7 @@
    i32.const 0
    i32.const 80
    i32.const 316
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -990,7 +1423,7 @@
    i32.const 0
    i32.const 80
    i32.const 318
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1009,7 +1442,7 @@
    i32.const 0
    i32.const 80
    i32.const 320
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1026,7 +1459,7 @@
    i32.const 0
    i32.const 80
    i32.const 321
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1043,10 +1476,55 @@
    i32.const 0
    i32.const 80
    i32.const 322
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
+  v128.const i32x4 0x00000000 0x7fffffff 0x7fffffff 0x00000000
+  v128.const i32x4 0x80000000 0x00000000 0x80000000 0x00000000
+  i32x4.min_s
+  v128.const i32x4 0x80000000 0x00000000 0x80000000 0x00000000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x00000000 0x7fffffff 0x7fffffff 0x00000000
+  v128.const i32x4 0x80000000 0x00000000 0x80000000 0x00000000
+  i32x4.min_u
+  v128.const i32x4 0x00000000 0x00000000 0x7fffffff 0x00000000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x00000000 0x7fffffff 0x7fffffff 0x00000000
+  v128.const i32x4 0x80000000 0x00000000 0x80000000 0x00000000
+  i32x4.max_s
+  v128.const i32x4 0x00000000 0x7fffffff 0x7fffffff 0x00000000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x00000000 0x7fffffff 0x7fffffff 0x00000000
+  v128.const i32x4 0x80000000 0x00000000 0x80000000 0x00000000
+  i32x4.max_u
+  v128.const i32x4 0x80000000 0x7fffffff 0x80000000 0x00000000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x00020001 0x00040003 0x0003ffff 0x00000000
+  v128.const i32x4 0x00060005 0x00080007 0xffff0002 0x00000000
+  i32x4.dot_i16x8_s
+  v128.const i32x4 0x00000011 0x00000035 0xfffffffb 0x00000000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
   local.get $0
   i32x4.neg
   v128.const i32x4 0xffffffff 0xfffffffe 0xfffffffd 0x80000001
@@ -1059,7 +1537,7 @@
    i32.const 0
    i32.const 80
    i32.const 363
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1072,7 +1550,7 @@
    i32.const 0
    i32.const 80
    i32.const 368
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1085,7 +1563,7 @@
    i32.const 0
    i32.const 80
    i32.const 369
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1102,7 +1580,7 @@
    i32.const 0
    i32.const 80
    i32.const 370
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1119,10 +1597,58 @@
    i32.const 0
    i32.const 80
    i32.const 375
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
+  i32.const 1
+  i32x4.splat
+  i32.const 1
+  i32x4.shl
+  i32.const 2
+  i32x4.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -2
+  i32x4.splat
+  i32.const 1
+  i32x4.shr_s
+  i32.const -1
+  i32x4.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -1
+  i32x4.splat
+  i32.const 1
+  i32x4.shr_u
+  i32.const 2147483647
+  i32x4.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x00000001 0x00000000 0x00000000 0x00000000
+  i32x4.any_true
+  i32.const 0
+  i32.ne
+  i32.const 1
+  i32.eq
+  drop
+  i32.const 1
+  i32x4.splat
+  i32x4.all_true
+  i32.const 0
+  i32.ne
+  i32.const 1
+  i32.eq
+  drop
   i32.const 0
   i32x4.splat
   i32.const 1
@@ -1151,7 +1677,7 @@
    i32.const 0
    i32.const 80
    i32.const 389
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1168,7 +1694,7 @@
    i32.const 0
    i32.const 80
    i32.const 390
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1185,7 +1711,7 @@
    i32.const 0
    i32.const 80
    i32.const 391
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1202,7 +1728,7 @@
    i32.const 0
    i32.const 80
    i32.const 392
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1219,7 +1745,7 @@
    i32.const 0
    i32.const 80
    i32.const 393
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1236,7 +1762,7 @@
    i32.const 0
    i32.const 80
    i32.const 394
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1253,7 +1779,7 @@
    i32.const 0
    i32.const 80
    i32.const 395
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1270,7 +1796,7 @@
    i32.const 0
    i32.const 80
    i32.const 396
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1287,7 +1813,7 @@
    i32.const 0
    i32.const 80
    i32.const 397
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1304,12 +1830,80 @@
    i32.const 0
    i32.const 80
    i32.const 398
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
+  f32.const -1.5
+  f32x4.splat
+  i32x4.trunc_sat_f32x4_s
+  i32.const -1
+  i32x4.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  f32.const -1.5
+  f32x4.splat
+  i32x4.trunc_sat_f32x4_u
+  i32.const 0
+  i32x4.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -1
+  i16x8.splat
+  i32.const 0
+  i16x8.replace_lane 4
+  i32x4.widen_low_i16x8_s
+  i32.const -1
+  i32x4.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -1
+  i16x8.splat
+  i32.const 0
+  i16x8.replace_lane 4
+  i32x4.widen_low_i16x8_u
+  i32.const 65535
+  i32x4.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -1
+  i16x8.splat
+  i32.const 0
+  i16x8.replace_lane 0
+  i32x4.widen_high_i16x8_s
+  i32.const -1
+  i32x4.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -1
+  i16x8.splat
+  i32.const 0
+  i16x8.replace_lane 0
+  i32x4.widen_high_i16x8_u
+  i32.const 65535
+  i32x4.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
  )
- (func $features/simd/test_i64x2 (; 8 ;)
+ (func $features/simd/test_i64x2
   (local $0 v128)
   (local $1 v128)
   (local $2 v128)
@@ -1326,7 +1920,7 @@
    i32.const 0
    i32.const 80
    i32.const 436
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1344,7 +1938,7 @@
    i32.const 0
    i32.const 80
    i32.const 438
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1363,7 +1957,7 @@
    i32.const 0
    i32.const 80
    i32.const 440
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1380,7 +1974,7 @@
    i32.const 0
    i32.const 80
    i32.const 441
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1396,7 +1990,7 @@
    i32.const 0
    i32.const 80
    i32.const 442
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1409,7 +2003,7 @@
    i32.const 0
    i32.const 80
    i32.const 447
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1422,7 +2016,7 @@
    i32.const 0
    i32.const 80
    i32.const 448
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1439,7 +2033,7 @@
    i32.const 0
    i32.const 80
    i32.const 449
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1456,12 +2050,80 @@
    i32.const 0
    i32.const 80
    i32.const 454
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
+  i64.const 1
+  i64x2.splat
+  i32.const 1
+  i64x2.shl
+  i64.const 2
+  i64x2.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i64.const -2
+  i64x2.splat
+  i32.const 1
+  i64x2.shr_s
+  i64.const -1
+  i64x2.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i64.const -1
+  i64x2.splat
+  i32.const 1
+  i64x2.shr_u
+  i64.const 9223372036854775807
+  i64x2.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  v128.const i32x4 0x00000001 0x00000000 0x00000000 0x00000000
+  i64x2.any_true
+  i32.const 0
+  i32.ne
+  i32.const 1
+  i32.eq
+  drop
+  i64.const 1
+  i64x2.splat
+  i64x2.all_true
+  i32.const 0
+  i32.ne
+  i32.const 1
+  i32.eq
+  drop
+  f64.const -1.5
+  f64x2.splat
+  i64x2.trunc_sat_f64x2_s
+  i64.const -1
+  i64x2.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  f64.const -1.5
+  f64x2.splat
+  i64x2.trunc_sat_f64x2_u
+  i64.const 0
+  i64x2.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
  )
- (func $features/simd/test_f32x4 (; 9 ;)
+ (func $features/simd/test_f32x4
   (local $0 v128)
   (local $1 v128)
   (local $2 v128)
@@ -1483,7 +2145,7 @@
    i32.const 0
    i32.const 80
    i32.const 495
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1501,7 +2163,7 @@
    i32.const 0
    i32.const 80
    i32.const 497
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1520,7 +2182,7 @@
    i32.const 0
    i32.const 80
    i32.const 499
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1537,7 +2199,7 @@
    i32.const 0
    i32.const 80
    i32.const 500
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1554,7 +2216,7 @@
    i32.const 0
    i32.const 80
    i32.const 501
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1575,7 +2237,7 @@
    i32.const 0
    i32.const 80
    i32.const 503
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1592,7 +2254,7 @@
    i32.const 0
    i32.const 80
    i32.const 504
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1608,7 +2270,7 @@
    i32.const 0
    i32.const 80
    i32.const 505
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1621,7 +2283,7 @@
    i32.const 0
    i32.const 80
    i32.const 506
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1634,7 +2296,7 @@
    i32.const 0
    i32.const 80
    i32.const 507
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1651,7 +2313,7 @@
    i32.const 0
    i32.const 80
    i32.const 508
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1668,7 +2330,7 @@
    i32.const 0
    i32.const 80
    i32.const 513
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1699,7 +2361,7 @@
    i32.const 0
    i32.const 80
    i32.const 522
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1716,7 +2378,7 @@
    i32.const 0
    i32.const 80
    i32.const 523
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1733,7 +2395,7 @@
    i32.const 0
    i32.const 80
    i32.const 524
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1750,7 +2412,7 @@
    i32.const 0
    i32.const 80
    i32.const 525
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1767,7 +2429,7 @@
    i32.const 0
    i32.const 80
    i32.const 526
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1784,7 +2446,7 @@
    i32.const 0
    i32.const 80
    i32.const 527
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1801,7 +2463,7 @@
    i32.const 0
    i32.const 80
    i32.const 528
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1818,7 +2480,7 @@
    i32.const 0
    i32.const 80
    i32.const 529
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1834,12 +2496,40 @@
    i32.const 0
    i32.const 80
    i32.const 530
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
+  v128.const i32x4 0x40800000 0x41100000 0x41800000 0x41c80000
+  f32x4.sqrt
+  v128.const i32x4 0x40000000 0x40400000 0x40800000 0x40a00000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -1
+  i32x4.splat
+  f32x4.convert_i32x4_s
+  f32.const -1
+  f32x4.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i32.const -1
+  i32x4.splat
+  f32x4.convert_i32x4_u
+  f32.const 4294967296
+  f32x4.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
  )
- (func $features/simd/test_f64x2 (; 10 ;)
+ (func $features/simd/test_f64x2
   (local $0 v128)
   (local $1 v128)
   (local $2 v128)
@@ -1861,7 +2551,7 @@
    i32.const 0
    i32.const 80
    i32.const 557
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1879,7 +2569,7 @@
    i32.const 0
    i32.const 80
    i32.const 559
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1898,7 +2588,7 @@
    i32.const 0
    i32.const 80
    i32.const 561
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1915,7 +2605,7 @@
    i32.const 0
    i32.const 80
    i32.const 562
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1932,7 +2622,7 @@
    i32.const 0
    i32.const 80
    i32.const 563
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1953,7 +2643,7 @@
    i32.const 0
    i32.const 80
    i32.const 565
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1970,7 +2660,7 @@
    i32.const 0
    i32.const 80
    i32.const 566
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1986,7 +2676,7 @@
    i32.const 0
    i32.const 80
    i32.const 567
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1999,7 +2689,7 @@
    i32.const 0
    i32.const 80
    i32.const 568
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2012,7 +2702,7 @@
    i32.const 0
    i32.const 80
    i32.const 569
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2029,7 +2719,7 @@
    i32.const 0
    i32.const 80
    i32.const 570
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2046,7 +2736,7 @@
    i32.const 0
    i32.const 80
    i32.const 575
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2077,7 +2767,7 @@
    i32.const 0
    i32.const 80
    i32.const 584
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2094,7 +2784,7 @@
    i32.const 0
    i32.const 80
    i32.const 585
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2111,7 +2801,7 @@
    i32.const 0
    i32.const 80
    i32.const 586
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2128,7 +2818,7 @@
    i32.const 0
    i32.const 80
    i32.const 587
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2145,7 +2835,7 @@
    i32.const 0
    i32.const 80
    i32.const 588
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2162,7 +2852,7 @@
    i32.const 0
    i32.const 80
    i32.const 589
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2179,7 +2869,7 @@
    i32.const 0
    i32.const 80
    i32.const 590
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2196,7 +2886,7 @@
    i32.const 0
    i32.const 80
    i32.const 591
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2212,12 +2902,40 @@
    i32.const 0
    i32.const 80
    i32.const 592
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
+  v128.const i32x4 0x00000000 0x40100000 0x00000000 0x40220000
+  f64x2.sqrt
+  v128.const i32x4 0x00000000 0x40000000 0x00000000 0x40080000
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i64.const -1
+  i64x2.splat
+  f64x2.convert_i64x2_s
+  f64.const -1
+  f64x2.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
+  i64.const -1
+  i64x2.splat
+  f64x2.convert_i64x2_u
+  f64.const 18446744073709551615
+  f64x2.splat
+  i8x16.eq
+  i8x16.all_true
+  i32.const 0
+  i32.ne
+  drop
  )
- (func $features/simd/test_v8x16 (; 11 ;)
+ (func $features/simd/test_v8x16
   (local $0 v128)
   (local $1 v128)
   (local $2 v128)
@@ -2238,7 +2956,7 @@
    i32.const 0
    i32.const 80
    i32.const 620
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2257,21 +2975,21 @@
    i32.const 0
    i32.const 80
    i32.const 626
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $features/simd/test_v16x8 (; 12 ;)
+ (func $features/simd/test_v16x8
   nop
  )
- (func $features/simd/test_v32x4 (; 13 ;)
+ (func $features/simd/test_v32x4
   nop
  )
- (func $features/simd/test_v64x2 (; 14 ;)
+ (func $features/simd/test_v64x2
   nop
  )
- (func $start:features/simd (; 15 ;)
+ (func $start:features/simd
   global.get $~lib/heap/__heap_base
   i32.const 15
   i32.add
@@ -2282,6 +3000,8 @@
   global.set $~lib/rt/stub/startOffset
   global.get $~lib/rt/stub/startOffset
   global.set $~lib/rt/stub/offset
+  i32.const 1
+  drop
   call $features/simd/test_v128
   call $features/simd/test_i8x16
   call $features/simd/test_i16x8
@@ -2294,7 +3014,7 @@
   call $features/simd/test_v32x4
   call $features/simd/test_v64x2
  )
- (func $~start (; 16 ;)
+ (func $~start
   call $start:features/simd
  )
 )

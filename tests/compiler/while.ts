@@ -62,6 +62,15 @@ ran = false;
 testAlwaysTrue();
 assert(ran);
 
+function testAlwaysTrueNeverBreaks(): i32 {
+  var i = 0;
+  while (true) {
+    if (++i == 10) return i;
+  }
+  // no return required
+}
+assert(testAlwaysTrueNeverBreaks() == 10);
+
 function testAlwaysFalse(): void {
   var i = 0;
   while (false) {
@@ -165,4 +174,36 @@ function testRefAutorelease(): void {
 }
 ran = false;
 testRefAutorelease();
+assert(ran);
+
+function testIfImplicitContinueThen(): void {
+  var i = 0;
+  while (true) {
+    i++;
+    if (i < 1) {
+      // continue
+    } else {
+      break;
+    }
+  }
+  ran = true;
+}
+ran = false;
+testIfImplicitContinueThen();
+assert(ran);
+
+function testIfImplicitContinueElse(): void {
+  var i = 0;
+  while (true) {
+    i++;
+    if (i >= 1) {
+      break;
+    } else {
+      // continue
+    }
+  }
+  ran = true;
+}
+ran = false;
+testIfImplicitContinueElse();
 assert(ran);

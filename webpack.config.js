@@ -1,6 +1,18 @@
 const path = require("path");
 const fs = require("fs");
 const webpack = require("webpack");
+const TerserPlugin = require('terser-webpack-plugin');
+
+function preamble(name) {
+  return [
+    "/**",
+    " * @license",
+    " * " + name,
+    " * Copyright Daniel Wirtz / The AssemblyScript Authors.",
+    " * SPDX-License-Identifier: Apache-2.0",
+    " */"
+  ].join("\n");
+}
 
 // Build the C-like library
 const lib = {
@@ -30,6 +42,20 @@ const lib = {
   devtool: "source-map",
   performance: {
     hints : false
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          output: {
+            comments: false,
+            preamble: preamble("The AssemblyScript Compiler.")
+          }
+        },
+        sourceMap: true
+      })
+    ],
   }
 };
 
@@ -38,7 +64,9 @@ const bin = {
   context: path.join(__dirname, "cli"),
   entry: [ "./asc.js" ],
   externals: [
-    { "../dist/assemblyscript.js": "assemblyscript" }
+    "binaryen",
+    "assemblyscript",
+    "ts-node"
   ],
   node: {
     "buffer": false,
@@ -75,8 +103,22 @@ const bin = {
       },
       __dirname: JSON.stringify(".")
     }),
-    new webpack.IgnorePlugin(/\.\/src|package\.json|^(ts\-node|glob)$/)
-  ]
+    new webpack.IgnorePlugin(/\.\/src|package\.json|^(ts-node|glob)$/)
+  ],
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          output: {
+            comments: false,
+            preamble: preamble("The AssemblyScript Compiler Frontend.")
+          }
+        },
+        sourceMap: true
+      })
+    ],
+  }
 };
 
 function bundleFile(filename) {

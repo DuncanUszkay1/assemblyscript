@@ -1,11 +1,12 @@
 /**
- * Portable definitions for Binaryen's C-API. tsc uses the .js file next to it,
- * while asc makes it a Wasm import.
+ * @fileoverview Portable definitions for Binaryen's C-API.
+ * 
+ * tsc uses the .js file next to it, while asc makes it a Wasm import.
  *
  * See: https://github.com/WebAssembly/binaryen/blob/master/src/binaryen-c.h
  *
- * @module glue/binaryen
- *//***/
+ * @license Apache-2.0
+ */
 
 export declare function _malloc(size: usize): usize;
 export declare function _free(ptr: usize): void;
@@ -14,17 +15,17 @@ export declare function __i32_store16(ptr: usize, value: number): void;
 export declare function __i32_store(ptr: usize, value: number): void;
 export declare function __f32_store(ptr: usize, value: number): void;
 export declare function __f64_store(ptr: usize, value: number): void;
-export declare function __i32_load8_s(ptr: usize): number;
-export declare function __i32_load8_u(ptr: usize): number;
-export declare function __i32_load16_s(ptr: usize): number;
-export declare function __i32_load16_u(ptr: usize): number;
-export declare function __i32_load(ptr: usize): number;
-export declare function __f32_load(ptr: usize): number;
-export declare function __f64_load(ptr: usize): number;
+export declare function __i32_load8_s(ptr: usize): i8;
+export declare function __i32_load8_u(ptr: usize): u8;
+export declare function __i32_load16_s(ptr: usize): i16;
+export declare function __i32_load16_u(ptr: usize): u16;
+export declare function __i32_load(ptr: usize): i32;
+export declare function __f32_load(ptr: usize): f32;
+export declare function __f64_load(ptr: usize): f64;
 
 type BinaryenIndex = u32;
 
-type BinaryenType = i32;
+type BinaryenType = usize;
 
 export declare function _BinaryenTypeNone(): BinaryenType;
 export declare function _BinaryenTypeInt32(): BinaryenType;
@@ -55,6 +56,7 @@ export declare function _BinaryenFeatureSignExt(): BinaryenFeatureFlags;
 export declare function _BinaryenFeatureExceptionHandling(): BinaryenFeatureFlags;
 export declare function _BinaryenFeatureTailCall(): BinaryenFeatureFlags;
 export declare function _BinaryenFeatureReferenceTypes(): BinaryenFeatureFlags;
+export declare function _BinaryenFeatureMultivalue(): BinaryenFeatureFlags;
 export declare function _BinaryenFeatureAll(): BinaryenFeatureFlags;
 
 type BinaryenExpressionId = i32;
@@ -104,6 +106,8 @@ export declare function _BinaryenTryId(): BinaryenExpressionId;
 export declare function _BinaryenThrowId(): BinaryenExpressionId;
 export declare function _BinaryenRethrowId(): BinaryenExpressionId;
 export declare function _BinaryenBrOnExnId(): BinaryenExpressionId;
+export declare function _BinaryenTupleMakeId(): BinaryenExpressionId;
+export declare function _BinaryenTupleExtractId(): BinaryenExpressionId;
 export declare function _BinaryenPushId(): BinaryenExpressionId;
 export declare function _BinaryenPopId(): BinaryenExpressionId;
 
@@ -340,9 +344,11 @@ export declare function _BinaryenOrVec128(): BinaryenOp;
 export declare function _BinaryenXorVec128(): BinaryenOp;
 export declare function _BinaryenAndNotVec128(): BinaryenOp;
 export declare function _BinaryenBitselectVec128(): BinaryenOp;
+export declare function _BinaryenAbsVecI8x16(): BinaryenOp;
 export declare function _BinaryenNegVecI8x16(): BinaryenOp;
 export declare function _BinaryenAnyTrueVecI8x16(): BinaryenOp;
 export declare function _BinaryenAllTrueVecI8x16(): BinaryenOp;
+export declare function _BinaryenBitmaskVecI8x16(): BinaryenOp;
 export declare function _BinaryenShlVecI8x16(): BinaryenOp;
 export declare function _BinaryenShrSVecI8x16(): BinaryenOp;
 export declare function _BinaryenShrUVecI8x16(): BinaryenOp;
@@ -358,9 +364,11 @@ export declare function _BinaryenMinUVecI8x16(): BinaryenOp;
 export declare function _BinaryenMaxSVecI8x16(): BinaryenOp;
 export declare function _BinaryenMaxUVecI8x16(): BinaryenOp;
 export declare function _BinaryenAvgrUVecI8x16(): BinaryenOp;
+export declare function _BinaryenAbsVecI16x8(): BinaryenOp;
 export declare function _BinaryenNegVecI16x8(): BinaryenOp;
 export declare function _BinaryenAnyTrueVecI16x8(): BinaryenOp;
 export declare function _BinaryenAllTrueVecI16x8(): BinaryenOp;
+export declare function _BinaryenBitmaskVecI16x8(): BinaryenOp;
 export declare function _BinaryenShlVecI16x8(): BinaryenOp;
 export declare function _BinaryenShrSVecI16x8(): BinaryenOp;
 export declare function _BinaryenShrUVecI16x8(): BinaryenOp;
@@ -376,9 +384,11 @@ export declare function _BinaryenMinUVecI16x8(): BinaryenOp;
 export declare function _BinaryenMaxSVecI16x8(): BinaryenOp;
 export declare function _BinaryenMaxUVecI16x8(): BinaryenOp;
 export declare function _BinaryenAvgrUVecI16x8(): BinaryenOp;
+export declare function _BinaryenAbsVecI32x4(): BinaryenOp;
 export declare function _BinaryenNegVecI32x4(): BinaryenOp;
 export declare function _BinaryenAnyTrueVecI32x4(): BinaryenOp;
 export declare function _BinaryenAllTrueVecI32x4(): BinaryenOp;
+export declare function _BinaryenBitmaskVecI32x4(): BinaryenOp;
 export declare function _BinaryenShlVecI32x4(): BinaryenOp;
 export declare function _BinaryenShrSVecI32x4(): BinaryenOp;
 export declare function _BinaryenShrUVecI32x4(): BinaryenOp;
@@ -476,7 +486,7 @@ export declare function _BinaryenBinary(module: BinaryenModuleRef, op: BinaryenO
 export declare function _BinaryenSelect(module: BinaryenModuleRef, condition: BinaryenExpressionRef, ifTrue: BinaryenExpressionRef, ifFalse: BinaryenExpressionRef, type: BinaryenType): BinaryenExpressionRef;
 export declare function _BinaryenDrop(module: BinaryenModuleRef, value: BinaryenExpressionRef): BinaryenExpressionRef;
 export declare function _BinaryenReturn(module: BinaryenModuleRef, value: BinaryenExpressionRef): BinaryenExpressionRef;
-export declare function _BinaryenHost(module: BinaryenModuleRef, op: BinaryenOp, name: usize | 0, operands: usize, numOperands: BinaryenIndex): BinaryenExpressionRef;
+export declare function _BinaryenHost(module: BinaryenModuleRef, op: BinaryenOp, name: usize, operands: usize, numOperands: BinaryenIndex): BinaryenExpressionRef;
 export declare function _BinaryenNop(module: BinaryenModuleRef): BinaryenExpressionRef;
 export declare function _BinaryenUnreachable(module: BinaryenModuleRef): BinaryenExpressionRef;
 
@@ -509,12 +519,20 @@ export declare function _BinaryenThrow(module: BinaryenModuleRef, event: usize, 
 export declare function _BinaryenRethrow(module: BinaryenModuleRef, exnref: BinaryenExpressionRef): BinaryenExpressionRef;
 export declare function _BinaryenBrOnExn(module: BinaryenModuleRef, name: usize, eventName: usize, exnref: BinaryenExpressionRef): BinaryenExpressionRef;
 
+export declare function _BinaryenTupleMake(module: BinaryenModuleRef, operands: usize, numOperands: BinaryenIndex): BinaryenExpressionRef;
+export declare function _BinaryenTupleMakeGetNumOperands(expr: BinaryenExpressionRef): BinaryenIndex;
+export declare function _BinaryenTupleMakeGetOperand(expr: BinaryenExpressionRef, index: BinaryenIndex): BinaryenExpressionRef;
+export declare function _BinaryenTupleExtract(module: BinaryenModuleRef, tuple: BinaryenExpressionRef, index: BinaryenIndex): BinaryenExpressionRef;
+export declare function _BinaryenTupleExtractGetTuple(expr: BinaryenExpressionRef): BinaryenExpressionRef;
+export declare function _BinaryenTupleExtractGetIndex(expr: BinaryenExpressionRef): BinaryenIndex;
+
 export declare function _BinaryenPush(module: BinaryenModuleRef, value: BinaryenExpressionRef): BinaryenExpressionRef;
 export declare function _BinaryenPop(module: BinaryenModuleRef, type: BinaryenType): BinaryenExpressionRef;
 
 export declare function _BinaryenExpressionGetId(expr: BinaryenExpressionRef): BinaryenExpressionId;
 export declare function _BinaryenExpressionGetType(expr: BinaryenExpressionRef): BinaryenType;
 export declare function _BinaryenExpressionPrint(expr: BinaryenExpressionRef): void;
+export declare function _BinaryenExpressionCopy(expr: BinaryenExpressionRef, module: BinaryenModuleRef): BinaryenExpressionRef;
 
 export declare function _BinaryenBlockGetName(expr: BinaryenExpressionRef): usize;
 export declare function _BinaryenBlockGetNumChildren(expr: BinaryenExpressionRef): BinaryenIndex;
@@ -725,7 +743,7 @@ export declare function _BinaryenRemoveGlobal(module: BinaryenModuleRef, name: u
 export declare function _BinaryenGlobalGetName(global: BinaryenGlobalRef): usize;
 export declare function _BinaryenGlobalGetType(global: BinaryenGlobalRef): BinaryenType;
 export declare function _BinaryenGlobalIsMutable(global: BinaryenGlobalRef): bool;
-export declare function _BinaryenGlobalGetInit(global: BinaryenGlobalRef): BinaryenExpressionRef;
+export declare function _BinaryenGlobalGetInitExpr(global: BinaryenGlobalRef): BinaryenExpressionRef;
 
 type BinaryenEventRef = usize;
 
@@ -735,9 +753,8 @@ export declare function _BinaryenRemoveEvent(module: BinaryenModuleRef, name: us
 
 export declare function _BinaryenEventGetName(event: BinaryenEventRef): usize;
 export declare function _BinaryenEventGetAttribute(event: BinaryenEventRef): u32;
-export declare function _BinaryenEventGetType(event: BinaryenEventRef): usize;
-export declare function _BinaryenEventGetNumParams(event: BinaryenEventRef): BinaryenIndex;
-export declare function _BinaryenEventGetParam(event: BinaryenEventRef, index: BinaryenIndex): BinaryenType;
+export declare function _BinaryenEventGetParams(event: BinaryenEventRef): BinaryenType;
+export declare function _BinaryenEventGetResults(event: BinaryenEventRef): BinaryenType;
 
 export declare function _BinaryenSetFunctionTable(module: BinaryenModuleRef, initial: BinaryenIndex, maximum: BinaryenIndex, funcs: usize, numFuncs: BinaryenIndex, offset: BinaryenExpressionRef): void;
 
@@ -793,6 +810,17 @@ export declare function _RelooperAddBlockWithSwitch(relooper: BinaryenRelooperRe
 export declare function _RelooperAddBranchForSwitch(from: BinaryenRelooperBlockRef, to: BinaryenRelooperBlockRef, indexes: usize, numIndexes: BinaryenIndex, code: BinaryenExpressionRef): void;
 export declare function _RelooperRenderAndDispose(relooper: BinaryenRelooperRef, entry: BinaryenRelooperBlockRef, labelHelper: BinaryenIndex): BinaryenExpressionRef;
 
+type BinaryenExpressionRunnerRef = usize;
+type BinaryenExpressionRunnerFlags = u32;
+
+export declare function _ExpressionRunnerFlagsDefault(): BinaryenExpressionRunnerFlags;
+export declare function _ExpressionRunnerFlagsPreserveSideeffects(): BinaryenExpressionRunnerFlags;
+export declare function _ExpressionRunnerFlagsTraverseCalls(): BinaryenExpressionRunnerFlags;
+export declare function _ExpressionRunnerCreate(module: BinaryenModuleRef, flags: BinaryenExpressionRunnerFlags, maxDepth: BinaryenIndex, maxLoopIterations: BinaryenIndex): BinaryenExpressionRunnerRef;
+export declare function _ExpressionRunnerSetLocalValue(runner: BinaryenExpressionRunnerRef, index: BinaryenIndex, value: BinaryenExpressionRef): bool;
+export declare function _ExpressionRunnerSetGlobalValue(runner: BinaryenExpressionRunnerRef, name: usize, value: BinaryenExpressionRef): bool;
+export declare function _ExpressionRunnerRunAndDispose(runner: BinaryenExpressionRunnerRef, expr: BinaryenExpressionRef): BinaryenExpressionRef;
+
 export declare function _BinaryenGetOptimizeLevel(): i32;
 export declare function _BinaryenSetOptimizeLevel(level: i32): void;
 export declare function _BinaryenGetShrinkLevel(): i32;
@@ -810,5 +838,3 @@ export declare function _BinaryenGetFlexibleInlineMaxSize(): BinaryenIndex;
 export declare function _BinaryenSetFlexibleInlineMaxSize(size: BinaryenIndex): void;
 export declare function _BinaryenGetOneCallerInlineMaxSize(): BinaryenIndex;
 export declare function _BinaryenSetOneCallerInlineMaxSize(size: BinaryenIndex): void;
-
-export declare function _BinaryenSetAPITracing(on: bool): void;

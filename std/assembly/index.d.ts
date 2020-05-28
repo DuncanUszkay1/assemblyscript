@@ -52,6 +52,8 @@ declare const ASC_TABLE_BASE: i32;
 declare const ASC_OPTIMIZE_LEVEL: i32;
 /** Provided shrinkLevel option. */
 declare const ASC_SHRINK_LEVEL: i32;
+/** Provided lowMemoryLimit option. */
+declare const ASC_LOW_MEMORY_LIMIT: i32;
 /** Whether the sign extension feature is enabled. */
 declare const ASC_FEATURE_SIGN_EXTENSION: bool;
 /** Whether the mutable globals feature is enabled. */
@@ -70,6 +72,8 @@ declare const ASC_FEATURE_EXCEPTION_HANDLING: bool;
 declare const ASC_FEATURE_TAIL_CALLS: bool;
 /** Whether the reference types feature is enabled. */
 declare const ASC_FEATURE_REFERENCE_TYPES: bool;
+/** Whether the multi value types feature is enabled. */
+declare const ASC_FEATURE_MULTI_VALUE: bool;
 
 // Builtins
 
@@ -108,7 +112,7 @@ declare function trunc<T = f32 | f64>(value: T): T;
 /** Loads a value of the specified type from memory. Equivalent to dereferncing a pointer in other languages. */
 declare function load<T>(ptr: usize, immOffset?: usize, immAlign?: usize): T;
 /** Stores a value of the specified type to memory. Equivalent to dereferencing a pointer in other languages when assigning a value. */
-declare function store<T>(ptr: usize, value: any, immOffset?: usize, immAlign?: usize): void;
+declare function store<T>(ptr: usize, value: T, immOffset?: usize, immAlign?: usize): void;
 /** Emits an unreachable operation that results in a runtime error when executed. Both a statement and an expression. */
 declare function unreachable(): never;
 
@@ -171,7 +175,7 @@ declare function isManaged<T>(value?: any): bool;
 /** Tests if the specified type is void. Compiles to a constant. */
 declare function isVoid<T>(): bool;
 /** Traps if the specified value is not true-ish, otherwise returns the (non-nullable) value. */
-declare function assert<T>(isTrueish: T, message?: string): T & object; // any better way to model `: T != null`?
+declare function assert<T>(isTrueish: T, message?: string): T & (object | string | number); // any better way to model `: T != null`?
 /** Parses an integer string to a 64-bit float. */
 declare function parseInt(str: string, radix?: i32): f64;
 /** Parses a string to a 64-bit float. */
@@ -587,10 +591,16 @@ declare namespace v128 {
   export function any_true<T>(a: v128): bool;
   /** Reduces a vector to a scalar indicating whether all lanes are considered `true`. */
   export function all_true<T>(a: v128): bool;
+  /** Extracts the high bit of each lane and produces a scalar mask with all bits concatenated. */
+  export function bitmask<T>(a: v128): i32;
   /** Computes the minimum of each lane. */
   export function min<T>(a: v128, b: v128): v128;
   /** Computes the maximum of each lane. */
   export function max<T>(a: v128, b: v128): v128;
+  /** Computes the pseudo-minimum of each lane. */
+  export function pmin<T>(a: v128, b: v128): v128;
+  /** Computes the pseudo-maximum of each lane. */
+  export function pmax<T>(a: v128, b: v128): v128;
   /** Computes the dot product of two lanes each, yielding lanes one size wider than the input. */
   export function dot<T = i16>(a: v128, b: v128): v128;
   /** Computes the average of each lane. */
@@ -653,6 +663,8 @@ declare namespace i8x16 {
   export function max_u(a: v128, b: v128): v128;
   /** Computes the unsigned average of each 8-bit integer lane. */
   export function avgr_u(a: v128, b: v128): v128;
+  /** Compules the absolute value of each 8-bit integer lane. */
+  export function abs(a: v128): v128;
   /** Negates each 8-bit integer lane. */
   export function neg(a: v128): v128;
   /** Adds each 8-bit integer lane using signed saturation. */
@@ -673,6 +685,8 @@ declare namespace i8x16 {
   export function any_true(a: v128): bool;
   /** Reduces a vector to a scalar indicating whether all 8-bit integer lanes are considered `true`. */
   export function all_true(a: v128): bool;
+  /** Extracts the high bit of each 8-bit integer lane and produces a scalar mask with all bits concatenated. */
+  export function bitmask(a: v128): i32;
   /** Computes which 8-bit integer lanes are equal. */
   export function eq(a: v128, b: v128): v128;
   /** Computes which 8-bit integer lanes are not equal. */
@@ -725,6 +739,8 @@ declare namespace i16x8 {
   export function max_u(a: v128, b: v128): v128;
   /** Computes the unsigned average of each 16-bit integer lane. */
   export function avgr_u(a: v128, b: v128): v128;
+  /** Compules the absolute value of each 16-bit integer lane. */
+  export function abs(a: v128): v128;
   /** Negates each 16-bit integer lane. */
   export function neg(a: v128): v128;
   /** Adds each 16-bit integer lane using signed saturation. */
@@ -745,6 +761,8 @@ declare namespace i16x8 {
   export function any_true(a: v128): bool;
   /** Reduces a vector to a scalar indicating whether all 16-bit integer lanes are considered `true`. */
   export function all_true(a: v128): bool;
+  /** Extracts the high bit of each 16-bit integer lane and produces a scalar mask with all bits concatenated. */
+  export function bitmask(a: v128): i32;
   /** Computes which 16-bit integer lanes are equal. */
   export function eq(a: v128, b: v128): v128;
   /** Computes which 16-bit integer lanes are not equal. */
@@ -807,6 +825,8 @@ declare namespace i32x4 {
   export function max_u(a: v128, b: v128): v128;
   /** Computes the dot product of two 16-bit integer lanes each, yielding 32-bit integer lanes. */
   export function dot_i16x8_s(a: v128, b: v128): v128;
+  /** Compules the absolute value of each 32-bit integer lane. */
+  export function abs(a: v128): v128;
   /** Negates each 32-bit integer lane. */
   export function neg(a: v128): v128;
   /** Performs a bitwise left shift on each 32-bit integer lane by a scalar. */
@@ -819,6 +839,8 @@ declare namespace i32x4 {
   export function any_true(a: v128): bool;
   /** Reduces a vector to a scalar indicating whether all 32-bit integer lanes are considered `true`. */
   export function all_true(a: v128): bool;
+  /** Extracts the high bit of each 32-bit integer lane and produces a scalar mask with all bits concatenated. */
+  export function bitmask(a: v128): i32;
   /** Computes which 32-bit integer lanes are equal. */
   export function eq(a: v128, b: v128): v128;
   /** Computes which 32-bit integer lanes are not equal. */
@@ -915,6 +937,10 @@ declare namespace f32x4 {
   export function min(a: v128, b: v128): v128;
   /** Computes the maximum of each 32-bit float lane. */
   export function max(a: v128, b: v128): v128;
+  /** Computes the pseudo-minimum of each 32-bit float lane. */
+  export function pmin(a: v128, b: v128): v128;
+  /** Computes the pseudo-maximum of each 32-bit float lane. */
+  export function pmax(a: v128, b: v128): v128;
   /** Computes the absolute value of each 32-bit float lane. */
   export function abs(a: v128): v128;
   /** Computes the square root of each 32-bit float lane. */
@@ -963,6 +989,10 @@ declare namespace f64x2 {
   export function min(a: v128, b: v128): v128;
   /** Computes the maximum of each 64-bit float lane. */
   export function max(a: v128, b: v128): v128;
+  /** Computes the pseudo-minimum of each 64-bit float lane. */
+  export function pmin(a: v128, b: v128): v128;
+  /** Computes the pseudo-maximum of each 64-bit float lane. */
+  export function pmax(a: v128, b: v128): v128;
   /** Computes the absolute value of each 64-bit float lane. */
   export function abs(a: v128): v128;
   /** Computes the square root of each 64-bit float lane. */
@@ -1028,7 +1058,7 @@ declare class _Integer {
   /** Converts a string to an integer of this type. */
   static parseInt(value: string, radix?: number): number;
   /** Converts this integer to a string. */
-  toString(): string;
+  toString(radix?: number): string;
 }
 
 /** Pseudo-class representing the backing class of floating-point types. */
@@ -1062,7 +1092,7 @@ declare class _Float {
   /** Converts a string to a floating-point number. */
   static parseFloat(value: string): f32 | f64;
   /** Converts this floating-point number to a string. */
-  toString(this: f64): string;
+  toString(radix?: number): string;
 }
 
 /** Backing class of signed 8-bit integers. */
@@ -1128,6 +1158,10 @@ declare namespace memory {
   export function drop(segmentIndex: u32): void;
   /** Compares two chunks of memory. Returns `0` if equal, otherwise the difference of the first differing bytes. */
   export function compare(vl: usize, vr: usize, n: usize): i32;
+  /** Gets a pointer to a zeroed static chunk of memory of the given size. Alignment defaults to `16`. Arguments must be compile-time constants. */
+  export function data(size: i32, align?: i32): usize;
+  /** Gets a pointer to a pre-initialized static chunk of memory. Alignment defaults to the size of `T`. Arguments must be compile-time constants. */
+  export function data<T>(values: T[], align?: i32): usize;
 }
 
 /** Garbage collector interface. */
@@ -1395,14 +1429,26 @@ declare class Array<T> {
   sort(comparator?: (a: T, b: T) => i32): this;
   join(separator?: string): string;
   reverse(): T[];
+  /** Flattens an array of arrays. If any null entries exist in the array, they are ignored, unlike JavaScript's version of Array#flat(). */
+  flat(): T extends unknown[] ? T : never;
   toString(): string;
 }
 
-/** Class representing a fixed sequence of values of type `T`. */
-declare class FixedArray<T> {
+/** Class representing a static (not resizable) sequence of values of type `T`. This class is @final. */
+declare class StaticArray<T> {
   [key: number]: T;
+  static fromArray<T>(source: Array<T>): StaticArray<T>;
+  static concat<T>(source: StaticArray<T>, other: StaticArray<T>): StaticArray<T>;
+  static slice<T>(source: StaticArray<T>, start?: i32, end?: i32): StaticArray<T>;
   readonly length: i32;
-  constructor(capacity?: i32);
+  constructor(length?: i32);
+  includes(searchElement: T, fromIndex?: i32): bool;
+  indexOf(searchElement: T, fromIndex?: i32): i32;
+  lastIndexOf(searchElement: T, fromIndex?: i32): i32;
+  concat(items: Array<T>): Array<T>;
+  slice(from: i32, to?: i32): Array<T>;
+  join(separator?: string): string;
+  toString(): string;
 }
 
 /** Class representing a sequence of characters. */
@@ -1448,6 +1494,8 @@ declare namespace String {
     export function byteLength(str: string, nullTerminated?: bool): i32;
     /** Encodes the specified string to UTF-8 bytes, optionally null terminated. */
     export function encode(str: string, nullTerminated?: bool): ArrayBuffer;
+    /** Encodes the specified raw string to UTF-8 bytes, opionally null terminated. Returns the number of bytes written. */
+    export function encodeUnsafe(str: usize, len: i32, buf: usize, nullTerminated?: bool): usize;
     /** Decodes the specified buffer from UTF-8 bytes to a string, optionally null terminated. */
     export function decode(buf: ArrayBuffer, nullTerminated?: bool): string;
     /** Decodes raw UTF-8 bytes to a string, optionally null terminated. */
@@ -1459,6 +1507,8 @@ declare namespace String {
     export function byteLength(str: string): i32;
     /** Encodes the specified string to UTF-16 bytes. */
     export function encode(str: string): ArrayBuffer;
+    /** Encodes the specified raw string to UTF-16 bytes. Returns the number of bytes written. */
+    export function encodeUnsafe(str: usize, len: i32, buf: usize): usize;
     /** Decodes the specified buffer from UTF-16 bytes to a string. */
     export function decode(buf: ArrayBuffer): string;
     /** Decodes raw UTF-16 bytes to a string. */
@@ -1521,7 +1571,7 @@ declare class TypeError extends Error { }
 declare class SyntaxError extends Error { }
 
 interface Boolean {
-  toString(): string;
+  toString(radix?: number): string;
 }
 
 interface Number {
@@ -1695,8 +1745,12 @@ declare const Math: IMath<f64>;
 /** Alias of {@link NativeMathf} or {@link JSMath} respectively. Defaults to `NativeMathf`. */
 declare const Mathf: IMath<f32>;
 
-/** Environmental tracing function for debugging purposes. */
+/** Environmental abort function. */
+declare function abort(msg?: string | null, fileName?: string | null, lineNumber?: i32, columnNumber?: i32): never;
+/** Environmental tracing function. */
 declare function trace(msg: string, n?: i32, a0?: f64, a1?: f64, a2?: f64, a3?: f64, a4?: f64): void;
+/** Environmental seeding function. */
+declare function seed(): f64;
 
 // Decorators
 
@@ -1749,8 +1803,8 @@ declare function global(...args: any[]): any;
 /** Annotates a class as being unmanaged with limited capabilities. */
 declare function unmanaged(constructor: Function): void;
 
-/** Annotates a class as being sealed / non-derivable. */
-declare function sealed(constructor: Function): void;
+/** Annotates a class as being final / non-derivable. */
+declare function final(constructor: Function): void;
 
 /** Annotates a method, function or constant global as always inlined. */
 declare function inline(...args: any[]): any;

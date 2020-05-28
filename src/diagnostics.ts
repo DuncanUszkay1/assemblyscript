@@ -1,11 +1,13 @@
 /**
- * Shared diagnostic handling inherited by the parser and the compiler.
- * @module diagnostics
- * @preferred
- *//***/
+ * @fileoverview Shared diagnostic handling.
+ * @license Apache-2.0
+ */
 
 import {
-  Range,
+  Range
+} from "./tokenizer";
+
+import {
   Source
 } from "./ast";
 
@@ -86,7 +88,7 @@ export class DiagnosticMessage {
   /** Respective source range, if any. */
   range: Range | null = null;
   /** Related range, if any. */
-  relatedRange: Range | null = null;
+  relatedRange: Range | null = null; // TODO: Make this a related message for chains?
 
   /** Constructs a new diagnostic message. */
   private constructor(code: i32, category: DiagnosticCategory, message: string) {
@@ -104,10 +106,30 @@ export class DiagnosticMessage {
     arg2: string | null = null
   ): DiagnosticMessage {
     var message = diagnosticCodeToString(code);
-    if (arg0 != null) message = message.replace("{0}", arg0);
-    if (arg1 != null) message = message.replace("{1}", arg1);
-    if (arg2 != null) message = message.replace("{2}", arg2);
+    if (arg0 !== null) message = message.replace("{0}", arg0);
+    if (arg1 !== null) message = message.replace("{1}", arg1);
+    if (arg2 !== null) message = message.replace("{2}", arg2);
     return new DiagnosticMessage(code, category, message);
+  }
+
+  /** Tests if this message equals the specified. */
+  equals(other: DiagnosticMessage): bool {
+    if (this.code != other.code) return false;
+    var thisRange = this.range;
+    var otherRange = other.range;
+    if (thisRange) {
+      if (!otherRange || !thisRange.equals(otherRange)) return false;
+    } else if (otherRange) {
+      return false;
+    }
+    var thisRelatedRange = this.relatedRange;
+    var otherRelatedRange = other.relatedRange;
+    if (thisRelatedRange) {
+      if (!otherRelatedRange || !thisRelatedRange.equals(otherRelatedRange)) return false;
+    } else if (otherRange) {
+      return false;
+    }
+    return this.message == other.message;
   }
 
   /** Adds a source range to this message. */
@@ -124,25 +146,30 @@ export class DiagnosticMessage {
 
   /** Converts this message to a string. */
   toString(): string {
-    if (this.range) {
+    var range = this.range;
+    if (range) {
+      let source = range.source;
       return (
         diagnosticCategoryToString(this.category) +
         " " +
-        this.code.toString(10) +
+        this.code.toString() +
         ": \"" +
         this.message +
         "\" in " +
-        this.range.source.normalizedPath +
-        ":" +
-        this.range.line.toString(10) +
-        ":" +
-        this.range.column.toString(10)
+        source.normalizedPath +
+        "(" +
+        source.lineAt(range.start).toString() +
+        "," +
+        source.columnAt().toString() +
+        "+" +
+        (range.end - range.start).toString() +
+        ")"
       );
     }
     return (
       diagnosticCategoryToString(this.category) +
       " " +
-      this.code.toString(10) +
+      this.code.toString() +
       ": " +
       this.message
     );
@@ -162,41 +189,43 @@ export function formatDiagnosticMessage(
   sb.push(diagnosticCategoryToString(message.category));
   if (useColors) sb.push(COLOR_RESET);
   sb.push(message.code < 1000 ? " AS" : " TS");
-  sb.push(message.code.toString(10));
+  sb.push(message.code.toString());
   sb.push(": ");
   sb.push(message.message);
 
   // include range information if available
-  if (message.range) {
+  var range = message.range;
+  if (range) {
+    let source = range.source;
 
     // include context information if requested
-    let range = message.range;
     if (showContext) {
       sb.push("\n");
       sb.push(formatDiagnosticContext(range, useColors));
     }
     sb.push("\n");
     sb.push(" in ");
-    sb.push(range.source.normalizedPath);
+    sb.push(source.normalizedPath);
     sb.push("(");
-    sb.push(range.line.toString(10));
+    sb.push(source.lineAt(range.start).toString());
     sb.push(",");
-    sb.push(range.column.toString(10));
+    sb.push(source.columnAt().toString());
     sb.push(")");
 
     let relatedRange = message.relatedRange;
     if (relatedRange) {
+      let relatedSource = relatedRange.source;
       if (showContext) {
         sb.push("\n");
         sb.push(formatDiagnosticContext(relatedRange, useColors));
       }
       sb.push("\n");
       sb.push(" in ");
-      sb.push(relatedRange.source.normalizedPath);
+      sb.push(relatedSource.normalizedPath);
       sb.push("(");
-      sb.push(relatedRange.line.toString(10));
+      sb.push(relatedSource.lineAt(relatedRange.start).toString());
       sb.push(",");
-      sb.push(relatedRange.column.toString(10));
+      sb.push(relatedSource.columnAt().toString());
       sb.push(")");
     }
   }
@@ -242,11 +271,12 @@ export abstract class DiagnosticEmitter {
   /** Diagnostic messages emitted so far. */
   diagnostics: DiagnosticMessage[];
   /** Diagnostic messages already seen, by range. */
-  private seen: Map<Source,Map<i32,i32[]>> = new Map();
+  private seen: Map<Source,Map<i32,DiagnosticMessage[]>> = new Map();
 
   /** Initializes this diagnostic emitter. */
   protected constructor(diagnostics: DiagnosticMessage[] | null = null) {
-    this.diagnostics = diagnostics ? <DiagnosticMessage[]>diagnostics : new Array();
+    if (!diagnostics) diagnostics = new Array();
+    this.diagnostics = diagnostics;
   }
 
   /** Emits a diagnostic message of the specified category. */
@@ -259,6 +289,9 @@ export abstract class DiagnosticEmitter {
     arg1: string | null = null,
     arg2: string | null = null
   ): void {
+    var message = DiagnosticMessage.create(code, category, arg0, arg1, arg2);
+    if (range) message = message.withRange(range);
+    if (relatedRange) message.relatedRange = relatedRange;
     // It is possible that the same diagnostic is emitted twice, for example
     // when compiling generics with different types or when recompiling a loop
     // because our initial assumptions didn't hold. It is even possible to get
@@ -266,23 +299,22 @@ export abstract class DiagnosticEmitter {
     if (range) {
       let seen = this.seen;
       if (seen.has(range.source)) {
-        let seenInSource = seen.get(range.source)!;
+        let seenInSource = assert(seen.get(range.source));
         if (seenInSource.has(range.start)) {
-          let seenCodesAtPos = seenInSource.get(range.start)!;
-          if (seenCodesAtPos.includes(code)) return;
-          seenCodesAtPos.push(code);
+          let seenMessagesAtPos = assert(seenInSource.get(range.start));
+          for (let i = 0, k = seenMessagesAtPos.length; i < k; ++i) {
+            if (seenMessagesAtPos[i].equals(message)) return;
+          }
+          seenMessagesAtPos.push(message);
         } else {
-          seenInSource.set(range.start, [ code ]);
+          seenInSource.set(range.start, [ message ]);
         }
       } else {
-        let seenInSource = new Map();
-        seenInSource.set(range.start, [ code ]);
+        let seenInSource = new Map<i32,DiagnosticMessage[]>();
+        seenInSource.set(range.start, [ message ]);
         seen.set(range.source, seenInSource);
       }
     }
-    var message = DiagnosticMessage.create(code, category, arg0, arg1, arg2);
-    if (range) message = message.withRange(range);
-    if (relatedRange) message.relatedRange = relatedRange;
     this.diagnostics.push(message);
     // console.log(formatDiagnosticMessage(message, true, true) + "\n"); // temporary
     // console.log(<string>new Error("stack").stack);

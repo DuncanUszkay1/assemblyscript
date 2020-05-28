@@ -14,7 +14,7 @@
  (global $bool/uu (mut i32) (i32.const 2))
  (export "memory" (memory $0))
  (start $~start)
- (func $start:bool (; 1 ;)
+ (func $start:bool
   global.get $bool/i
   i32.const 0
   i32.ne
@@ -25,7 +25,7 @@
    i32.const 0
    i32.const 32
    i32.const 2
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -39,7 +39,7 @@
    i32.const 0
    i32.const 32
    i32.const 4
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -53,7 +53,7 @@
    i32.const 0
    i32.const 32
    i32.const 6
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -67,7 +67,7 @@
    i32.const 0
    i32.const 32
    i32.const 8
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -81,7 +81,7 @@
    i32.const 0
    i32.const 32
    i32.const 10
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -95,7 +95,7 @@
    i32.const 0
    i32.const 32
    i32.const 12
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -109,12 +109,12 @@
    i32.const 0
    i32.const 32
    i32.const 14
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $~start (; 2 ;)
+ (func $~start
   call $start:bool
  )
 )

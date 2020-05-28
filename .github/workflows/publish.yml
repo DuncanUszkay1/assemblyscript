@@ -1,18 +1,20 @@
 name: Publish
 on:
-  schedule:
-  - cron: '0 0 * * *'
+  push:
+    branches:
+    - master
 jobs:
   publish:
-    name: "Publish packages"
+    name: "Packages"
+    if: github.repository == 'DuncanUszkay1/assemblyscript'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
       with:
         ref: release
-    - uses: dcodeIO/setup-node-nvm@v1.0.0
+    - uses: dcodeIO/setup-node-nvm@master
       with:
-        node-version: node
+        node-version: current
     - name: Merge master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -67,16 +69,4 @@ jobs:
         npm publish --tag $CHANNEL
         cd lib/loader
         npm publish --tag $CHANNEL --access public
-        cd ../..
-    - name: Publish to gpr
-      env:
-        NPM_REGISTRY: "npm.pkg.github.com"
-        NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        npm config set "//${NPM_REGISTRY}/:_authToken=${NPM_AUTH_TOKEN}"
-        sed -i 's/"assemblyscript"/"@assemblyscript\/assemblyscript"/' package.json
-        sed -i 's/"assemblyscript"/"@assemblyscript\/assemblyscript"/' package-lock.json
-        npm publish --registry=https://${NPM_REGISTRY}
-        cd lib/loader
-        npm publish --registry=https://${NPM_REGISTRY}
         cd ../..

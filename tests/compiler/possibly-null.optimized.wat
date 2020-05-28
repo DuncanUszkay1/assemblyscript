@@ -21,10 +21,10 @@
  (export "testLogicalOrMulti" (func $possibly-null/testLogicalAndMulti))
  (export "testAssign" (func $possibly-null/testLogicalAndMulti))
  (export "testNeverNull" (func $possibly-null/testTrue))
- (func $possibly-null/testTrue (; 0 ;) (param $0 i32)
+ (func $possibly-null/testTrue (param $0 i32)
   nop
  )
- (func $possibly-null/testWhile (; 1 ;) (param $0 i32)
+ (func $possibly-null/testWhile (param $0 i32)
   loop $while-continue|0
    local.get $0
    if
@@ -34,7 +34,7 @@
    end
   end
  )
- (func $possibly-null/testWhile2 (; 2 ;) (param $0 i32) (param $1 i32)
+ (func $possibly-null/testWhile2 (param $0 i32) (param $1 i32)
   loop $while-continue|0
    local.get $0
    if
@@ -44,20 +44,20 @@
    end
   end
  )
- (func $possibly-null/testWhile3 (; 3 ;) (param $0 i32) (param $1 i32)
+ (func $possibly-null/testWhile3 (param $0 i32) (param $1 i32)
   loop $while-continue|0
    local.get $0
    if
     local.get $1
-    if
-     local.get $1
-     local.set $0
-    end
+    local.get $0
+    local.get $1
+    select
+    local.set $0
     br $while-continue|0
    end
   end
  )
- (func $possibly-null/testLogicalAndMulti (; 4 ;) (param $0 i32) (param $1 i32)
+ (func $possibly-null/testLogicalAndMulti (param $0 i32) (param $1 i32)
   nop
  )
 )

@@ -14,7 +14,7 @@
  (export "memory" (memory $0))
  (export "internalValue" (global $features/js-bigint-integration/internalValue))
  (export "getInternalValue" (func $features/js-bigint-integration/getInternalValue))
- (func $start:features/js-bigint-integration (; 2 ;)
+ (func $start:features/js-bigint-integration
   global.get $features/js-bigint-integration/externalValue
   i64.const 9007199254740991
   i64.eq
@@ -23,7 +23,7 @@
    i32.const 0
    i32.const 32
    i32.const 4
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -35,15 +35,15 @@
    i32.const 0
    i32.const 32
    i32.const 5
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $features/js-bigint-integration/getInternalValue (; 3 ;) (result i64)
+ (func $features/js-bigint-integration/getInternalValue (result i64)
   global.get $features/js-bigint-integration/internalValue
  )
- (func $~start (; 4 ;)
+ (func $~start
   global.get $~started
   if
    return

@@ -7,7 +7,7 @@
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (memory $0 1)
  (data (i32.const 16) " \00\00\00\01\00\00\00\01\00\00\00 \00\00\00r\00t\00/\00i\00n\00s\00t\00a\00n\00c\00e\00o\00f\00.\00t\00s\00")
- (data (i32.const 64) "\06\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\03\00\00\00\10\00\00\00\04\00\00\00")
+ (data (i32.const 64) "\06\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\03\00\00\00 \00\00\00\04\00\00\00")
  (table $0 1 funcref)
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
@@ -25,7 +25,7 @@
  (global $~lib/heap/__heap_base i32 (i32.const 116))
  (export "_start" (func $~start))
  (export "memory" (memory $0))
- (func $~lib/rt/stub/maybeGrowMemory (; 1 ;) (param $0 i32)
+ (func $~lib/rt/stub/maybeGrowMemory (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -79,7 +79,7 @@
   local.get $0
   global.set $~lib/rt/stub/offset
  )
- (func $~lib/rt/stub/__alloc (; 2 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/stub/__alloc (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -121,6 +121,8 @@
   local.get $6
   local.get $5
   i32.store
+  i32.const 1
+  drop
   local.get $6
   i32.const 1
   i32.store offset=4
@@ -132,10 +134,10 @@
   i32.store offset=12
   local.get $2
  )
- (func $~lib/rt/stub/__retain (; 3 ;) (param $0 i32) (result i32)
+ (func $~lib/rt/stub/__retain (param $0 i32) (result i32)
   local.get $0
  )
- (func $rt/instanceof/Animal#constructor (; 4 ;) (param $0 i32) (result i32)
+ (func $rt/instanceof/Animal#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -147,7 +149,7 @@
   end
   local.get $0
  )
- (func $rt/instanceof/Cat#constructor (; 5 ;) (param $0 i32) (result i32)
+ (func $rt/instanceof/Cat#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -162,7 +164,7 @@
   local.set $0
   local.get $0
  )
- (func $rt/instanceof/BlackCat#constructor (; 6 ;) (param $0 i32) (result i32)
+ (func $rt/instanceof/BlackCat#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -177,7 +179,7 @@
   local.set $0
   local.get $0
  )
- (func $~lib/rt/__instanceof (; 7 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/__instanceof (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -217,7 +219,7 @@
   end
   i32.const 0
  )
- (func $start:rt/instanceof (; 8 ;)
+ (func $start:rt/instanceof
   (local $0 i32)
   global.get $~lib/heap/__heap_base
   i32.const 15
@@ -238,6 +240,8 @@
   i32.const 0
   call $rt/instanceof/BlackCat#constructor
   global.set $rt/instanceof/blackcat
+  i32.const 1
+  drop
   global.get $rt/instanceof/animal
   local.tee $0
   i32.eqz
@@ -254,7 +258,7 @@
    i32.const 0
    i32.const 32
    i32.const 10
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -274,10 +278,12 @@
    i32.const 0
    i32.const 32
    i32.const 11
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  i32.const 1
+  drop
   global.get $rt/instanceof/cat
   local.tee $0
   i32.eqz
@@ -293,7 +299,7 @@
    i32.const 0
    i32.const 32
    i32.const 14
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -313,10 +319,12 @@
    i32.const 0
    i32.const 32
    i32.const 15
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  i32.const 1
+  drop
   global.get $rt/instanceof/blackcat
   local.tee $0
   i32.eqz
@@ -332,7 +340,7 @@
    i32.const 0
    i32.const 32
    i32.const 18
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -351,7 +359,7 @@
    i32.const 0
    i32.const 32
    i32.const 19
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -372,7 +380,7 @@
    i32.const 0
    i32.const 32
    i32.const 25
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -392,7 +400,7 @@
    i32.const 0
    i32.const 32
    i32.const 26
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -412,7 +420,7 @@
    i32.const 0
    i32.const 32
    i32.const 27
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -424,7 +432,7 @@
    i32.const 0
    i32.const 32
    i32.const 29
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -443,7 +451,7 @@
    i32.const 0
    i32.const 32
    i32.const 30
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -463,7 +471,7 @@
    i32.const 0
    i32.const 32
    i32.const 31
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -475,7 +483,7 @@
    i32.const 0
    i32.const 32
    i32.const 33
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -494,7 +502,7 @@
    i32.const 0
    i32.const 32
    i32.const 34
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -513,7 +521,7 @@
    i32.const 0
    i32.const 32
    i32.const 35
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -526,7 +534,7 @@
    i32.const 0
    i32.const 32
    i32.const 41
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -546,7 +554,7 @@
    i32.const 0
    i32.const 32
    i32.const 42
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -566,7 +574,7 @@
    i32.const 0
    i32.const 32
    i32.const 43
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -579,7 +587,7 @@
    i32.const 0
    i32.const 32
    i32.const 45
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -599,7 +607,7 @@
    i32.const 0
    i32.const 32
    i32.const 46
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -619,7 +627,7 @@
    i32.const 0
    i32.const 32
    i32.const 47
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -632,7 +640,7 @@
    i32.const 0
    i32.const 32
    i32.const 49
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -652,7 +660,7 @@
    i32.const 0
    i32.const 32
    i32.const 50
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -672,12 +680,12 @@
    i32.const 0
    i32.const 32
    i32.const 51
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $~start (; 9 ;)
+ (func $~start
   global.get $~started
   if
    return

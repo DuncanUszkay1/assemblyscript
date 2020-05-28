@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Command line options utility.
+ * @license Apache-2.0
+ */
+
 const colorsUtil = require("./colors");
 
 // type | meaning
@@ -14,8 +19,9 @@ const colorsUtil = require("./colors");
 function parse(argv, config) {
   var options = {};
   var unknown = [];
-  var arguments = [];
+  var args = [];
   var trailing = [];
+  var provided = new Set();
 
   // make an alias map and initialize defaults
   var aliases = {};
@@ -33,7 +39,7 @@ function parse(argv, config) {
   for (var i = 0, k = (argv = argv.slice()).length; i < k; ++i) {
     let arg = argv[i];
     if (arg == "--") { ++i; break; }
-    let match = /^(?:(\-\w)(?:=(.*))?|(\-\-\w{2,})(?:=(.*))?)$/.exec(arg), option, key;
+    let match = /^(?:(-\w)(?:=(.*))?|(--\w{2,})(?:=(.*))?)$/.exec(arg), option, key;
     if (match) {
       if (config[arg]) option = config[key = arg]; // exact
       else if (match[1] != null) { // alias
@@ -45,12 +51,16 @@ function parse(argv, config) {
       }
     } else {
       if (arg.charCodeAt(0) == 45) option = config[key = arg]; // exact
-      else { arguments.push(arg); continue; } // argument
+      else { args.push(arg); continue; } // argument
     }
     if (option) {
-      if (option.type == null || option.type === "b") options[key] = true; // flag
-      else {
+      if (option.type == null || option.type === "b") {
+        options[key] = true; // flag
+        provided.add(key);
+      } else {
+        // the argument was provided
         if (i + 1 < argv.length && argv[i + 1].charCodeAt(0) != 45) { // present
+          provided.add(key);
           switch (option.type) {
             case "i": options[key] = parseInt(argv[++i], 10); break;
             case "I": options[key] = (options[key] || []).concat(parseInt(argv[++i], 10)); break;
@@ -67,7 +77,7 @@ function parse(argv, config) {
             case "s": options[key] = option.default || ""; break;
             case "I":
             case "F":
-            case "S": options[key] = options.default || []; break;
+            case "S": options[key] = option.default || []; break;
             default: unknown.push(arg);
           }
         }
@@ -77,7 +87,7 @@ function parse(argv, config) {
   }
   while (i < k) trailing.push(argv[i++]); // trailing
 
-  return { options, unknown, arguments, trailing };
+  return { options, unknown, arguments: args, trailing, provided };
 }
 
 exports.parse = parse;

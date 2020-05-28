@@ -1,10 +1,10 @@
 (module
  (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
- (type $i32_=>_none (func (param i32)))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
  (type $none_=>_none (func))
+ (type $i32_=>_none (func (param i32)))
  (type $i32_i32_=>_none (func (param i32 i32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $i32_i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32 i32) (result i32)))
@@ -57,13 +57,13 @@
  (global $~lib/heap/__heap_base i32 (i32.const 1092))
  (export "memory" (memory $0))
  (start $~start)
- (func $~lib/rt/stub/__retain (; 1 ;) (param $0 i32) (result i32)
+ (func $~lib/rt/stub/__retain (param $0 i32) (result i32)
   local.get $0
  )
- (func $~lib/rt/stub/__release (; 2 ;) (param $0 i32)
+ (func $~lib/rt/stub/__release (param $0 i32)
   nop
  )
- (func $~lib/symbol/Symbol (; 3 ;) (param $0 i32) (result i32)
+ (func $~lib/symbol/Symbol (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   local.get $0
@@ -87,7 +87,7 @@
   call $~lib/rt/stub/__release
   local.get $1
  )
- (func $~lib/rt/stub/maybeGrowMemory (; 4 ;) (param $0 i32)
+ (func $~lib/rt/stub/maybeGrowMemory (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -141,7 +141,7 @@
   local.get $0
   global.set $~lib/rt/stub/offset
  )
- (func $~lib/rt/stub/__alloc (; 5 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/stub/__alloc (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -183,6 +183,8 @@
   local.get $6
   local.get $5
   i32.store
+  i32.const 1
+  drop
   local.get $6
   i32.const 1
   i32.store offset=4
@@ -194,14 +196,15 @@
   i32.store offset=12
   local.get $2
  )
- (func $~lib/memory/memory.fill (; 6 ;) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $~lib/memory/memory.fill (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
   (local $6 i32)
   (local $7 i32)
-  (local $8 i64)
-  (local $9 i32)
+  (local $8 i32)
+  (local $9 i64)
+  (local $10 i32)
   block $~lib/util/memory/memset|inlined.0
    local.get $0
    local.set $5
@@ -209,21 +212,27 @@
    local.set $4
    local.get $2
    local.set $3
+   i32.const 0
+   i32.const 1
+   i32.gt_s
+   drop
    local.get $3
    i32.eqz
    if
     br $~lib/util/memory/memset|inlined.0
    end
    local.get $5
-   local.get $4
-   i32.store8
-   local.get $5
    local.get $3
    i32.add
-   i32.const 1
+   i32.const 4
    i32.sub
+   local.set $6
+   local.get $5
    local.get $4
    i32.store8
+   local.get $6
+   local.get $4
+   i32.store8 offset=3
    local.get $3
    i32.const 2
    i32.le_u
@@ -231,29 +240,17 @@
     br $~lib/util/memory/memset|inlined.0
    end
    local.get $5
-   i32.const 1
-   i32.add
    local.get $4
-   i32.store8
+   i32.store8 offset=1
    local.get $5
-   i32.const 2
-   i32.add
    local.get $4
-   i32.store8
-   local.get $5
-   local.get $3
-   i32.add
-   i32.const 2
-   i32.sub
+   i32.store8 offset=2
+   local.get $6
    local.get $4
-   i32.store8
-   local.get $5
-   local.get $3
-   i32.add
-   i32.const 3
-   i32.sub
+   i32.store8 offset=2
+   local.get $6
    local.get $4
-   i32.store8
+   i32.store8 offset=1
    local.get $3
    i32.const 6
    i32.le_u
@@ -261,15 +258,9 @@
     br $~lib/util/memory/memset|inlined.0
    end
    local.get $5
-   i32.const 3
-   i32.add
    local.get $4
-   i32.store8
-   local.get $5
-   local.get $3
-   i32.add
-   i32.const 4
-   i32.sub
+   i32.store8 offset=3
+   local.get $6
    local.get $4
    i32.store8
    local.get $3
@@ -283,13 +274,13 @@
    i32.sub
    i32.const 3
    i32.and
-   local.set $6
+   local.set $7
    local.get $5
-   local.get $6
+   local.get $7
    i32.add
    local.set $5
    local.get $3
-   local.get $6
+   local.get $7
    i32.sub
    local.set $3
    local.get $3
@@ -303,148 +294,108 @@
    i32.const 255
    i32.and
    i32.mul
-   local.set $7
-   local.get $5
-   local.get $7
-   i32.store
-   local.get $5
-   local.get $3
-   i32.add
-   i32.const 4
-   i32.sub
-   local.get $7
-   i32.store
-   local.get $3
-   i32.const 8
-   i32.le_u
-   if
-    br $~lib/util/memory/memset|inlined.0
-   end
-   local.get $5
-   i32.const 4
-   i32.add
-   local.get $7
-   i32.store
-   local.get $5
-   i32.const 8
-   i32.add
-   local.get $7
-   i32.store
-   local.get $5
-   local.get $3
-   i32.add
-   i32.const 12
-   i32.sub
-   local.get $7
-   i32.store
-   local.get $5
-   local.get $3
-   i32.add
-   i32.const 8
-   i32.sub
-   local.get $7
-   i32.store
-   local.get $3
-   i32.const 24
-   i32.le_u
-   if
-    br $~lib/util/memory/memset|inlined.0
-   end
-   local.get $5
-   i32.const 12
-   i32.add
-   local.get $7
-   i32.store
-   local.get $5
-   i32.const 16
-   i32.add
-   local.get $7
-   i32.store
-   local.get $5
-   i32.const 20
-   i32.add
-   local.get $7
-   i32.store
-   local.get $5
-   i32.const 24
-   i32.add
-   local.get $7
-   i32.store
+   local.set $8
    local.get $5
    local.get $3
    i32.add
    i32.const 28
    i32.sub
-   local.get $7
-   i32.store
+   local.set $6
    local.get $5
+   local.get $8
+   i32.store
+   local.get $6
+   local.get $8
+   i32.store offset=24
    local.get $3
-   i32.add
+   i32.const 8
+   i32.le_u
+   if
+    br $~lib/util/memory/memset|inlined.0
+   end
+   local.get $5
+   local.get $8
+   i32.store offset=4
+   local.get $5
+   local.get $8
+   i32.store offset=8
+   local.get $6
+   local.get $8
+   i32.store offset=16
+   local.get $6
+   local.get $8
+   i32.store offset=20
+   local.get $3
    i32.const 24
-   i32.sub
-   local.get $7
-   i32.store
+   i32.le_u
+   if
+    br $~lib/util/memory/memset|inlined.0
+   end
    local.get $5
-   local.get $3
-   i32.add
-   i32.const 20
-   i32.sub
-   local.get $7
-   i32.store
+   local.get $8
+   i32.store offset=12
    local.get $5
-   local.get $3
-   i32.add
-   i32.const 16
-   i32.sub
-   local.get $7
+   local.get $8
+   i32.store offset=16
+   local.get $5
+   local.get $8
+   i32.store offset=20
+   local.get $5
+   local.get $8
+   i32.store offset=24
+   local.get $6
+   local.get $8
    i32.store
+   local.get $6
+   local.get $8
+   i32.store offset=4
+   local.get $6
+   local.get $8
+   i32.store offset=8
+   local.get $6
+   local.get $8
+   i32.store offset=12
    i32.const 24
    local.get $5
    i32.const 4
    i32.and
    i32.add
-   local.set $6
+   local.set $7
    local.get $5
-   local.get $6
+   local.get $7
    i32.add
    local.set $5
    local.get $3
-   local.get $6
+   local.get $7
    i32.sub
    local.set $3
-   local.get $7
+   local.get $8
    i64.extend_i32_u
-   local.get $7
+   local.get $8
    i64.extend_i32_u
    i64.const 32
    i64.shl
    i64.or
-   local.set $8
+   local.set $9
    loop $while-continue|0
     local.get $3
     i32.const 32
     i32.ge_u
-    local.set $9
-    local.get $9
+    local.set $10
+    local.get $10
     if
      local.get $5
-     local.get $8
+     local.get $9
      i64.store
      local.get $5
-     i32.const 8
-     i32.add
-     local.get $8
-     i64.store
+     local.get $9
+     i64.store offset=8
      local.get $5
-     i32.const 16
-     i32.add
-     local.get $8
-     i64.store
+     local.get $9
+     i64.store offset=16
      local.get $5
-     i32.const 24
-     i32.add
-     local.get $8
-     i64.store
+     local.get $9
+     i64.store offset=24
      local.get $3
      i32.const 32
      i32.sub
@@ -458,16 +409,17 @@
    end
   end
  )
- (func $~lib/arraybuffer/ArrayBuffer#constructor (; 7 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/arraybuffer/ArrayBuffer#constructor (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
+  (local $3 i32)
   local.get $1
   i32.const 1073741808
   i32.gt_u
   if
    i32.const 112
    i32.const 160
-   i32.const 54
-   i32.const 42
+   i32.const 49
+   i32.const 43
    call $~lib/builtins/abort
    unreachable
   end
@@ -481,48 +433,12 @@
   call $~lib/memory/memory.fill
   local.get $2
   call $~lib/rt/stub/__retain
- )
- (func $~lib/map/Map<~lib/string/String,usize>#clear (; 8 ;) (param $0 i32)
-  (local $1 i32)
-  (local $2 i32)
+  local.set $3
   local.get $0
-  local.tee $1
-  i32.const 0
-  i32.const 16
-  call $~lib/arraybuffer/ArrayBuffer#constructor
-  local.set $2
-  local.get $1
-  i32.load
   call $~lib/rt/stub/__release
-  local.get $2
-  i32.store
-  local.get $0
-  i32.const 4
-  i32.const 1
-  i32.sub
-  i32.store offset=4
-  local.get $0
-  local.tee $2
-  i32.const 0
-  i32.const 48
-  call $~lib/arraybuffer/ArrayBuffer#constructor
-  local.set $1
-  local.get $2
-  i32.load offset=8
-  call $~lib/rt/stub/__release
-  local.get $1
-  i32.store offset=8
-  local.get $0
-  i32.const 4
-  i32.store offset=12
-  local.get $0
-  i32.const 0
-  i32.store offset=16
-  local.get $0
-  i32.const 0
-  i32.store offset=20
+  local.get $3
  )
- (func $~lib/map/Map<~lib/string/String,usize>#constructor (; 9 ;) (param $0 i32) (result i32)
+ (func $~lib/map/Map<~lib/string/String,usize>#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -534,39 +450,10 @@
   end
   local.get $0
   i32.const 0
-  i32.store
-  local.get $0
-  i32.const 0
-  i32.store offset=4
-  local.get $0
-  i32.const 0
-  i32.store offset=8
-  local.get $0
-  i32.const 0
-  i32.store offset=12
-  local.get $0
-  i32.const 0
-  i32.store offset=16
-  local.get $0
-  i32.const 0
-  i32.store offset=20
-  local.get $0
-  call $~lib/map/Map<~lib/string/String,usize>#clear
-  local.get $0
- )
- (func $~lib/map/Map<usize,~lib/string/String>#clear (; 10 ;) (param $0 i32)
-  (local $1 i32)
-  (local $2 i32)
-  local.get $0
-  local.tee $1
-  i32.const 0
-  i32.const 16
+  i32.const 4
+  i32.const 4
+  i32.mul
   call $~lib/arraybuffer/ArrayBuffer#constructor
-  local.set $2
-  local.get $1
-  i32.load
-  call $~lib/rt/stub/__release
-  local.get $2
   i32.store
   local.get $0
   i32.const 4
@@ -574,15 +461,11 @@
   i32.sub
   i32.store offset=4
   local.get $0
-  local.tee $2
   i32.const 0
-  i32.const 48
+  i32.const 4
+  i32.const 12
+  i32.mul
   call $~lib/arraybuffer/ArrayBuffer#constructor
-  local.set $1
-  local.get $2
-  i32.load offset=8
-  call $~lib/rt/stub/__release
-  local.get $1
   i32.store offset=8
   local.get $0
   i32.const 4
@@ -593,8 +476,9 @@
   local.get $0
   i32.const 0
   i32.store offset=20
+  local.get $0
  )
- (func $~lib/map/Map<usize,~lib/string/String>#constructor (; 11 ;) (param $0 i32) (result i32)
+ (func $~lib/map/Map<usize,~lib/string/String>#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -606,15 +490,25 @@
   end
   local.get $0
   i32.const 0
+  i32.const 4
+  i32.const 4
+  i32.mul
+  call $~lib/arraybuffer/ArrayBuffer#constructor
   i32.store
   local.get $0
-  i32.const 0
+  i32.const 4
+  i32.const 1
+  i32.sub
   i32.store offset=4
   local.get $0
   i32.const 0
+  i32.const 4
+  i32.const 12
+  i32.mul
+  call $~lib/arraybuffer/ArrayBuffer#constructor
   i32.store offset=8
   local.get $0
-  i32.const 0
+  i32.const 4
   i32.store offset=12
   local.get $0
   i32.const 0
@@ -623,10 +517,8 @@
   i32.const 0
   i32.store offset=20
   local.get $0
-  call $~lib/map/Map<usize,~lib/string/String>#clear
-  local.get $0
  )
- (func $~lib/string/String#get:length (; 12 ;) (param $0 i32) (result i32)
+ (func $~lib/string/String#get:length (param $0 i32) (result i32)
   local.get $0
   i32.const 16
   i32.sub
@@ -634,7 +526,7 @@
   i32.const 1
   i32.shr_u
  )
- (func $~lib/util/hash/hashStr (; 13 ;) (param $0 i32) (result i32)
+ (func $~lib/util/hash/hashStr (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -685,7 +577,7 @@
   call $~lib/rt/stub/__release
   local.get $3
  )
- (func $~lib/util/string/compareImpl (; 14 ;) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (result i32)
+ (func $~lib/util/string/compareImpl (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (result i32)
   (local $5 i32)
   (local $6 i32)
   (local $7 i32)
@@ -710,6 +602,10 @@
   i32.shl
   i32.add
   local.set $6
+  i32.const 0
+  i32.const 2
+  i32.lt_s
+  drop
   local.get $4
   i32.const 4
   i32.ge_u
@@ -807,7 +703,7 @@
   call $~lib/rt/stub/__release
   local.get $7
  )
- (func $~lib/string/String.__eq (; 15 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/string/String.__eq (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   local.get $0
@@ -880,7 +776,7 @@
   call $~lib/rt/stub/__release
   local.get $2
  )
- (func $~lib/map/Map<~lib/string/String,usize>#find (; 16 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $~lib/map/Map<~lib/string/String,usize>#find (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -940,7 +836,7 @@
   call $~lib/rt/stub/__release
   local.get $4
  )
- (func $~lib/map/Map<~lib/string/String,usize>#has (; 17 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/map/Map<~lib/string/String,usize>#has (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   local.get $1
@@ -952,6 +848,8 @@
    local.get $1
    call $~lib/rt/stub/__retain
    local.set $2
+   i32.const 1
+   drop
    local.get $2
    call $~lib/util/hash/hashStr
    local.set $3
@@ -968,7 +866,7 @@
   call $~lib/rt/stub/__release
   local.get $2
  )
- (func $~lib/map/Map<~lib/string/String,usize>#get (; 18 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/map/Map<~lib/string/String,usize>#get (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -981,6 +879,8 @@
    local.get $1
    call $~lib/rt/stub/__retain
    local.set $2
+   i32.const 1
+   drop
    local.get $2
    call $~lib/util/hash/hashStr
    local.set $3
@@ -994,12 +894,10 @@
   local.get $4
   i32.eqz
   if
-   local.get $1
-   call $~lib/rt/stub/__release
    i32.const 224
    i32.const 288
-   i32.const 111
-   i32.const 16
+   i32.const 104
+   i32.const 17
    call $~lib/builtins/abort
    unreachable
   end
@@ -1010,7 +908,7 @@
   call $~lib/rt/stub/__release
   local.get $2
  )
- (func $~lib/map/Map<~lib/string/String,usize>#rehash (; 19 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/map/Map<~lib/string/String,usize>#rehash (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -1087,6 +985,8 @@
       i32.load
       call $~lib/rt/stub/__retain
       local.set $12
+      i32.const 1
+      drop
       local.get $12
       call $~lib/util/hash/hashStr
       local.set $13
@@ -1172,7 +1072,7 @@
   local.get $5
   call $~lib/rt/stub/__release
  )
- (func $~lib/map/Map<~lib/string/String,usize>#set (; 20 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $~lib/map/Map<~lib/string/String,usize>#set (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -1184,6 +1084,8 @@
    local.get $1
    call $~lib/rt/stub/__retain
    local.set $3
+   i32.const 1
+   drop
    local.get $3
    call $~lib/util/hash/hashStr
    local.set $4
@@ -1200,6 +1102,8 @@
   local.set $6
   local.get $6
   if
+   i32.const 0
+   drop
    local.get $6
    local.get $2
    i32.store offset=4
@@ -1290,7 +1194,7 @@
   call $~lib/rt/stub/__release
   local.get $4
  )
- (func $~lib/util/hash/hash32 (; 21 ;) (param $0 i32) (result i32)
+ (func $~lib/util/hash/hash32 (param $0 i32) (result i32)
   (local $1 i32)
   i32.const -2128831035
   local.set $1
@@ -1332,7 +1236,7 @@
   local.set $1
   local.get $1
  )
- (func $~lib/map/Map<usize,~lib/string/String>#find (; 22 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $~lib/map/Map<usize,~lib/string/String>#find (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   (local $4 i32)
   local.get $0
@@ -1380,7 +1284,7 @@
   end
   i32.const 0
  )
- (func $~lib/map/Map<usize,~lib/string/String>#rehash (; 23 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/map/Map<usize,~lib/string/String>#rehash (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -1456,6 +1360,24 @@
       local.get $10
       i32.load
       local.set $12
+      i32.const 0
+      drop
+      i32.const 0
+      drop
+      i32.const 0
+      drop
+      i32.const 4
+      i32.const 1
+      i32.eq
+      drop
+      i32.const 4
+      i32.const 2
+      i32.eq
+      drop
+      i32.const 4
+      i32.const 4
+      i32.eq
+      drop
       local.get $12
       call $~lib/util/hash/hash32
       br $~lib/util/hash/HASH<usize>|inlined.1
@@ -1537,7 +1459,7 @@
   local.get $5
   call $~lib/rt/stub/__release
  )
- (func $~lib/map/Map<usize,~lib/string/String>#set (; 24 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $~lib/map/Map<usize,~lib/string/String>#set (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -1548,6 +1470,24 @@
   block $~lib/util/hash/HASH<usize>|inlined.0 (result i32)
    local.get $1
    local.set $3
+   i32.const 0
+   drop
+   i32.const 0
+   drop
+   i32.const 0
+   drop
+   i32.const 4
+   i32.const 1
+   i32.eq
+   drop
+   i32.const 4
+   i32.const 2
+   i32.eq
+   drop
+   i32.const 4
+   i32.const 4
+   i32.eq
+   drop
    local.get $3
    call $~lib/util/hash/hash32
    br $~lib/util/hash/HASH<usize>|inlined.0
@@ -1560,6 +1500,8 @@
   local.set $5
   local.get $5
   if
+   i32.const 1
+   drop
    local.get $5
    i32.load offset=4
    local.set $3
@@ -1661,7 +1603,7 @@
   call $~lib/rt/stub/__release
   local.get $6
  )
- (func $~lib/symbol/_Symbol.for (; 25 ;) (param $0 i32) (result i32)
+ (func $~lib/symbol/_Symbol.for (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   local.get $0
@@ -1727,13 +1669,31 @@
   call $~lib/rt/stub/__release
   local.get $1
  )
- (func $~lib/map/Map<usize,~lib/string/String>#has (; 26 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/map/Map<usize,~lib/string/String>#has (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   local.get $0
   local.get $1
   block $~lib/util/hash/HASH<usize>|inlined.2 (result i32)
    local.get $1
    local.set $2
+   i32.const 0
+   drop
+   i32.const 0
+   drop
+   i32.const 0
+   drop
+   i32.const 4
+   i32.const 1
+   i32.eq
+   drop
+   i32.const 4
+   i32.const 2
+   i32.eq
+   drop
+   i32.const 4
+   i32.const 4
+   i32.eq
+   drop
    local.get $2
    call $~lib/util/hash/hash32
    br $~lib/util/hash/HASH<usize>|inlined.2
@@ -1742,7 +1702,7 @@
   i32.const 0
   i32.ne
  )
- (func $~lib/map/Map<usize,~lib/string/String>#get (; 27 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/map/Map<usize,~lib/string/String>#get (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   local.get $0
@@ -1750,6 +1710,24 @@
   block $~lib/util/hash/HASH<usize>|inlined.3 (result i32)
    local.get $1
    local.set $2
+   i32.const 0
+   drop
+   i32.const 0
+   drop
+   i32.const 0
+   drop
+   i32.const 4
+   i32.const 1
+   i32.eq
+   drop
+   i32.const 4
+   i32.const 2
+   i32.eq
+   drop
+   i32.const 4
+   i32.const 4
+   i32.eq
+   drop
    local.get $2
    call $~lib/util/hash/hash32
    br $~lib/util/hash/HASH<usize>|inlined.3
@@ -1761,8 +1739,8 @@
   if
    i32.const 224
    i32.const 288
-   i32.const 111
-   i32.const 16
+   i32.const 104
+   i32.const 17
    call $~lib/builtins/abort
    unreachable
   end
@@ -1770,7 +1748,7 @@
   i32.load offset=4
   call $~lib/rt/stub/__retain
  )
- (func $~lib/symbol/_Symbol.keyFor (; 28 ;) (param $0 i32) (result i32)
+ (func $~lib/symbol/_Symbol.keyFor (param $0 i32) (result i32)
   global.get $~lib/symbol/idToString
   i32.const 0
   i32.ne
@@ -1790,7 +1768,7 @@
    call $~lib/rt/stub/__retain
   end
  )
- (func $~lib/util/memory/memcpy (; 29 ;) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $~lib/util/memory/memcpy (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -2814,7 +2792,7 @@
    i32.store8
   end
  )
- (func $~lib/memory/memory.copy (; 30 ;) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $~lib/memory/memory.copy (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -2833,6 +2811,10 @@
    if
     br $~lib/util/memory/memmove|inlined.0
    end
+   i32.const 0
+   i32.const 1
+   i32.lt_s
+   drop
    local.get $4
    local.get $3
    i32.add
@@ -2858,6 +2840,10 @@
    local.get $4
    i32.lt_u
    if
+    i32.const 0
+    i32.const 2
+    i32.lt_s
+    drop
     local.get $4
     i32.const 7
     i32.and
@@ -2953,6 +2939,10 @@
      end
     end
    else
+    i32.const 0
+    i32.const 2
+    i32.lt_s
+    drop
     local.get $4
     i32.const 7
     i32.and
@@ -3034,7 +3024,7 @@
    end
   end
  )
- (func $~lib/string/String#concat (; 31 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/string/String#concat (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -3110,7 +3100,7 @@
   call $~lib/rt/stub/__release
   local.get $2
  )
- (func $~lib/string/String.__concat (; 32 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/string/String.__concat (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   local.get $0
   call $~lib/rt/stub/__retain
@@ -3133,7 +3123,7 @@
   call $~lib/rt/stub/__release
   local.get $2
  )
- (func $~lib/symbol/_Symbol#toString (; 33 ;) (param $0 i32) (result i32)
+ (func $~lib/symbol/_Symbol#toString (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -3328,7 +3318,7 @@
   call $~lib/rt/stub/__release
   local.get $5
  )
- (func $start:std/symbol (; 34 ;)
+ (func $start:std/symbol
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -3347,7 +3337,7 @@
    i32.const 0
    i32.const 64
    i32.const 4
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -3375,7 +3365,7 @@
    i32.const 0
    i32.const 64
    i32.const 9
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -3393,7 +3383,7 @@
    i32.const 0
    i32.const 64
    i32.const 14
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -3405,7 +3395,7 @@
    i32.const 0
    i32.const 64
    i32.const 15
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -3418,7 +3408,7 @@
    i32.const 0
    i32.const 64
    i32.const 17
-   i32.const 11
+   i32.const 12
    call $~lib/builtins/abort
    unreachable
   end
@@ -3433,7 +3423,7 @@
    i32.const 0
    i32.const 64
    i32.const 18
-   i32.const 11
+   i32.const 12
    call $~lib/builtins/abort
    unreachable
   end
@@ -3447,7 +3437,7 @@
    i32.const 0
    i32.const 64
    i32.const 20
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -3459,7 +3449,7 @@
    i32.const 0
    i32.const 64
    i32.const 21
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -3474,7 +3464,7 @@
    i32.const 0
    i32.const 64
    i32.const 23
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -3488,7 +3478,7 @@
    i32.const 0
    i32.const 64
    i32.const 24
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -3506,7 +3496,7 @@
    i32.const 0
    i32.const 64
    i32.const 28
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -3520,7 +3510,7 @@
    i32.const 0
    i32.const 64
    i32.const 29
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -3537,7 +3527,7 @@
   local.get $3
   call $~lib/rt/stub/__release
  )
- (func $~start (; 35 ;)
+ (func $~start
   call $start:std/symbol
  )
 )

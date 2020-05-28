@@ -9,7 +9,7 @@
  (memory $0 1)
  (data (i32.const 16) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00s\00t\00u\00b\00.\00t\00s\00")
  (data (i32.const 64) "$\00\00\00\01\00\00\00\01\00\00\00$\00\00\00r\00t\00/\00s\00t\00u\00b\00-\00r\00e\00a\00l\00l\00o\00c\00.\00t\00s\00")
- (data (i32.const 128) "\03\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00")
+ (data (i32.const 128) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
  (table $0 1 funcref)
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
@@ -28,7 +28,7 @@
  (export "__collect" (func $~lib/rt/stub/__collect))
  (export "__reset" (func $~lib/rt/stub/__reset))
  (export "__rtti_base" (global $~lib/rt/__rtti_base))
- (func $~lib/rt/stub/maybeGrowMemory (; 1 ;) (param $0 i32)
+ (func $~lib/rt/stub/maybeGrowMemory (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -82,7 +82,7 @@
   local.get $0
   global.set $~lib/rt/stub/offset
  )
- (func $~lib/rt/stub/__alloc (; 2 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/stub/__alloc (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -124,6 +124,8 @@
   local.get $6
   local.get $5
   i32.store
+  i32.const 1
+  drop
   local.get $6
   i32.const 1
   i32.store offset=4
@@ -135,20 +137,20 @@
   i32.store offset=12
   local.get $2
  )
- (func $~lib/rt/stub/__retain (; 3 ;) (param $0 i32) (result i32)
+ (func $~lib/rt/stub/__retain (param $0 i32) (result i32)
   local.get $0
  )
- (func $~lib/rt/stub/__release (; 4 ;) (param $0 i32)
+ (func $~lib/rt/stub/__release (param $0 i32)
   nop
  )
- (func $~lib/rt/stub/__collect (; 5 ;)
+ (func $~lib/rt/stub/__collect
   nop
  )
- (func $~lib/rt/stub/__reset (; 6 ;)
+ (func $~lib/rt/stub/__reset
   global.get $~lib/rt/stub/startOffset
   global.set $~lib/rt/stub/offset
  )
- (func $~lib/util/memory/memcpy (; 7 ;) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $~lib/util/memory/memcpy (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -1172,7 +1174,7 @@
    i32.store8
   end
  )
- (func $~lib/memory/memory.copy (; 8 ;) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $~lib/memory/memory.copy (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -1191,6 +1193,10 @@
    if
     br $~lib/util/memory/memmove|inlined.0
    end
+   i32.const 0
+   i32.const 1
+   i32.lt_s
+   drop
    local.get $4
    local.get $3
    i32.add
@@ -1216,6 +1222,10 @@
    local.get $4
    i32.lt_u
    if
+    i32.const 0
+    i32.const 2
+    i32.lt_s
+    drop
     local.get $4
     i32.const 7
     i32.and
@@ -1311,6 +1321,10 @@
      end
     end
    else
+    i32.const 0
+    i32.const 2
+    i32.lt_s
+    drop
     local.get $4
     i32.const 7
     i32.and
@@ -1392,7 +1406,7 @@
    end
   end
  )
- (func $~lib/rt/stub/__realloc (; 9 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/stub/__realloc (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -1414,8 +1428,8 @@
   if
    i32.const 0
    i32.const 32
-   i32.const 43
-   i32.const 2
+   i32.const 41
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1426,6 +1440,8 @@
   local.get $2
   i32.load
   local.set $3
+  i32.const 1
+  drop
   local.get $2
   i32.load offset=4
   i32.const 1
@@ -1434,8 +1450,8 @@
   if
    i32.const 0
    i32.const 32
-   i32.const 46
-   i32.const 13
+   i32.const 44
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
@@ -1515,7 +1531,7 @@
   i32.store offset=12
   local.get $0
  )
- (func $~lib/rt/stub/__free (; 10 ;) (param $0 i32)
+ (func $~lib/rt/stub/__free (param $0 i32)
   (local $1 i32)
   local.get $0
   i32.const 0
@@ -1532,8 +1548,8 @@
   if
    i32.const 0
    i32.const 32
-   i32.const 70
-   i32.const 2
+   i32.const 68
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -1541,6 +1557,8 @@
   i32.const 16
   i32.sub
   local.set $1
+  i32.const 1
+  drop
   local.get $1
   i32.load offset=4
   i32.const 1
@@ -1549,8 +1567,8 @@
   if
    i32.const 0
    i32.const 32
-   i32.const 72
-   i32.const 13
+   i32.const 70
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
@@ -1565,7 +1583,7 @@
    global.set $~lib/rt/stub/offset
   end
  )
- (func $start:rt/stub-realloc (; 11 ;)
+ (func $start:rt/stub-realloc
   i32.const 10
   i32.const 0
   call $~lib/rt/stub/__alloc
@@ -1584,7 +1602,7 @@
    i32.const 0
    i32.const 80
    i32.const 7
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -1600,7 +1618,7 @@
    i32.const 0
    i32.const 80
    i32.const 10
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -1616,7 +1634,7 @@
    i32.const 0
    i32.const 80
    i32.const 13
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -1640,7 +1658,7 @@
    i32.const 0
    i32.const 80
    i32.const 18
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -1656,7 +1674,7 @@
    i32.const 0
    i32.const 80
    i32.const 21
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -1672,7 +1690,7 @@
    i32.const 0
    i32.const 80
    i32.const 24
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -1688,7 +1706,7 @@
    i32.const 0
    i32.const 80
    i32.const 27
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -1704,12 +1722,12 @@
    i32.const 0
    i32.const 80
    i32.const 30
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $~start (; 12 ;)
+ (func $~start
   global.get $~started
   if
    return

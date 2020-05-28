@@ -7,11 +7,11 @@
  (export "Child" (global $extends-recursive/Child))
  (export "Child#get:child" (func $extends-recursive/Parent#get:child))
  (export "Child#set:child" (func $extends-recursive/Parent#set:child))
- (func $extends-recursive/Parent#get:child (; 0 ;) (param $0 i32) (result i32)
+ (func $extends-recursive/Parent#get:child (param $0 i32) (result i32)
   local.get $0
   i32.load
  )
- (func $extends-recursive/Parent#set:child (; 1 ;) (param $0 i32) (param $1 i32)
+ (func $extends-recursive/Parent#set:child (param $0 i32) (param $1 i32)
   local.get $0
   i32.load
   drop

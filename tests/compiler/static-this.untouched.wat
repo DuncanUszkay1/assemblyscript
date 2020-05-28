@@ -9,10 +9,10 @@
  (global $static-this/Foo.bar (mut i32) (i32.const 42))
  (export "memory" (memory $0))
  (start $~start)
- (func $static-this/Foo.getBar (; 1 ;) (result i32)
+ (func $static-this/Foo.getBar (result i32)
   global.get $static-this/Foo.bar
  )
- (func $start:static-this (; 2 ;)
+ (func $start:static-this
   call $static-this/Foo.getBar
   i32.const 42
   i32.eq
@@ -21,12 +21,12 @@
    i32.const 0
    i32.const 32
    i32.const 8
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $~start (; 3 ;)
+ (func $~start
   call $start:static-this
  )
 )

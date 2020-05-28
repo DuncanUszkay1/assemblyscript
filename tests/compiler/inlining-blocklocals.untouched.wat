@@ -11,7 +11,7 @@
  (global $inlining-blocklocals/theCall_c (mut i32) (i32.const 0))
  (export "memory" (memory $0))
  (start $~start)
- (func $inlining-blocklocals/test (; 1 ;)
+ (func $inlining-blocklocals/test
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -51,7 +51,7 @@
    i32.const 0
    i32.const 32
    i32.const 18
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -63,7 +63,7 @@
    i32.const 0
    i32.const 32
    i32.const 19
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -75,7 +75,7 @@
    i32.const 0
    i32.const 32
    i32.const 20
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -87,15 +87,15 @@
    i32.const 0
    i32.const 32
    i32.const 21
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $start:inlining-blocklocals (; 2 ;)
+ (func $start:inlining-blocklocals
   call $inlining-blocklocals/test
  )
- (func $~start (; 3 ;)
+ (func $~start
   call $start:inlining-blocklocals
  )
 )

@@ -8,6 +8,7 @@
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $none_=>_i32 (func (result i32)))
+ (type $i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32) (result i32)))
  (type $i32_i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32 i32) (result i32)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (import "rtrace" "onincrement" (func $~lib/rt/rtrace/onincrement (param i32)))
@@ -35,24 +36,29 @@
  (table $0 1 funcref)
  (global $std/string-encoding/str (mut i32) (i32.const 32))
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
+ (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
  (global $~lib/gc/gc.auto (mut i32) (i32.const 1))
  (global $~lib/ASC_SHRINK_LEVEL i32 (i32.const 0))
  (global $~lib/heap/__heap_base i32 (i32.const 21052))
  (export "memory" (memory $0))
  (start $~start)
- (func $~lib/rt/pure/increment (; 6 ;) (param $0 i32)
+ (func $~lib/rt/pure/increment (param $0 i32)
   (local $1 i32)
   local.get $0
   i32.load offset=4
   local.set $1
   local.get $1
-  i32.const -268435456
+  i32.const 268435455
+  i32.const -1
+  i32.xor
   i32.and
   local.get $1
   i32.const 1
   i32.add
-  i32.const -268435456
+  i32.const 268435455
+  i32.const -1
+  i32.xor
   i32.and
   i32.eq
   i32.eqz
@@ -60,7 +66,7 @@
    i32.const 0
    i32.const 64
    i32.const 109
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -69,8 +75,12 @@
   i32.const 1
   i32.add
   i32.store offset=4
+  i32.const 1
+  drop
   local.get $0
   call $~lib/rt/rtrace/onincrement
+  i32.const 1
+  drop
   local.get $0
   i32.load
   i32.const 1
@@ -81,12 +91,12 @@
    i32.const 0
    i32.const 64
    i32.const 112
-   i32.const 13
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $~lib/rt/pure/__retain (; 7 ;) (param $0 i32) (result i32)
+ (func $~lib/rt/pure/__retain (param $0 i32) (result i32)
   local.get $0
   global.get $~lib/heap/__heap_base
   i32.gt_u
@@ -98,7 +108,7 @@
   end
   local.get $0
  )
- (func $~lib/rt/pure/__release (; 8 ;) (param $0 i32)
+ (func $~lib/rt/pure/__release (param $0 i32)
   local.get $0
   global.get $~lib/heap/__heap_base
   i32.gt_u
@@ -109,7 +119,7 @@
    call $~lib/rt/pure/decrement
   end
  )
- (func $~lib/string/String.UTF16.byteLength (; 9 ;) (param $0 i32) (result i32)
+ (func $~lib/string/String.UTF16.byteLength (param $0 i32) (result i32)
   (local $1 i32)
   local.get $0
   call $~lib/rt/pure/__retain
@@ -123,7 +133,7 @@
   call $~lib/rt/pure/__release
   local.get $1
  )
- (func $std/string-encoding/testUTF16Length (; 10 ;)
+ (func $std/string-encoding/testUTF16Length
   global.get $std/string-encoding/str
   call $~lib/string/String.UTF16.byteLength
   i32.const 12
@@ -133,12 +143,12 @@
    i32.const 0
    i32.const 112
    i32.const 8
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $~lib/rt/tlsf/removeBlock (; 11 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/rt/tlsf/removeBlock (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -152,6 +162,8 @@
   local.get $1
   i32.load
   local.set $2
+  i32.const 1
+  drop
   local.get $2
   i32.const 1
   i32.and
@@ -160,7 +172,7 @@
    i32.const 0
    i32.const 176
    i32.const 277
-   i32.const 13
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
@@ -170,6 +182,8 @@
   i32.xor
   i32.and
   local.set $3
+  i32.const 1
+  drop
   local.get $3
   i32.const 16
   i32.ge_u
@@ -185,7 +199,7 @@
    i32.const 0
    i32.const 176
    i32.const 279
-   i32.const 13
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
@@ -222,6 +236,8 @@
    i32.sub
    local.set $4
   end
+  i32.const 1
+  drop
   local.get $4
   i32.const 23
   i32.lt_u
@@ -237,7 +253,7 @@
    i32.const 0
    i32.const 176
    i32.const 292
-   i32.const 13
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
@@ -348,7 +364,7 @@
    end
   end
  )
- (func $~lib/rt/tlsf/insertBlock (; 12 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/rt/tlsf/insertBlock (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -361,19 +377,23 @@
   (local $11 i32)
   (local $12 i32)
   (local $13 i32)
+  i32.const 1
+  drop
   local.get $1
   i32.eqz
   if
    i32.const 0
    i32.const 176
    i32.const 205
-   i32.const 13
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
   local.get $1
   i32.load
   local.set $2
+  i32.const 1
+  drop
   local.get $2
   i32.const 1
   i32.and
@@ -382,7 +402,7 @@
    i32.const 0
    i32.const 176
    i32.const 207
-   i32.const 13
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
@@ -467,6 +487,8 @@
    local.get $6
    i32.load
    local.set $3
+   i32.const 1
+   drop
    local.get $3
    i32.const 1
    i32.and
@@ -475,7 +497,7 @@
     i32.const 0
     i32.const 176
     i32.const 228
-    i32.const 15
+    i32.const 16
     call $~lib/builtins/abort
     unreachable
    end
@@ -523,6 +545,8 @@
   i32.xor
   i32.and
   local.set $8
+  i32.const 1
+  drop
   local.get $8
   i32.const 16
   i32.ge_u
@@ -538,10 +562,12 @@
    i32.const 0
    i32.const 176
    i32.const 243
-   i32.const 13
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
+  i32.const 1
+  drop
   local.get $1
   i32.const 16
   i32.add
@@ -554,7 +580,7 @@
    i32.const 0
    i32.const 176
    i32.const 244
-   i32.const 13
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
@@ -596,6 +622,8 @@
    i32.sub
    local.set $9
   end
+  i32.const 1
+  drop
   local.get $9
   i32.const 23
   i32.lt_u
@@ -611,7 +639,7 @@
    i32.const 0
    i32.const 176
    i32.const 260
-   i32.const 13
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
@@ -698,7 +726,7 @@
   local.get $7
   i32.store offset=4
  )
- (func $~lib/rt/tlsf/addMemory (; 13 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $~lib/rt/tlsf/addMemory (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -706,6 +734,8 @@
   (local $7 i32)
   (local $8 i32)
   (local $9 i32)
+  i32.const 1
+  drop
   local.get $1
   local.get $2
   i32.le_u
@@ -730,7 +760,7 @@
    i32.const 0
    i32.const 176
    i32.const 386
-   i32.const 4
+   i32.const 5
    call $~lib/builtins/abort
    unreachable
   end
@@ -743,6 +773,8 @@
   local.set $5
   local.get $4
   if
+   i32.const 1
+   drop
    local.get $1
    local.get $4
    i32.const 16
@@ -753,7 +785,7 @@
     i32.const 0
     i32.const 176
     i32.const 396
-    i32.const 15
+    i32.const 16
     call $~lib/builtins/abort
     unreachable
    end
@@ -774,6 +806,8 @@
     nop
    end
   else
+   i32.const 1
+   drop
    local.get $1
    local.get $0
    i32.const 1572
@@ -784,7 +818,7 @@
     i32.const 0
     i32.const 176
     i32.const 408
-    i32.const 4
+    i32.const 5
     call $~lib/builtins/abort
     unreachable
    end
@@ -794,7 +828,11 @@
   i32.sub
   local.set $6
   local.get $6
-  i32.const 48
+  i32.const 16
+  i32.const 16
+  i32.add
+  i32.const 16
+  i32.add
   i32.lt_u
   if
    i32.const 0
@@ -846,7 +884,7 @@
   call $~lib/rt/tlsf/insertBlock
   i32.const 1
  )
- (func $~lib/rt/tlsf/maybeInitialize (; 14 ;) (result i32)
+ (func $~lib/rt/tlsf/maybeInitialize (result i32)
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -867,7 +905,9 @@
    global.get $~lib/heap/__heap_base
    i32.const 15
    i32.add
-   i32.const -16
+   i32.const 15
+   i32.const -1
+   i32.xor
    i32.and
    local.set $1
    memory.size
@@ -976,7 +1016,6 @@
      br $for-loop|0
     end
    end
-   local.get $0
    local.get $1
    i32.const 1572
    i32.add
@@ -986,6 +1025,11 @@
    i32.const -1
    i32.xor
    i32.and
+   local.set $5
+   i32.const 0
+   drop
+   local.get $0
+   local.get $5
    memory.size
    i32.const 16
    i32.shl
@@ -996,7 +1040,7 @@
   end
   local.get $0
  )
- (func $~lib/rt/tlsf/prepareSize (; 15 ;) (param $0 i32) (result i32)
+ (func $~lib/rt/tlsf/prepareSize (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   local.get $0
@@ -1005,8 +1049,8 @@
   if
    i32.const 224
    i32.const 176
-   i32.const 457
-   i32.const 29
+   i32.const 461
+   i32.const 30
    call $~lib/builtins/abort
    unreachable
   end
@@ -1025,7 +1069,7 @@
   i32.gt_u
   select
  )
- (func $~lib/rt/tlsf/searchBlock (; 16 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/tlsf/searchBlock (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -1085,6 +1129,8 @@
    i32.sub
    local.set $2
   end
+  i32.const 1
+  drop
   local.get $2
   i32.const 23
   i32.lt_u
@@ -1100,7 +1146,7 @@
    i32.const 0
    i32.const 176
    i32.const 338
-   i32.const 13
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
@@ -1157,13 +1203,15 @@
     i32.add
     i32.load offset=4
     local.set $6
+    i32.const 1
+    drop
     local.get $6
     i32.eqz
     if
      i32.const 0
      i32.const 176
      i32.const 351
-     i32.const 17
+     i32.const 18
      call $~lib/builtins/abort
      unreachable
     end
@@ -1208,13 +1256,15 @@
   end
   local.get $7
  )
- (func $~lib/rt/tlsf/growMemory (; 17 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/rt/tlsf/growMemory (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
   (local $6 i32)
   (local $7 i32)
+  i32.const 0
+  drop
   local.get $1
   i32.const 536870904
   i32.lt_u
@@ -1292,13 +1342,15 @@
   call $~lib/rt/tlsf/addMemory
   drop
  )
- (func $~lib/rt/tlsf/prepareBlock (; 18 ;) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $~lib/rt/tlsf/prepareBlock (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
   local.get $1
   i32.load
   local.set $3
+  i32.const 1
+  drop
   local.get $2
   i32.const 15
   i32.and
@@ -1308,7 +1360,7 @@
    i32.const 0
    i32.const 176
    i32.const 365
-   i32.const 13
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
@@ -1321,7 +1373,9 @@
   i32.sub
   local.set $4
   local.get $4
-  i32.const 32
+  i32.const 16
+  i32.const 16
+  i32.add
   i32.ge_u
   if
    local.get $1
@@ -1387,17 +1441,19 @@
    i32.store
   end
  )
- (func $~lib/rt/tlsf/allocateBlock (; 19 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $~lib/rt/tlsf/allocateBlock (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   (local $4 i32)
+  i32.const 1
+  drop
   global.get $~lib/rt/tlsf/collectLock
   i32.eqz
   i32.eqz
   if
    i32.const 0
    i32.const 176
-   i32.const 490
-   i32.const 13
+   i32.const 500
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
@@ -1414,8 +1470,12 @@
    global.get $~lib/gc/gc.auto
    if
     i32.const 1
+    drop
+    i32.const 1
     global.set $~lib/rt/tlsf/collectLock
     call $~lib/rt/pure/__collect
+    i32.const 1
+    drop
     i32.const 0
     global.set $~lib/rt/tlsf/collectLock
     local.get $0
@@ -1432,13 +1492,15 @@
      local.get $3
      call $~lib/rt/tlsf/searchBlock
      local.set $4
+     i32.const 1
+     drop
      local.get $4
      i32.eqz
      if
       i32.const 0
       i32.const 176
-      i32.const 502
-      i32.const 19
+      i32.const 512
+      i32.const 20
       call $~lib/builtins/abort
       unreachable
      end
@@ -1451,21 +1513,27 @@
     local.get $3
     call $~lib/rt/tlsf/searchBlock
     local.set $4
+    i32.const 1
+    drop
     local.get $4
     i32.eqz
     if
      i32.const 0
      i32.const 176
-     i32.const 507
-     i32.const 17
+     i32.const 517
+     i32.const 18
      call $~lib/builtins/abort
      unreachable
     end
    end
   end
+  i32.const 1
+  drop
   local.get $4
   i32.load
-  i32.const -4
+  i32.const 3
+  i32.const -1
+  i32.xor
   i32.and
   local.get $3
   i32.ge_u
@@ -1473,8 +1541,8 @@
   if
    i32.const 0
    i32.const 176
-   i32.const 510
-   i32.const 13
+   i32.const 520
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
@@ -1494,11 +1562,13 @@
   local.get $4
   local.get $3
   call $~lib/rt/tlsf/prepareBlock
+  i32.const 1
+  drop
   local.get $4
   call $~lib/rt/rtrace/onalloc
   local.get $4
  )
- (func $~lib/rt/tlsf/__alloc (; 20 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/tlsf/__alloc (param $0 i32) (param $1 i32) (result i32)
   call $~lib/rt/tlsf/maybeInitialize
   local.get $0
   local.get $1
@@ -1506,7 +1576,15 @@
   i32.const 16
   i32.add
  )
- (func $~lib/util/memory/memcpy (; 21 ;) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $~lib/string/String#get:length (param $0 i32) (result i32)
+  local.get $0
+  i32.const 16
+  i32.sub
+  i32.load offset=12
+  i32.const 1
+  i32.shr_u
+ )
+ (func $~lib/util/memory/memcpy (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -2530,7 +2608,7 @@
    i32.store8
   end
  )
- (func $~lib/memory/memory.copy (; 22 ;) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $~lib/memory/memory.copy (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -2549,6 +2627,10 @@
    if
     br $~lib/util/memory/memmove|inlined.0
    end
+   i32.const 0
+   i32.const 1
+   i32.lt_s
+   drop
    local.get $4
    local.get $3
    i32.add
@@ -2574,6 +2656,10 @@
    local.get $4
    i32.lt_u
    if
+    i32.const 0
+    i32.const 2
+    i32.lt_s
+    drop
     local.get $4
     i32.const 7
     i32.and
@@ -2669,6 +2755,10 @@
      end
     end
    else
+    i32.const 0
+    i32.const 2
+    i32.lt_s
+    drop
     local.get $4
     i32.const 7
     i32.and
@@ -2750,38 +2840,49 @@
    end
   end
  )
- (func $~lib/string/String.UTF16.encode (; 23 ;) (param $0 i32) (result i32)
+ (func $~lib/string/String.UTF16.encodeUnsafe (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+  (local $3 i32)
+  local.get $1
+  i32.const 1
+  i32.shl
+  local.set $3
+  local.get $2
+  local.get $0
+  local.get $3
+  call $~lib/memory/memory.copy
+  local.get $3
+ )
+ (func $~lib/string/String.UTF16.encode (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
-  (local $3 i32)
   local.get $0
   call $~lib/rt/pure/__retain
   local.set $0
   local.get $0
   call $~lib/string/String.UTF16.byteLength
-  local.set $1
-  local.get $1
   i32.const 0
   call $~lib/rt/tlsf/__alloc
-  local.set $2
-  local.get $2
+  local.set $1
   local.get $0
+  local.get $0
+  call $~lib/string/String#get:length
   local.get $1
-  call $~lib/memory/memory.copy
-  local.get $2
+  call $~lib/string/String.UTF16.encodeUnsafe
+  drop
+  local.get $1
   call $~lib/rt/pure/__retain
-  local.set $3
+  local.set $2
   local.get $0
   call $~lib/rt/pure/__release
-  local.get $3
+  local.get $2
  )
- (func $~lib/arraybuffer/ArrayBuffer#get:byteLength (; 24 ;) (param $0 i32) (result i32)
+ (func $~lib/arraybuffer/ArrayBuffer#get:byteLength (param $0 i32) (result i32)
   local.get $0
   i32.const 16
   i32.sub
   i32.load offset=12
  )
- (func $std/string-encoding/testUTF16Encode (; 25 ;)
+ (func $std/string-encoding/testUTF16Encode
   (local $0 i32)
   (local $1 i32)
   global.get $std/string-encoding/str
@@ -2798,7 +2899,7 @@
    i32.const 0
    i32.const 112
    i32.const 15
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2811,7 +2912,7 @@
    i32.const 0
    i32.const 112
    i32.const 16
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2824,7 +2925,7 @@
    i32.const 0
    i32.const 112
    i32.const 17
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2837,7 +2938,7 @@
    i32.const 0
    i32.const 112
    i32.const 18
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2850,7 +2951,7 @@
    i32.const 0
    i32.const 112
    i32.const 19
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2863,7 +2964,7 @@
    i32.const 0
    i32.const 112
    i32.const 20
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2876,7 +2977,7 @@
    i32.const 0
    i32.const 112
    i32.const 21
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2889,7 +2990,7 @@
    i32.const 0
    i32.const 112
    i32.const 22
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2902,7 +3003,7 @@
    i32.const 0
    i32.const 112
    i32.const 23
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2915,7 +3016,7 @@
    i32.const 0
    i32.const 112
    i32.const 24
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2928,7 +3029,7 @@
    i32.const 0
    i32.const 112
    i32.const 25
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2941,7 +3042,7 @@
    i32.const 0
    i32.const 112
    i32.const 26
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -2954,14 +3055,14 @@
    i32.const 0
    i32.const 112
    i32.const 27
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
   local.get $0
   call $~lib/rt/pure/__release
  )
- (func $~lib/string/String.UTF16.decodeUnsafe (; 26 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/string/String.UTF16.decodeUnsafe (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   local.get $1
   i32.const 1
@@ -2979,7 +3080,7 @@
   local.get $2
   call $~lib/rt/pure/__retain
  )
- (func $~lib/string/String.UTF16.decode (; 27 ;) (param $0 i32) (result i32)
+ (func $~lib/string/String.UTF16.decode (param $0 i32) (result i32)
   (local $1 i32)
   local.get $0
   call $~lib/rt/pure/__retain
@@ -2993,15 +3094,7 @@
   call $~lib/rt/pure/__release
   local.get $1
  )
- (func $~lib/string/String#get:length (; 28 ;) (param $0 i32) (result i32)
-  local.get $0
-  i32.const 16
-  i32.sub
-  i32.load offset=12
-  i32.const 1
-  i32.shr_u
- )
- (func $~lib/util/string/compareImpl (; 29 ;) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (result i32)
+ (func $~lib/util/string/compareImpl (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (result i32)
   (local $5 i32)
   (local $6 i32)
   (local $7 i32)
@@ -3026,6 +3119,10 @@
   i32.shl
   i32.add
   local.set $6
+  i32.const 0
+  i32.const 2
+  i32.lt_s
+  drop
   local.get $4
   i32.const 4
   i32.ge_u
@@ -3123,7 +3220,7 @@
   call $~lib/rt/pure/__release
   local.get $7
  )
- (func $~lib/string/String.__eq (; 30 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/string/String.__eq (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   local.get $0
@@ -3196,7 +3293,7 @@
   call $~lib/rt/pure/__release
   local.get $2
  )
- (func $std/string-encoding/testUTF16Decode (; 31 ;)
+ (func $std/string-encoding/testUTF16Decode
   (local $0 i32)
   (local $1 i32)
   global.get $std/string-encoding/str
@@ -3212,7 +3309,7 @@
    i32.const 0
    i32.const 112
    i32.const 33
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3221,7 +3318,7 @@
   local.get $0
   call $~lib/rt/pure/__release
  )
- (func $std/string-encoding/testUTF16DecodeUnsafe (; 32 ;)
+ (func $std/string-encoding/testUTF16DecodeUnsafe
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -3251,7 +3348,7 @@
    i32.const 0
    i32.const 112
    i32.const 42
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3266,7 +3363,7 @@
    i32.const 0
    i32.const 112
    i32.const 43
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3281,7 +3378,7 @@
    i32.const 0
    i32.const 112
    i32.const 44
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3298,7 +3395,7 @@
    i32.const 0
    i32.const 112
    i32.const 45
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3315,7 +3412,7 @@
    i32.const 0
    i32.const 112
    i32.const 46
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3332,7 +3429,7 @@
    i32.const 0
    i32.const 112
    i32.const 47
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3349,7 +3446,7 @@
    i32.const 0
    i32.const 112
    i32.const 48
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3370,7 +3467,7 @@
   local.get $0
   call $~lib/rt/pure/__release
  )
- (func $~lib/string/String.UTF8.byteLength (; 33 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/string/String.UTF8.byteLength (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -3481,7 +3578,7 @@
   call $~lib/rt/pure/__release
   local.get $5
  )
- (func $std/string-encoding/testUTF8Length (; 34 ;)
+ (func $std/string-encoding/testUTF8Length
   global.get $std/string-encoding/str
   i32.const 0
   call $~lib/string/String.UTF8.byteLength
@@ -3492,7 +3589,7 @@
    i32.const 0
    i32.const 112
    i32.const 55
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3506,14 +3603,12 @@
    i32.const 0
    i32.const 112
    i32.const 56
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $~lib/string/String.UTF8.encode (; 35 ;) (param $0 i32) (param $1 i32) (result i32)
-  (local $2 i32)
-  (local $3 i32)
+ (func $~lib/string/String.UTF8.encodeUnsafe (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
   (local $4 i32)
   (local $5 i32)
   (local $6 i32)
@@ -3523,247 +3618,239 @@
   (local $10 i32)
   (local $11 i32)
   (local $12 i32)
-  (local $13 i32)
-  (local $14 i32)
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.set $0
-  local.get $0
-  local.set $2
-  local.get $0
-  local.get $0
-  i32.const 16
-  i32.sub
-  i32.load offset=12
-  i32.add
-  local.set $3
   local.get $0
   local.get $1
-  call $~lib/string/String.UTF8.byteLength
+  i32.const 1
+  i32.shl
+  i32.add
   local.set $4
-  local.get $4
-  i32.const 0
-  call $~lib/rt/tlsf/__alloc
+  local.get $2
   local.set $5
-  local.get $5
-  local.get $4
-  i32.add
-  local.get $1
-  i32.const 0
-  i32.ne
-  i32.sub
-  local.set $6
-  local.get $5
-  local.set $7
   loop $while-continue|0
-   local.get $7
-   local.get $6
+   local.get $0
+   local.get $4
    i32.lt_u
-   local.set $8
-   local.get $8
+   local.set $6
+   local.get $6
    if
-    local.get $2
+    local.get $0
     i32.load16_u
-    local.set $9
-    local.get $9
+    local.set $7
+    local.get $7
     i32.const 128
     i32.lt_u
     if
+     local.get $5
      local.get $7
-     local.get $9
      i32.store8
-     local.get $7
+     local.get $5
      i32.const 1
      i32.add
-     local.set $7
+     local.set $5
     else
-     local.get $9
+     local.get $7
      i32.const 2048
      i32.lt_u
      if
-      local.get $9
+      local.get $7
       i32.const 6
       i32.shr_u
       i32.const 192
       i32.or
-      local.set $10
-      local.get $9
+      local.set $8
+      local.get $7
       i32.const 63
       i32.and
       i32.const 128
       i32.or
-      local.set $11
-      local.get $7
-      local.get $11
+      local.set $9
+      local.get $5
+      local.get $9
       i32.const 8
       i32.shl
-      local.get $10
+      local.get $8
       i32.or
       i32.store16
-      local.get $7
+      local.get $5
       i32.const 2
       i32.add
-      local.set $7
+      local.set $5
      else
-      local.get $9
+      local.get $7
       i32.const 64512
       i32.and
       i32.const 55296
       i32.eq
       if (result i32)
-       local.get $2
+       local.get $0
        i32.const 2
        i32.add
-       local.get $3
+       local.get $4
        i32.lt_u
       else
        i32.const 0
       end
       if
-       local.get $2
+       local.get $0
        i32.load16_u offset=2
-       local.set $11
-       local.get $11
+       local.set $9
+       local.get $9
        i32.const 64512
        i32.and
        i32.const 56320
        i32.eq
        if
         i32.const 65536
-        local.get $9
+        local.get $7
         i32.const 1023
         i32.and
         i32.const 10
         i32.shl
         i32.add
-        local.get $11
+        local.get $9
         i32.const 1023
         i32.and
         i32.or
-        local.set $9
-        local.get $9
+        local.set $7
+        local.get $7
         i32.const 18
         i32.shr_u
         i32.const 240
         i32.or
-        local.set $10
-        local.get $9
+        local.set $8
+        local.get $7
         i32.const 12
         i32.shr_u
         i32.const 63
         i32.and
         i32.const 128
         i32.or
-        local.set $12
-        local.get $9
+        local.set $10
+        local.get $7
         i32.const 6
         i32.shr_u
         i32.const 63
         i32.and
         i32.const 128
         i32.or
-        local.set $13
-        local.get $9
+        local.set $11
+        local.get $7
         i32.const 63
         i32.and
         i32.const 128
         i32.or
-        local.set $14
-        local.get $7
-        local.get $14
+        local.set $12
+        local.get $5
+        local.get $12
         i32.const 24
         i32.shl
-        local.get $13
+        local.get $11
         i32.const 16
         i32.shl
         i32.or
-        local.get $12
+        local.get $10
         i32.const 8
         i32.shl
         i32.or
-        local.get $10
+        local.get $8
         i32.or
         i32.store
-        local.get $7
+        local.get $5
         i32.const 4
         i32.add
-        local.set $7
-        local.get $2
+        local.set $5
+        local.get $0
         i32.const 4
         i32.add
-        local.set $2
+        local.set $0
         br $while-continue|0
        end
       end
-      local.get $9
+      local.get $7
       i32.const 12
       i32.shr_u
       i32.const 224
       i32.or
-      local.set $11
-      local.get $9
+      local.set $9
+      local.get $7
       i32.const 6
       i32.shr_u
       i32.const 63
       i32.and
       i32.const 128
       i32.or
-      local.set $14
-      local.get $9
+      local.set $12
+      local.get $7
       i32.const 63
       i32.and
       i32.const 128
       i32.or
-      local.set $13
-      local.get $7
-      local.get $14
+      local.set $11
+      local.get $5
+      local.get $12
       i32.const 8
       i32.shl
-      local.get $11
+      local.get $9
       i32.or
       i32.store16
-      local.get $7
-      local.get $13
+      local.get $5
+      local.get $11
       i32.store8 offset=2
-      local.get $7
+      local.get $5
       i32.const 3
       i32.add
-      local.set $7
+      local.set $5
      end
     end
-    local.get $2
+    local.get $0
     i32.const 2
     i32.add
-    local.set $2
+    local.set $0
     br $while-continue|0
    end
   end
-  local.get $2
   local.get $3
-  i32.le_u
-  i32.eqz
   if
-   i32.const 0
-   i32.const 432
-   i32.const 703
-   i32.const 6
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $1
-  if
-   local.get $7
+   local.get $5
+   local.tee $6
+   i32.const 1
+   i32.add
+   local.set $5
+   local.get $6
    i32.const 0
    i32.store8
   end
   local.get $5
+  local.get $2
+  i32.sub
+ )
+ (func $~lib/string/String.UTF8.encode (param $0 i32) (param $1 i32) (result i32)
+  (local $2 i32)
+  (local $3 i32)
+  local.get $0
   call $~lib/rt/pure/__retain
-  local.set $8
+  local.set $0
+  local.get $0
+  local.get $1
+  call $~lib/string/String.UTF8.byteLength
+  i32.const 0
+  call $~lib/rt/tlsf/__alloc
+  local.set $2
+  local.get $0
+  local.get $0
+  call $~lib/string/String#get:length
+  local.get $2
+  local.get $1
+  call $~lib/string/String.UTF8.encodeUnsafe
+  drop
+  local.get $2
+  call $~lib/rt/pure/__retain
+  local.set $3
   local.get $0
   call $~lib/rt/pure/__release
-  local.get $8
+  local.get $3
  )
- (func $std/string-encoding/testUTF8Encode (; 36 ;)
+ (func $std/string-encoding/testUTF8Encode
   (local $0 i32)
   (local $1 i32)
   global.get $std/string-encoding/str
@@ -3781,7 +3868,7 @@
    i32.const 0
    i32.const 112
    i32.const 63
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3794,7 +3881,7 @@
    i32.const 0
    i32.const 112
    i32.const 64
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3807,7 +3894,7 @@
    i32.const 0
    i32.const 112
    i32.const 65
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3820,7 +3907,7 @@
    i32.const 0
    i32.const 112
    i32.const 66
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3833,7 +3920,7 @@
    i32.const 0
    i32.const 112
    i32.const 67
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3846,7 +3933,7 @@
    i32.const 0
    i32.const 112
    i32.const 68
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3859,7 +3946,7 @@
    i32.const 0
    i32.const 112
    i32.const 69
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3872,7 +3959,7 @@
    i32.const 0
    i32.const 112
    i32.const 70
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3885,7 +3972,7 @@
    i32.const 0
    i32.const 112
    i32.const 71
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3898,7 +3985,7 @@
    i32.const 0
    i32.const 112
    i32.const 72
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3911,14 +3998,14 @@
    i32.const 0
    i32.const 112
    i32.const 73
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
   local.get $0
   call $~lib/rt/pure/__release
  )
- (func $std/string-encoding/testUTF8EncodeNullTerminated (; 37 ;)
+ (func $std/string-encoding/testUTF8EncodeNullTerminated
   (local $0 i32)
   (local $1 i32)
   global.get $std/string-encoding/str
@@ -3936,7 +4023,7 @@
    i32.const 0
    i32.const 112
    i32.const 80
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3949,7 +4036,7 @@
    i32.const 0
    i32.const 112
    i32.const 81
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3962,7 +4049,7 @@
    i32.const 0
    i32.const 112
    i32.const 82
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3975,7 +4062,7 @@
    i32.const 0
    i32.const 112
    i32.const 83
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -3988,7 +4075,7 @@
    i32.const 0
    i32.const 112
    i32.const 84
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4001,7 +4088,7 @@
    i32.const 0
    i32.const 112
    i32.const 85
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4014,7 +4101,7 @@
    i32.const 0
    i32.const 112
    i32.const 86
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4027,7 +4114,7 @@
    i32.const 0
    i32.const 112
    i32.const 87
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4040,7 +4127,7 @@
    i32.const 0
    i32.const 112
    i32.const 88
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4053,7 +4140,7 @@
    i32.const 0
    i32.const 112
    i32.const 89
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4066,7 +4153,7 @@
    i32.const 0
    i32.const 112
    i32.const 90
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4079,14 +4166,14 @@
    i32.const 0
    i32.const 112
    i32.const 91
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
   local.get $0
   call $~lib/rt/pure/__release
  )
- (func $~lib/rt/tlsf/checkUsedBlock (; 38 ;) (param $0 i32) (result i32)
+ (func $~lib/rt/tlsf/checkUsedBlock (param $0 i32) (result i32)
   (local $1 i32)
   local.get $0
   i32.const 16
@@ -4115,7 +4202,9 @@
   if (result i32)
    local.get $1
    i32.load offset=4
-   i32.const -268435456
+   i32.const 268435455
+   i32.const -1
+   i32.xor
    i32.and
    i32.eqz
   else
@@ -4125,14 +4214,14 @@
   if
    i32.const 0
    i32.const 176
-   i32.const 570
-   i32.const 2
+   i32.const 580
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
   local.get $1
  )
- (func $~lib/rt/tlsf/freeBlock (; 39 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/rt/tlsf/freeBlock (param $0 i32) (param $1 i32)
   (local $2 i32)
   local.get $1
   i32.load
@@ -4145,10 +4234,12 @@
   local.get $0
   local.get $1
   call $~lib/rt/tlsf/insertBlock
+  i32.const 1
+  drop
   local.get $1
   call $~lib/rt/rtrace/onfree
  )
- (func $~lib/rt/tlsf/reallocateBlock (; 40 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $~lib/rt/tlsf/reallocateBlock (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -4163,7 +4254,9 @@
   local.set $4
   local.get $3
   local.get $4
-  i32.const -4
+  i32.const 3
+  i32.const -1
+  i32.xor
   i32.and
   i32.le_u
   if
@@ -4258,6 +4351,8 @@
   global.get $~lib/heap/__heap_base
   i32.ge_u
   if
+   i32.const 1
+   drop
    local.get $1
    local.get $8
    call $~lib/rt/rtrace/onrealloc
@@ -4267,7 +4362,7 @@
   end
   local.get $8
  )
- (func $~lib/rt/tlsf/__realloc (; 41 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/tlsf/__realloc (param $0 i32) (param $1 i32) (result i32)
   call $~lib/rt/tlsf/maybeInitialize
   local.get $0
   call $~lib/rt/tlsf/checkUsedBlock
@@ -4276,7 +4371,7 @@
   i32.const 16
   i32.add
  )
- (func $~lib/string/String.UTF8.decodeUnsafe (; 42 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $~lib/string/String.UTF8.decodeUnsafe (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -4300,8 +4395,8 @@
   if
    i32.const 0
    i32.const 432
-   i32.const 719
-   i32.const 6
+   i32.const 738
+   i32.const 7
    call $~lib/builtins/abort
    unreachable
   end
@@ -4492,7 +4587,7 @@
   call $~lib/rt/tlsf/__realloc
   call $~lib/rt/pure/__retain
  )
- (func $~lib/string/String.UTF8.decode (; 43 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/string/String.UTF8.decode (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   local.get $0
   call $~lib/rt/pure/__retain
@@ -4507,7 +4602,7 @@
   call $~lib/rt/pure/__release
   local.get $2
  )
- (func $std/string-encoding/testUTF8Decode (; 44 ;)
+ (func $std/string-encoding/testUTF8Decode
   (local $0 i32)
   (local $1 i32)
   global.get $std/string-encoding/str
@@ -4525,7 +4620,7 @@
    i32.const 0
    i32.const 112
    i32.const 97
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4534,7 +4629,7 @@
   local.get $0
   call $~lib/rt/pure/__release
  )
- (func $std/string-encoding/testUTF8DecodeNullTerminated (; 45 ;)
+ (func $std/string-encoding/testUTF8DecodeNullTerminated
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -4558,7 +4653,7 @@
    i32.const 0
    i32.const 112
    i32.const 103
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4574,7 +4669,7 @@
    i32.const 0
    i32.const 112
    i32.const 105
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4591,7 +4686,7 @@
    i32.const 0
    i32.const 112
    i32.const 107
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4607,7 +4702,7 @@
    i32.const 0
    i32.const 112
    i32.const 109
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4622,7 +4717,7 @@
    i32.const 0
    i32.const 112
    i32.const 110
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4641,7 +4736,7 @@
    i32.const 0
    i32.const 112
    i32.const 112
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4662,7 +4757,7 @@
   local.get $6
   call $~lib/rt/pure/__release
  )
- (func $std/string-encoding/testUTF8DecodeUnsafe (; 46 ;)
+ (func $std/string-encoding/testUTF8DecodeUnsafe
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -4697,7 +4792,7 @@
    i32.const 0
    i32.const 112
    i32.const 121
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4713,7 +4808,7 @@
    i32.const 0
    i32.const 112
    i32.const 122
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4729,7 +4824,7 @@
    i32.const 0
    i32.const 112
    i32.const 123
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4747,7 +4842,7 @@
    i32.const 0
    i32.const 112
    i32.const 124
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4765,7 +4860,7 @@
    i32.const 0
    i32.const 112
    i32.const 125
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4783,7 +4878,7 @@
    i32.const 0
    i32.const 112
    i32.const 126
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4801,7 +4896,7 @@
    i32.const 0
    i32.const 112
    i32.const 128
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4819,7 +4914,7 @@
    i32.const 0
    i32.const 112
    i32.const 129
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4837,7 +4932,7 @@
    i32.const 0
    i32.const 112
    i32.const 130
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4862,7 +4957,7 @@
   local.get $0
   call $~lib/rt/pure/__release
  )
- (func $std/string-encoding/testLarge (; 47 ;) (param $0 i32)
+ (func $std/string-encoding/testLarge (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -4885,7 +4980,7 @@
    i32.const 0
    i32.const 112
    i32.const 136
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4902,7 +4997,7 @@
    i32.const 0
    i32.const 112
    i32.const 138
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -4917,7 +5012,7 @@
   local.get $3
   call $~lib/rt/pure/__release
  )
- (func $start:std/string-encoding (; 48 ;)
+ (func $start:std/string-encoding
   call $std/string-encoding/testUTF16Length
   call $std/string-encoding/testUTF16Encode
   call $std/string-encoding/testUTF16Decode
@@ -4933,10 +5028,17 @@
   i32.const 13696
   call $std/string-encoding/testLarge
  )
- (func $~start (; 49 ;)
+ (func $~start
   call $start:std/string-encoding
  )
- (func $~lib/rt/pure/decrement (; 50 ;) (param $0 i32)
+ (func $~lib/rt/pure/finalize (param $0 i32)
+  i32.const 0
+  drop
+  global.get $~lib/rt/tlsf/ROOT
+  local.get $0
+  call $~lib/rt/tlsf/freeBlock
+ )
+ (func $~lib/rt/pure/decrement (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   local.get $0
@@ -4946,8 +5048,12 @@
   i32.const 268435455
   i32.and
   local.set $2
+  i32.const 1
+  drop
   local.get $0
   call $~lib/rt/rtrace/ondecrement
+  i32.const 1
+  drop
   local.get $0
   i32.load
   i32.const 1
@@ -4958,7 +5064,7 @@
    i32.const 0
    i32.const 64
    i32.const 122
-   i32.const 13
+   i32.const 14
    call $~lib/builtins/abort
    unreachable
   end
@@ -4971,6 +5077,10 @@
    i32.add
    i32.const 1
    call $~lib/rt/__visit_members
+   i32.const 1
+   drop
+   i32.const 1
+   drop
    local.get $1
    i32.const -2147483648
    i32.and
@@ -4980,14 +5090,15 @@
     i32.const 0
     i32.const 64
     i32.const 126
-    i32.const 17
+    i32.const 18
     call $~lib/builtins/abort
     unreachable
    end
-   global.get $~lib/rt/tlsf/ROOT
    local.get $0
-   call $~lib/rt/tlsf/freeBlock
+   call $~lib/rt/pure/finalize
   else
+   i32.const 1
+   drop
    local.get $2
    i32.const 0
    i32.gt_u
@@ -4996,10 +5107,12 @@
     i32.const 0
     i32.const 64
     i32.const 136
-    i32.const 15
+    i32.const 16
     call $~lib/builtins/abort
     unreachable
    end
+   i32.const 1
+   drop
    local.get $0
    local.get $1
    i32.const 268435455
@@ -5013,16 +5126,22 @@
    i32.store offset=4
   end
  )
- (func $~lib/rt/pure/__collect (; 51 ;)
+ (func $~lib/rt/pure/__collect
+  i32.const 1
+  drop
   return
  )
- (func $~lib/rt/pure/__visit (; 52 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/rt/pure/__visit (param $0 i32) (param $1 i32)
   local.get $0
   global.get $~lib/heap/__heap_base
   i32.lt_u
   if
    return
   end
+  i32.const 1
+  drop
+  i32.const 1
+  drop
   local.get $1
   i32.const 1
   i32.eq
@@ -5031,7 +5150,7 @@
    i32.const 0
    i32.const 64
    i32.const 69
-   i32.const 15
+   i32.const 16
    call $~lib/builtins/abort
    unreachable
   end
@@ -5040,7 +5159,7 @@
   i32.sub
   call $~lib/rt/pure/decrement
  )
- (func $~lib/rt/__visit_members (; 53 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/rt/__visit_members (param $0 i32) (param $1 i32)
   (local $2 i32)
   block $switch$1$default
    block $switch$1$case$4

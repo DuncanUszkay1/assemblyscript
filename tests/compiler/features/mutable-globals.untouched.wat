@@ -12,7 +12,7 @@
  (export "memory" (memory $0))
  (export "external" (global $features/mutable-globals/external))
  (export "internal" (global $features/mutable-globals/internal))
- (func $start:features/mutable-globals (; 1 ;)
+ (func $start:features/mutable-globals
   global.get $features/mutable-globals/external
   i32.const 123
   i32.eq
@@ -21,7 +21,7 @@
    i32.const 0
    i32.const 32
    i32.const 5
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -33,7 +33,7 @@
    i32.const 0
    i32.const 32
    i32.const 6
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -53,7 +53,7 @@
    i32.const 0
    i32.const 32
    i32.const 11
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -65,12 +65,12 @@
    i32.const 0
    i32.const 32
    i32.const 12
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $~start (; 2 ;)
+ (func $~start
   global.get $~started
   if
    return

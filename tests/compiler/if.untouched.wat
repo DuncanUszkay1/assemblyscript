@@ -13,7 +13,7 @@
  (export "ifThenElseBlock" (func $if/ifThenElseBlock))
  (export "ifAlwaysReturns" (func $if/ifAlwaysReturns))
  (start $~start)
- (func $if/ifThenElse (; 1 ;) (param $0 i32) (result i32)
+ (func $if/ifThenElse (param $0 i32) (result i32)
   local.get $0
   if
    i32.const 1
@@ -24,7 +24,7 @@
   end
   unreachable
  )
- (func $if/ifThen (; 2 ;) (param $0 i32) (result i32)
+ (func $if/ifThen (param $0 i32) (result i32)
   local.get $0
   if
    i32.const 1
@@ -32,7 +32,7 @@
   end
   i32.const 0
  )
- (func $if/ifThenElseBlock (; 3 ;) (param $0 i32) (result i32)
+ (func $if/ifThenElseBlock (param $0 i32) (result i32)
   local.get $0
   if
    i32.const 1
@@ -43,7 +43,7 @@
   end
   unreachable
  )
- (func $start:if (; 4 ;)
+ (func $start:if
   i32.const 0
   call $if/ifThenElse
   i32.const 0
@@ -53,7 +53,7 @@
    i32.const 0
    i32.const 32
    i32.const 8
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -66,7 +66,7 @@
    i32.const 0
    i32.const 32
    i32.const 9
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -79,7 +79,7 @@
    i32.const 0
    i32.const 32
    i32.const 17
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -92,7 +92,7 @@
    i32.const 0
    i32.const 32
    i32.const 18
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -105,7 +105,7 @@
    i32.const 0
    i32.const 32
    i32.const 30
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -118,12 +118,12 @@
    i32.const 0
    i32.const 32
    i32.const 31
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $if/ifAlwaysReturns (; 5 ;) (param $0 i32) (result i32)
+ (func $if/ifAlwaysReturns (param $0 i32) (result i32)
   local.get $0
   if
    i32.const 1
@@ -132,13 +132,13 @@
    i32.const 64
    i32.const 32
    i32.const 37
-   i32.const 4
+   i32.const 5
    call $~lib/builtins/abort
    unreachable
   end
   unreachable
  )
- (func $~start (; 6 ;)
+ (func $~start
   call $start:if
  )
 )

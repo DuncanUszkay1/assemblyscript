@@ -16,7 +16,7 @@
  (data (i32.const 224) "\0c\00\00\00\01\00\00\00\01\00\00\00\0c\00\00\00s\00t\00r\00i\00n\00g\00")
  (data (i32.const 256) "\12\00\00\00\01\00\00\00\01\00\00\00\12\00\00\00u\00n\00d\00e\00f\00i\00n\00e\00d\00")
  (table $0 2 funcref)
- (elem (i32.const 1) $start:typeof~anonymous|0)
+ (elem (i32.const 1) $start:typeof~anonymous|0~nonClosure)
  (global $typeof/SomeNamespace.a i32 (i32.const 1))
  (global $~lib/ASC_SHRINK_LEVEL i32 (i32.const 0))
  (global $typeof/b (mut i32) (i32.const 1))
@@ -33,13 +33,13 @@
  (global $~lib/heap/__heap_base i32 (i32.const 292))
  (export "_start" (func $~start))
  (export "memory" (memory $0))
- (func $~lib/rt/stub/__retain (; 1 ;) (param $0 i32) (result i32)
+ (func $~lib/rt/stub/__retain (param $0 i32) (result i32)
   local.get $0
  )
- (func $~lib/rt/stub/__release (; 2 ;) (param $0 i32)
+ (func $~lib/rt/stub/__release (param $0 i32)
   nop
  )
- (func $~lib/string/String#get:length (; 3 ;) (param $0 i32) (result i32)
+ (func $~lib/string/String#get:length (param $0 i32) (result i32)
   local.get $0
   i32.const 16
   i32.sub
@@ -47,7 +47,7 @@
   i32.const 1
   i32.shr_u
  )
- (func $~lib/util/string/compareImpl (; 4 ;) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (result i32)
+ (func $~lib/util/string/compareImpl (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (result i32)
   (local $5 i32)
   (local $6 i32)
   (local $7 i32)
@@ -72,6 +72,10 @@
   i32.shl
   i32.add
   local.set $6
+  i32.const 0
+  i32.const 2
+  i32.lt_s
+  drop
   local.get $4
   i32.const 4
   i32.ge_u
@@ -169,7 +173,7 @@
   call $~lib/rt/stub/__release
   local.get $7
  )
- (func $~lib/string/String.__eq (; 5 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/string/String.__eq (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   local.get $0
@@ -242,10 +246,10 @@
   call $~lib/rt/stub/__release
   local.get $2
  )
- (func $start:typeof~anonymous|0 (; 6 ;)
+ (func $start:typeof~anonymous|0~nonClosure
   nop
  )
- (func $~lib/rt/stub/maybeGrowMemory (; 7 ;) (param $0 i32)
+ (func $~lib/rt/stub/maybeGrowMemory (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -299,7 +303,7 @@
   local.get $0
   global.set $~lib/rt/stub/offset
  )
- (func $~lib/rt/stub/__alloc (; 8 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/stub/__alloc (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -341,6 +345,8 @@
   local.get $6
   local.get $5
   i32.store
+  i32.const 1
+  drop
   local.get $6
   i32.const 1
   i32.store offset=4
@@ -352,7 +358,7 @@
   i32.store offset=12
   local.get $2
  )
- (func $typeof/SomeClass#constructor (; 9 ;) (param $0 i32) (result i32)
+ (func $typeof/SomeClass#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -364,7 +370,13 @@
   end
   local.get $0
  )
- (func $start:typeof (; 10 ;)
+ (func $start:typeof
+  i32.const 1
+  drop
+  i32.const 32
+  i32.const 32
+  i32.eq
+  drop
   i32.const 64
   i32.const 64
   call $~lib/string/String.__eq
@@ -373,7 +385,7 @@
    i32.const 0
    i32.const 96
    i32.const 13
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -385,7 +397,7 @@
    i32.const 0
    i32.const 96
    i32.const 14
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -397,7 +409,7 @@
    i32.const 0
    i32.const 96
    i32.const 15
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -409,7 +421,7 @@
    i32.const 0
    i32.const 96
    i32.const 16
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -421,10 +433,12 @@
    i32.const 0
    i32.const 96
    i32.const 17
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  i32.const 1
+  drop
   i32.const 176
   i32.const 176
   call $~lib/string/String.__eq
@@ -433,7 +447,7 @@
    i32.const 0
    i32.const 96
    i32.const 19
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -445,10 +459,12 @@
    i32.const 0
    i32.const 96
    i32.const 20
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  i32.const 1
+  drop
   i32.const 32
   i32.const 32
   call $~lib/string/String.__eq
@@ -457,10 +473,12 @@
    i32.const 0
    i32.const 96
    i32.const 21
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  f64.const 1
+  drop
   i32.const 32
   i32.const 32
   call $~lib/string/String.__eq
@@ -469,10 +487,12 @@
    i32.const 0
    i32.const 96
    i32.const 22
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  i64.const 1
+  drop
   i32.const 32
   i32.const 32
   call $~lib/string/String.__eq
@@ -481,10 +501,12 @@
    i32.const 0
    i32.const 96
    i32.const 23
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  i32.const 208
+  drop
   i32.const 240
   i32.const 240
   call $~lib/string/String.__eq
@@ -493,10 +515,12 @@
    i32.const 0
    i32.const 96
    i32.const 24
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  global.get $typeof/b
+  drop
   i32.const 176
   i32.const 176
   call $~lib/string/String.__eq
@@ -505,10 +529,12 @@
    i32.const 0
    i32.const 96
    i32.const 27
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  global.get $typeof/i
+  drop
   i32.const 32
   i32.const 32
   call $~lib/string/String.__eq
@@ -517,10 +543,12 @@
    i32.const 0
    i32.const 96
    i32.const 29
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  global.get $typeof/f
+  drop
   i32.const 32
   i32.const 32
   call $~lib/string/String.__eq
@@ -529,10 +557,12 @@
    i32.const 0
    i32.const 96
    i32.const 31
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  global.get $typeof/I
+  drop
   i32.const 32
   i32.const 32
   call $~lib/string/String.__eq
@@ -541,10 +571,12 @@
    i32.const 0
    i32.const 96
    i32.const 33
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  global.get $typeof/F
+  drop
   i32.const 32
   i32.const 32
   call $~lib/string/String.__eq
@@ -553,10 +585,12 @@
    i32.const 0
    i32.const 96
    i32.const 35
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  global.get $typeof/s
+  drop
   i32.const 240
   i32.const 240
   call $~lib/string/String.__eq
@@ -565,10 +599,12 @@
    i32.const 0
    i32.const 96
    i32.const 37
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  global.get $typeof/fn
+  drop
   i32.const 144
   i32.const 144
   call $~lib/string/String.__eq
@@ -577,7 +613,7 @@
    i32.const 0
    i32.const 96
    i32.const 39
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -594,6 +630,8 @@
   i32.const 0
   call $typeof/SomeClass#constructor
   global.set $typeof/c
+  global.get $typeof/c
+  drop
   i32.const 64
   i32.const 64
   call $~lib/string/String.__eq
@@ -602,7 +640,7 @@
    i32.const 0
    i32.const 96
    i32.const 41
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -614,7 +652,7 @@
    i32.const 0
    i32.const 96
    i32.const 42
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -626,10 +664,12 @@
    i32.const 0
    i32.const 96
    i32.const 46
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  global.get $typeof/c
+  drop
   i32.const 272
   i32.const 272
   call $~lib/string/String.__eq
@@ -638,10 +678,12 @@
    i32.const 0
    i32.const 96
    i32.const 47
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
+  global.get $typeof/c
+  drop
   i32.const 272
   i32.const 272
   call $~lib/string/String.__eq
@@ -650,12 +692,12 @@
    i32.const 0
    i32.const 96
    i32.const 48
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $~start (; 11 ;)
+ (func $~start
   global.get $~started
   if
    return

@@ -9,7 +9,7 @@
  (global $comma/b (mut i32) (i32.const 0))
  (export "memory" (memory $0))
  (start $~start)
- (func $start:comma (; 1 ;)
+ (func $start:comma
   (local $0 i32)
   (local $1 i32)
   global.get $comma/a
@@ -29,7 +29,7 @@
    i32.const 0
    i32.const 32
    i32.const 4
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -41,7 +41,7 @@
    i32.const 0
    i32.const 32
    i32.const 5
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -59,7 +59,7 @@
    i32.const 0
    i32.const 32
    i32.const 8
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -71,7 +71,7 @@
    i32.const 0
    i32.const 32
    i32.const 9
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -93,7 +93,7 @@
    i32.const 0
    i32.const 32
    i32.const 14
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -105,7 +105,7 @@
    i32.const 0
    i32.const 32
    i32.const 15
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -125,7 +125,7 @@
    i32.const 0
    i32.const 32
    i32.const 18
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -137,7 +137,7 @@
    i32.const 0
    i32.const 32
    i32.const 19
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -170,7 +170,7 @@
    i32.const 0
    i32.const 32
    i32.const 22
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -181,7 +181,7 @@
   i32.const 3
   drop
  )
- (func $~start (; 2 ;)
+ (func $~start
   call $start:comma
  )
 )

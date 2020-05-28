@@ -11,7 +11,7 @@
  (table $0 1 funcref)
  (export "memory" (memory $0))
  (start $~start)
- (func $start:declare (; 3 ;)
+ (func $start:declare
   call $declare/externalFunction
   global.get $declare/externalConstant
   i32.const 1
@@ -21,7 +21,7 @@
    i32.const 0
    i32.const 32
    i32.const 5
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -34,12 +34,12 @@
    i32.const 0
    i32.const 32
    i32.const 13
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
  )
- (func $~start (; 4 ;)
+ (func $~start
   call $start:declare
  )
 )

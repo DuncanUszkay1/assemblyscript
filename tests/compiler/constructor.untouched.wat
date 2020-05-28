@@ -10,18 +10,18 @@
  (global $constructor/emptyCtor (mut i32) (i32.const 0))
  (global $constructor/emptyCtorWithFieldInit (mut i32) (i32.const 0))
  (global $constructor/emptyCtorWithFieldNoInit (mut i32) (i32.const 0))
+ (global $constructor/emptyCtorWithFieldAccess (mut i32) (i32.const 0))
  (global $constructor/none (mut i32) (i32.const 0))
  (global $constructor/justFieldInit (mut i32) (i32.const 0))
  (global $constructor/justFieldNoInit (mut i32) (i32.const 0))
  (global $constructor/ctorReturns (mut i32) (i32.const 0))
  (global $constructor/b (mut i32) (i32.const 1))
  (global $constructor/ctorConditionallyReturns (mut i32) (i32.const 0))
- (global $constructor/ctorAllocates (mut i32) (i32.const 0))
- (global $constructor/ctorConditionallyAllocates (mut i32) (i32.const 0))
+ (global $constructor/ctorConditionallyReturnsThis (mut i32) (i32.const 0))
  (global $~lib/heap/__heap_base i32 (i32.const 8))
  (export "memory" (memory $0))
  (start $~start)
- (func $~lib/rt/stub/maybeGrowMemory (; 0 ;) (param $0 i32)
+ (func $~lib/rt/stub/maybeGrowMemory (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -75,7 +75,7 @@
   local.get $0
   global.set $~lib/rt/stub/offset
  )
- (func $~lib/rt/stub/__alloc (; 1 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/stub/__alloc (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -117,6 +117,8 @@
   local.get $6
   local.get $5
   i32.store
+  i32.const 1
+  drop
   local.get $6
   i32.const 1
   i32.store offset=4
@@ -128,10 +130,10 @@
   i32.store offset=12
   local.get $2
  )
- (func $~lib/rt/stub/__retain (; 2 ;) (param $0 i32) (result i32)
+ (func $~lib/rt/stub/__retain (param $0 i32) (result i32)
   local.get $0
  )
- (func $constructor/EmptyCtor#constructor (; 3 ;) (param $0 i32) (result i32)
+ (func $constructor/EmptyCtor#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -143,7 +145,7 @@
   end
   local.get $0
  )
- (func $constructor/EmptyCtorWithFieldInit#constructor (; 4 ;) (param $0 i32) (result i32)
+ (func $constructor/EmptyCtorWithFieldInit#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -158,7 +160,7 @@
   i32.store
   local.get $0
  )
- (func $constructor/EmptyCtorWithFieldNoInit#constructor (; 5 ;) (param $0 i32) (result i32)
+ (func $constructor/EmptyCtorWithFieldNoInit#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -173,34 +175,37 @@
   i32.store
   local.get $0
  )
- (func $constructor/None#constructor (; 6 ;) (param $0 i32) (result i32)
+ (func $constructor/EmptyCtorWithFieldAccess#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
-   i32.const 0
+   i32.const 4
    i32.const 6
    call $~lib/rt/stub/__alloc
    call $~lib/rt/stub/__retain
    local.set $0
   end
   local.get $0
+  i32.const 0
+  i32.store
+  local.get $0
+  i32.const 1
+  i32.store
+  local.get $0
  )
- (func $constructor/JustFieldInit#constructor (; 7 ;) (param $0 i32) (result i32)
+ (func $constructor/None#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
-   i32.const 4
+   i32.const 0
    i32.const 7
    call $~lib/rt/stub/__alloc
    call $~lib/rt/stub/__retain
    local.set $0
   end
   local.get $0
-  i32.const 1
-  i32.store
-  local.get $0
  )
- (func $constructor/JustFieldNoInit#constructor (; 8 ;) (param $0 i32) (result i32)
+ (func $constructor/JustFieldInit#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -211,33 +216,39 @@
    local.set $0
   end
   local.get $0
-  i32.const 0
+  i32.const 1
   i32.store
   local.get $0
  )
- (func $constructor/CtorReturns#constructor (; 9 ;) (param $0 i32) (result i32)
-  i32.const 0
-  call $~lib/rt/stub/__retain
- )
- (func $constructor/CtorConditionallyReturns#constructor (; 10 ;) (param $0 i32) (result i32)
-  global.get $constructor/b
-  if
-   i32.const 0
-   call $~lib/rt/stub/__retain
-   return
-  end
+ (func $constructor/JustFieldNoInit#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
-   i32.const 0
-   i32.const 10
+   i32.const 4
+   i32.const 9
    call $~lib/rt/stub/__alloc
    call $~lib/rt/stub/__retain
    local.set $0
   end
   local.get $0
+  i32.const 0
+  i32.store
+  local.get $0
  )
- (func $constructor/CtorAllocates#constructor (; 11 ;) (param $0 i32) (result i32)
+ (func $~lib/rt/stub/__release (param $0 i32)
+  nop
+ )
+ (func $constructor/CtorReturns#constructor (param $0 i32) (result i32)
+  (local $1 i32)
+  i32.const 0
+  call $~lib/rt/stub/__retain
+  local.set $1
+  local.get $0
+  call $~lib/rt/stub/__release
+  local.get $1
+ )
+ (func $constructor/CtorConditionallyReturns#constructor (param $0 i32) (result i32)
+  (local $1 i32)
   local.get $0
   i32.eqz
   if
@@ -247,25 +258,19 @@
    call $~lib/rt/stub/__retain
    local.set $0
   end
-  local.get $0
-  drop
-  local.get $0
- )
- (func $constructor/CtorConditionallyAllocates#constructor (; 12 ;) (param $0 i32) (result i32)
   global.get $constructor/b
   if
+   i32.const 0
+   call $~lib/rt/stub/__retain
+   local.set $1
    local.get $0
-   i32.eqz
-   if
-    i32.const 0
-    i32.const 12
-    call $~lib/rt/stub/__alloc
-    call $~lib/rt/stub/__retain
-    local.set $0
-   end
-   local.get $0
-   drop
+   call $~lib/rt/stub/__release
+   local.get $1
+   return
   end
+  local.get $0
+ )
+ (func $constructor/CtorConditionallyReturnsThis#constructor (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -275,9 +280,14 @@
    call $~lib/rt/stub/__retain
    local.set $0
   end
+  global.get $constructor/b
+  if
+   local.get $0
+   return
+  end
   local.get $0
  )
- (func $start:constructor (; 13 ;)
+ (func $start:constructor
   global.get $~lib/heap/__heap_base
   i32.const 15
   i32.add
@@ -298,6 +308,9 @@
   call $constructor/EmptyCtorWithFieldNoInit#constructor
   global.set $constructor/emptyCtorWithFieldNoInit
   i32.const 0
+  call $constructor/EmptyCtorWithFieldAccess#constructor
+  global.set $constructor/emptyCtorWithFieldAccess
+  i32.const 0
   call $constructor/None#constructor
   global.set $constructor/none
   i32.const 0
@@ -313,13 +326,10 @@
   call $constructor/CtorConditionallyReturns#constructor
   global.set $constructor/ctorConditionallyReturns
   i32.const 0
-  call $constructor/CtorAllocates#constructor
-  global.set $constructor/ctorAllocates
-  i32.const 0
-  call $constructor/CtorConditionallyAllocates#constructor
-  global.set $constructor/ctorConditionallyAllocates
+  call $constructor/CtorConditionallyReturnsThis#constructor
+  global.set $constructor/ctorConditionallyReturnsThis
  )
- (func $~start (; 14 ;)
+ (func $~start
   call $start:constructor
  )
 )

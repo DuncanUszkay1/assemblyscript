@@ -22,10 +22,10 @@
  (export "external" (func $features/reference-types/external))
  (export "internal" (func $features/reference-types/internal))
  (start $~start)
- (func $features/reference-types/someFunc (; 5 ;)
+ (func $features/reference-types/someFunc
   nop
  )
- (func $start:features/reference-types (; 6 ;)
+ (func $start:features/reference-types
   (local $0 anyref)
   (local $1 anyref)
   global.get $features/reference-types/someObject
@@ -38,7 +38,7 @@
    i32.const 0
    i32.const 32
    i32.const 19
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -59,7 +59,7 @@
    i32.const 0
    i32.const 32
    i32.const 32
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -74,7 +74,7 @@
    i32.const 0
    i32.const 32
    i32.const 34
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -89,7 +89,7 @@
    i32.const 0
    i32.const 32
    i32.const 36
-   i32.const 0
+   i32.const 1
    call $~lib/builtins/abort
    unreachable
   end
@@ -102,7 +102,7 @@
    i32.const 0
    i32.const 32
    i32.const 39
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -117,7 +117,7 @@
    i32.const 0
    i32.const 32
    i32.const 41
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -132,7 +132,7 @@
    i32.const 0
    i32.const 32
    i32.const 43
-   i32.const 2
+   i32.const 3
    call $~lib/builtins/abort
    unreachable
   end
@@ -141,7 +141,7 @@
   ref.func $features/reference-types/someFunc
   local.set $1
  )
- (func $features/reference-types/internal (; 7 ;) (param $0 anyref) (result anyref)
+ (func $features/reference-types/internal (param $0 anyref) (result anyref)
   (local $1 anyref)
   (local $2 anyref)
   (local $3 anyref)
@@ -156,7 +156,7 @@
   local.set $3
   local.get $3
  )
- (func $~start (; 8 ;)
+ (func $~start
   call $start:features/reference-types
  )
 )

@@ -23,24 +23,25 @@
  (export "testLogicalOrMulti" (func $possibly-null/testLogicalOrMulti))
  (export "testAssign" (func $possibly-null/testAssign))
  (export "testNeverNull" (func $possibly-null/testNeverNull))
- (func $~lib/rt/stub/__retain (; 0 ;) (param $0 i32) (result i32)
+ (func $~lib/rt/stub/__retain (param $0 i32) (result i32)
   local.get $0
  )
- (func $~lib/rt/stub/__release (; 1 ;) (param $0 i32)
+ (func $~lib/rt/stub/__release (param $0 i32)
   nop
  )
- (func $possibly-null/testTrue (; 2 ;) (param $0 i32)
+ (func $possibly-null/testTrue (param $0 i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0
   local.get $0
   if
-   nop
+   i32.const 0
+   drop
   end
   local.get $0
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testFalseElse (; 3 ;) (param $0 i32)
+ (func $possibly-null/testFalseElse (param $0 i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0
@@ -51,12 +52,13 @@
    call $~lib/rt/stub/__release
    return
   else
-   nop
+   i32.const 0
+   drop
   end
   local.get $0
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testFalseContinuation (; 4 ;) (param $0 i32)
+ (func $possibly-null/testFalseContinuation (param $0 i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0
@@ -67,10 +69,12 @@
    call $~lib/rt/stub/__release
    return
   end
+  i32.const 0
+  drop
   local.get $0
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testNeNull (; 5 ;) (param $0 i32)
+ (func $possibly-null/testNeNull (param $0 i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0
@@ -78,12 +82,13 @@
   i32.const 0
   i32.ne
   if
-   nop
+   i32.const 0
+   drop
   end
   local.get $0
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testEqNullElse (; 6 ;) (param $0 i32)
+ (func $possibly-null/testEqNullElse (param $0 i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0
@@ -95,12 +100,13 @@
    call $~lib/rt/stub/__release
    return
   else
-   nop
+   i32.const 0
+   drop
   end
   local.get $0
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testEqNullContinuation (; 7 ;) (param $0 i32)
+ (func $possibly-null/testEqNullContinuation (param $0 i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0
@@ -112,10 +118,12 @@
    call $~lib/rt/stub/__release
    return
   end
+  i32.const 0
+  drop
   local.get $0
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testNotEqNull (; 8 ;) (param $0 i32)
+ (func $possibly-null/testNotEqNull (param $0 i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0
@@ -124,12 +132,13 @@
   i32.eq
   i32.eqz
   if
-   nop
+   i32.const 0
+   drop
   end
   local.get $0
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testNotNeNullElse (; 9 ;) (param $0 i32)
+ (func $possibly-null/testNotNeNullElse (param $0 i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0
@@ -142,12 +151,13 @@
    call $~lib/rt/stub/__release
    return
   else
-   nop
+   i32.const 0
+   drop
   end
   local.get $0
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testNotNeNullContinuation (; 10 ;) (param $0 i32)
+ (func $possibly-null/testNotNeNullContinuation (param $0 i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0
@@ -160,10 +170,12 @@
    call $~lib/rt/stub/__release
    return
   end
+  i32.const 0
+  drop
   local.get $0
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testWhile (; 11 ;) (param $0 i32)
+ (func $possibly-null/testWhile (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -175,6 +187,8 @@
    local.set $1
    local.get $1
    if
+    i32.const 0
+    drop
     i32.const 0
     local.tee $2
     local.get $0
@@ -189,13 +203,16 @@
     end
     local.get $2
     local.set $0
+    i32.const 1
+    i32.eqz
+    drop
     br $while-continue|0
    end
   end
   local.get $0
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testWhile2 (; 12 ;) (param $0 i32) (param $1 i32)
+ (func $possibly-null/testWhile2 (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -210,6 +227,8 @@
    local.set $2
    local.get $2
    if
+    i32.const 0
+    drop
     local.get $1
     local.tee $3
     local.get $0
@@ -224,6 +243,9 @@
     end
     local.get $3
     local.set $0
+    i32.const 1
+    i32.eqz
+    drop
     br $while-continue|0
    end
   end
@@ -232,7 +254,7 @@
   local.get $1
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testWhile3 (; 13 ;) (param $0 i32) (param $1 i32)
+ (func $possibly-null/testWhile3 (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -247,6 +269,8 @@
    local.set $2
    local.get $2
    if
+    i32.const 0
+    drop
     local.get $1
     if
      local.get $1
@@ -263,6 +287,8 @@
      end
      local.get $3
      local.set $0
+     i32.const 0
+     drop
     end
     br $while-continue|0
    end
@@ -272,13 +298,13 @@
   local.get $1
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/requireNonNull (; 14 ;) (param $0 i32) (result i32)
+ (func $possibly-null/requireNonNull (param $0 i32) (result i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0
   local.get $0
  )
- (func $possibly-null/testLogicalAnd (; 15 ;) (param $0 i32)
+ (func $possibly-null/testLogicalAnd (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   local.get $0
@@ -300,7 +326,7 @@
   local.get $0
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testLogicalOr (; 16 ;) (param $0 i32)
+ (func $possibly-null/testLogicalOr (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   local.get $0
@@ -325,7 +351,7 @@
   local.get $0
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testLogicalAndMulti (; 17 ;) (param $0 i32) (param $1 i32)
+ (func $possibly-null/testLogicalAndMulti (param $0 i32) (param $1 i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0
@@ -339,16 +365,24 @@
    i32.const 0
   end
   if
-   nop
+   i32.const 0
+   drop
+   i32.const 0
+   drop
   else
-   nop
+   i32.const 1
+   i32.eqz
+   drop
+   i32.const 1
+   i32.eqz
+   drop
   end
   local.get $0
   call $~lib/rt/stub/__release
   local.get $1
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testLogicalOrMulti (; 18 ;) (param $0 i32) (param $1 i32)
+ (func $possibly-null/testLogicalOrMulti (param $0 i32) (param $1 i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0
@@ -364,16 +398,24 @@
    i32.eqz
   end
   if
-   nop
+   i32.const 1
+   i32.eqz
+   drop
+   i32.const 1
+   i32.eqz
+   drop
   else
-   nop
+   i32.const 0
+   drop
+   i32.const 0
+   drop
   end
   local.get $0
   call $~lib/rt/stub/__release
   local.get $1
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testAssign (; 19 ;) (param $0 i32) (param $1 i32)
+ (func $possibly-null/testAssign (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   local.get $0
@@ -396,12 +438,14 @@
   end
   local.get $2
   local.set $0
+  i32.const 0
+  drop
   local.get $0
   call $~lib/rt/stub/__release
   local.get $1
   call $~lib/rt/stub/__release
  )
- (func $possibly-null/testNeverNull (; 20 ;) (param $0 i32)
+ (func $possibly-null/testNeverNull (param $0 i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0

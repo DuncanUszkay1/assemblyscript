@@ -1,7 +1,12 @@
 /**
- * A thin wrapper around Binaryen's C-API.
- * @module module
- *//***/
+ * @fileoverview A thin wrapper around Binaryen's C-API.
+ *
+ * The AssemblyScript compiler utilizes Binaryen's C-API directly. Even
+ * though it currently imports binaryen.js, none of the JS APIs it
+ * provides are used.
+ *
+ * @license Apache-2.0
+ */
 
 import { Target } from "./common";
 import * as binaryen from "./glue/binaryen";
@@ -23,19 +28,20 @@ export type Index = u32;
 // that this essentially fixes the compiler to specific versions of Binaryen
 // sometimes, because these constants can differ between Binaryen versions.
 
-export enum NativeType {
-  None = 0 /* _BinaryenTypeNone */,
-  Unreachable = 1 /* _BinaryenTypeUnreachable */,
-  I32 = 2 /* _BinaryenTypeInt32 */,
-  I64 = 3 /* _BinaryenTypeInt64 */,
-  F32 = 4 /* _BinaryenTypeFloat32 */,
-  F64 = 5 /* _BinaryenTypeFloat64 */,
-  V128 = 6 /* _BinaryenTypeVec128 */,
-  Funcref = 7 /* _BinaryenTypeFuncref */,
-  Anyref = 8 /* _BinaryenTypeAnyref */,
-  Nullref = 9 /* _BinaryenTypeNullref */,
-  Exnref = 10 /* _BinaryenTypeExnref */,
-  Auto = -1 /* _BinaryenTypeAuto */
+export type NativeType = usize;
+export namespace NativeType {
+  export const None: NativeType = 0 /* _BinaryenTypeNone */;
+  export const Unreachable: NativeType = 1 /* _BinaryenTypeUnreachable */;
+  export const I32: NativeType = 2 /* _BinaryenTypeInt32 */;
+  export const I64: NativeType = 3 /* _BinaryenTypeInt64 */;
+  export const F32: NativeType = 4 /* _BinaryenTypeFloat32 */;
+  export const F64: NativeType = 5 /* _BinaryenTypeFloat64 */;
+  export const V128: NativeType = 6 /* _BinaryenTypeVec128 */;
+  export const Funcref: NativeType = 7 /* _BinaryenTypeFuncref */;
+  export const Anyref: NativeType = 8 /* _BinaryenTypeAnyref */;
+  export const Nullref: NativeType = 9 /* _BinaryenTypeNullref */;
+  export const Exnref: NativeType = 10 /* _BinaryenTypeExnref */;
+  export const Auto: NativeType = -1 /* _BinaryenTypeAuto */;
 }
 
 export enum FeatureFlags {
@@ -49,7 +55,8 @@ export enum FeatureFlags {
   ExceptionHandling = 64 /* _BinaryenFeatureExceptionHandling */,
   TailCall = 128 /* _BinaryenFeatureTailCall */,
   ReferenceTypes = 256 /* _BinaryenFeatureReferenceTypes */,
-  All = 511 /* _BinaryenFeatureAll */
+  MultiValue = 512 /* _BinaryenFeatureMultivalue */,
+  All = 1023 /* _BinaryenFeatureAll */
 }
 
 export enum ExpressionId {
@@ -99,7 +106,9 @@ export enum ExpressionId {
   Try = 43 /* _BinaryenTryId */,
   Throw = 44 /* _BinaryenThrowId */,
   Rethrow = 45 /* _BinaryenRethrowId */,
-  BrOnExn = 46 /* _BinaryenBrOnExnId */
+  BrOnExn = 46 /* _BinaryenBrOnExnId */,
+  TupleMake = 47 /* _BinaryenTupleMakeId */,
+  TupleExtract = 48 /* _BinaryenTupleExtractId */
 }
 
 export enum UnaryOp {
@@ -176,40 +185,46 @@ export enum UnaryOp {
   SplatF32x4 = 64 /* _BinaryenSplatVecF32x4 */,
   SplatF64x2 = 65 /* _BinaryenSplatVecF64x2 */,
   NotV128 = 66 /* _BinaryenNotVec128 */,
-  NegI8x16 = 67 /* _BinaryenNegVecI8x16 */,
-  AnyTrueI8x16 = 68 /* _BinaryenAnyTrueVecI8x16 */,
-  AllTrueI8x16 = 69 /* _BinaryenAllTrueVecI8x16 */,
-  NegI16x8 = 70 /* _BinaryenNegVecI16x8 */,
-  AnyTrueI16x8 = 71 /* _BinaryenAnyTrueVecI16x8 */,
-  AllTrueI16x8 = 72 /* _BinaryenAllTrueVecI16x8 */,
-  NegI32x4 = 73 /* _BinaryenNegVecI32x4 */,
-  AnyTrueI32x4 = 74 /* _BinaryenAnyTrueVecI32x4 */,
-  AllTrueI32x4 = 75 /* _BinaryenAllTrueVecI32x4 */,
-  NegI64x2 = 76 /* _BinaryenNegVecI64x2 */,
-  AnyTrueI64x2 = 77 /* _BinaryenAnyTrueVecI64x2 */,
-  AllTrueI64x2 = 78 /* _BinaryenAllTrueVecI64x2 */,
-  AbsF32x4 = 79 /* _BinaryenAbsVecF32x4 */,
-  NegF32x4 = 80 /* _BinaryenNegVecF32x4 */,
-  SqrtF32x4 = 81 /* _BinaryenSqrtVecF32x4 */,
-  AbsF64x2 = 82 /* _BinaryenAbsVecF64x2 */,
-  NegF64x2 = 83 /* _BinaryenNegVecF64x2 */,
-  SqrtF64x2 = 84 /* _BinaryenSqrtVecF64x2 */,
-  TruncSatF32x4ToI32x4 = 85 /* _BinaryenTruncSatSVecF32x4ToVecI32x4 */,
-  TruncSatF32x4ToU32x4 = 86 /* _BinaryenTruncSatUVecF32x4ToVecI32x4 */,
-  TruncSatF64x2ToI64x2 = 87 /* _BinaryenTruncSatSVecF64x2ToVecI64x2 */,
-  TruncSatF64x2ToU64x2 = 88 /* _BinaryenTruncSatUVecF64x2ToVecI64x2 */,
-  ConvertI32x4ToF32x4 = 89 /* _BinaryenConvertSVecI32x4ToVecF32x4 */,
-  ConvertU32x4ToF32x4 = 90 /* _BinaryenConvertUVecI32x4ToVecF32x4 */,
-  ConvertI64x2ToF64x2 = 91 /* _BinaryenConvertSVecI64x2ToVecF64x2 */,
-  ConvertU64x2ToF64x2 = 92 /* _BinaryenConvertUVecI64x2ToVecF64x2 */,
-  WidenLowI8x16ToI16x8 = 93 /* _BinaryenWidenLowSVecI8x16ToVecI16x8 */,
-  WidenHighI8x16ToI16x8 = 94 /* _BinaryenWidenHighSVecI8x16ToVecI16x8 */,
-  WidenLowU8x16ToU16x8 = 95 /* _BinaryenWidenLowUVecI8x16ToVecI16x8 */,
-  WidenHighU8x16ToU16x8 = 96 /* _BinaryenWidenHighUVecI8x16ToVecI16x8 */,
-  WidenLowI16x8ToI32x4 = 97 /* _BinaryenWidenLowSVecI16x8ToVecI32x4 */,
-  WidenHighI16x8ToI32x4 = 98 /* _BinaryenWidenHighSVecI16x8ToVecI32x4 */,
-  WidenLowU16x8ToU32x4 = 99 /* _BinaryenWidenLowUVecI16x8ToVecI32x4 */,
-  WidenHighU16x8ToU32x4 = 100 /* _BinaryenWidenHighUVecI16x8ToVecI32x4 */
+  AbsI8x16 = 67 /* __BinaryenAbsVecI8x16 */,
+  NegI8x16 = 68 /* _BinaryenNegVecI8x16 */,
+  AnyTrueI8x16 = 69 /* _BinaryenAnyTrueVecI8x16 */,
+  AllTrueI8x16 = 70 /* _BinaryenAllTrueVecI8x16 */,
+  BitmaskI8x16 = 71 /* __BinaryenBitmaskVecI8x16 */,
+  AbsI16x8 = 72 /* __BinaryenAbsVecI16x8 */,
+  NegI16x8 = 73 /* _BinaryenNegVecI16x8 */,
+  AnyTrueI16x8 = 74 /* _BinaryenAnyTrueVecI16x8 */,
+  AllTrueI16x8 = 75 /* _BinaryenAllTrueVecI16x8 */,
+  BitmaskI16x8 = 76 /* _BinaryenBitmaskVecI16x8 */,
+  AbsI32x4 = 77 /* _BinaryenAbsVecI32x4 */,
+  NegI32x4 = 78 /* _BinaryenNegVecI32x4 */,
+  AnyTrueI32x4 = 79 /* _BinaryenAnyTrueVecI32x4 */,
+  AllTrueI32x4 = 80 /* _BinaryenAllTrueVecI32x4 */,
+  BitmaskI32x4 = 81 /* _BinaryenBitmaskVecI32x4 */,
+  NegI64x2 = 82 /* _BinaryenNegVecI64x2 */,
+  AnyTrueI64x2 = 83 /* _BinaryenAnyTrueVecI64x2 */,
+  AllTrueI64x2 = 84 /* _BinaryenAllTrueVecI64x2 */,
+  AbsF32x4 = 85 /* _BinaryenAbsVecF32x4 */,
+  NegF32x4 = 86 /* _BinaryenNegVecF32x4 */,
+  SqrtF32x4 = 87 /* _BinaryenSqrtVecF32x4 */,
+  AbsF64x2 = 88 /* _BinaryenAbsVecF64x2 */,
+  NegF64x2 = 89 /* _BinaryenNegVecF64x2 */,
+  SqrtF64x2 = 90 /* _BinaryenSqrtVecF64x2 */,
+  TruncSatF32x4ToI32x4 = 91 /* _BinaryenTruncSatSVecF32x4ToVecI32x4 */,
+  TruncSatF32x4ToU32x4 = 92 /* _BinaryenTruncSatUVecF32x4ToVecI32x4 */,
+  TruncSatF64x2ToI64x2 = 93 /* _BinaryenTruncSatSVecF64x2ToVecI64x2 */,
+  TruncSatF64x2ToU64x2 = 94 /* _BinaryenTruncSatUVecF64x2ToVecI64x2 */,
+  ConvertI32x4ToF32x4 = 95 /* _BinaryenConvertSVecI32x4ToVecF32x4 */,
+  ConvertU32x4ToF32x4 = 96 /* _BinaryenConvertUVecI32x4ToVecF32x4 */,
+  ConvertI64x2ToF64x2 = 97 /* _BinaryenConvertSVecI64x2ToVecF64x2 */,
+  ConvertU64x2ToF64x2 = 98 /* _BinaryenConvertUVecI64x2ToVecF64x2 */,
+  WidenLowI8x16ToI16x8 = 99 /* _BinaryenWidenLowSVecI8x16ToVecI16x8 */,
+  WidenHighI8x16ToI16x8 = 100 /* _BinaryenWidenHighSVecI8x16ToVecI16x8 */,
+  WidenLowU8x16ToU16x8 = 101 /* _BinaryenWidenLowUVecI8x16ToVecI16x8 */,
+  WidenHighU8x16ToU16x8 = 102 /* _BinaryenWidenHighUVecI8x16ToVecI16x8 */,
+  WidenLowI16x8ToI32x4 = 103 /* _BinaryenWidenLowSVecI16x8ToVecI32x4 */,
+  WidenHighI16x8ToI32x4 = 104 /* _BinaryenWidenHighSVecI16x8ToVecI32x4 */,
+  WidenLowU16x8ToU32x4 = 105 /* _BinaryenWidenLowUVecI16x8ToVecI32x4 */,
+  WidenHighU16x8ToU32x4 = 106 /* _BinaryenWidenHighUVecI16x8ToVecI32x4 */
 }
 
 export enum BinaryOp {
@@ -377,17 +392,21 @@ export enum BinaryOp {
   DivF32x4 = 159 /* _BinaryenDivVecF32x4 */,
   MinF32x4 = 160 /* _BinaryenMinVecF32x4 */,
   MaxF32x4 = 161 /* _BinaryenMaxVecF32x4 */,
-  AddF64x2 = 162 /* _BinaryenAddVecF64x2 */,
-  SubF64x2 = 163 /* _BinaryenSubVecF64x2 */,
-  MulF64x2 = 164 /* _BinaryenMulVecF64x2 */,
-  DivF64x2 = 165 /* _BinaryenDivVecF64x2 */,
-  MinF64x2 = 166 /* _BinaryenMinVecF64x2 */,
-  MaxF64x2 = 167 /* _BinaryenMaxVecF64x2 */,
-  NarrowI16x8ToI8x16 = 168 /* _BinaryenNarrowSVecI16x8ToVecI8x16 */,
-  NarrowU16x8ToU8x16 = 169 /* _BinaryenNarrowUVecI16x8ToVecI8x16 */,
-  NarrowI32x4ToI16x8 = 170 /* _BinaryenNarrowSVecI32x4ToVecI16x8 */,
-  NarrowU32x4ToU16x8 = 171 /* _BinaryenNarrowUVecI32x4ToVecI16x8 */,
-  SwizzleV8x16 = 172 /* _BinaryenSwizzleVec8x16 */
+  PminF32x4 = 162 /* _BinaryenPMinVecF32x4 */,
+  PmaxF32x4 = 163 /* _BinaryenPMaxVecF32x4 */,
+  AddF64x2 = 164 /* _BinaryenAddVecF64x2 */,
+  SubF64x2 = 165 /* _BinaryenSubVecF64x2 */,
+  MulF64x2 = 166 /* _BinaryenMulVecF64x2 */,
+  DivF64x2 = 167 /* _BinaryenDivVecF64x2 */,
+  MinF64x2 = 168 /* _BinaryenMinVecF64x2 */,
+  MaxF64x2 = 169 /* _BinaryenMaxVecF64x2 */,
+  PminF64x2 = 170 /* _BinaryenPMinVecF64x2 */,
+  PmaxF64x2 = 171 /* _BinaryenPMaxVecF64x2 */,
+  NarrowI16x8ToI8x16 = 172 /* _BinaryenNarrowSVecI16x8ToVecI8x16 */,
+  NarrowU16x8ToU8x16 = 173 /* _BinaryenNarrowUVecI16x8ToVecI8x16 */,
+  NarrowI32x4ToI16x8 = 174 /* _BinaryenNarrowSVecI32x4ToVecI16x8 */,
+  NarrowU32x4ToU16x8 = 175 /* _BinaryenNarrowUVecI32x4ToVecI16x8 */,
+  SwizzleV8x16 = 176 /* _BinaryenSwizzleVec8x16 */
 }
 
 export enum HostOp {
@@ -460,42 +479,41 @@ export enum SIMDLoadOp {
   LoadU32ToU64x2 = 9 /* _BinaryenLoadExtUVec32x2ToVecI64x2 */
 }
 
+export enum ExpressionRunnerFlags {
+  Default = 0 /* _ExpressionRunnerFlagsDefault */,
+  PreserveSideeffects = 1 /* _ExpressionRunnerFlagsPreserveSideeffects */,
+  TraverseCalls = 2 /* _ExpressionRunnerFlagsTraverseCalls */
+}
+
 export class MemorySegment {
-
-  buffer: Uint8Array;
-  offset: I64;
-
-  static create(buffer: Uint8Array, offset: I64): MemorySegment {
-    var segment = new MemorySegment();
-    segment.buffer = buffer;
-    segment.offset = offset;
-    return segment;
-  }
+  constructor(
+    /** Segment data. */
+    public buffer: Uint8Array,
+    /** Segment offset. */
+    public offset: i64
+  ) {}
 }
 
 export class Module {
-
-  ref: ModuleRef;
+  constructor(
+    /** Binaryen module reference. */
+    public ref: ModuleRef
+  ) {
+    this.lit = binaryen._malloc(binaryen._BinaryenSizeofLiteral());
+  }
 
   private lit: usize;
 
   static create(): Module {
-    var module = new Module();
-    module.ref = binaryen._BinaryenModuleCreate();
-    module.lit = binaryen._malloc(binaryen._BinaryenSizeofLiteral());
-    return module;
+    return new Module(binaryen._BinaryenModuleCreate());
   }
 
   static createFrom(buffer: Uint8Array): Module {
-    var module = new Module();
     var cArr = allocU8Array(buffer);
-    module.ref = binaryen._BinaryenModuleRead(cArr, buffer.length);
+    var module = new Module(binaryen._BinaryenModuleRead(cArr, buffer.length));
     binaryen._free(changetype<usize>(cArr));
-    module.lit = binaryen._malloc(binaryen._BinaryenSizeofLiteral());
     return module;
   }
-
-  private constructor() { }
 
   // constants
 
@@ -607,7 +625,6 @@ export class Module {
     offset: Index = 0,
     align: Index = bytes // naturally aligned by default
   ): ExpressionRef {
-    if (type < NativeType.None || type > NativeType.V128) throw new Error("here: " + type);
     return binaryen._BinaryenStore(this.ref, bytes, offset, align, ptr, value, type);
   }
 
@@ -740,6 +757,20 @@ export class Module {
     return binaryen._BinaryenDrop(this.ref, expression);
   }
 
+  maybeDropCondition(condition: ExpressionRef, result: ExpressionRef): ExpressionRef {
+    // FIXME: This is necessary because Binaryen's ExpressionRunner bails early
+    // when encountering a local with an unknown value. This helper only drops
+    // the pre-evaluated condition if it has relevant side effects.
+    // see WebAssembly/binaryen#1237
+    if ((getSideEffects(condition) & ~(SideEffects.ReadsLocal | SideEffects.ReadsGlobal)) != 0) {
+      return this.block(null, [
+        this.drop(condition),
+        result
+      ], getExpressionType(result));
+    }
+    return result;
+  }
+
   loop(
     label: string | null,
     body: ExpressionRef
@@ -790,7 +821,7 @@ export class Module {
     for (let i = 0; i < numNames; ++i) {
       strs[i] = this.allocStringCached(names[i]);
     }
-    var cArr = allocI32Array(strs);
+    var cArr = allocPtrArray(strs);
     var cStr = this.allocStringCached(defaultName);
     var ret = binaryen._BinaryenSwitch(this.ref, cArr, numNames, cStr, condition, value);
     binaryen._free(cArr);
@@ -806,9 +837,9 @@ export class Module {
     var cStr = this.allocStringCached(target);
     var cArr = allocPtrArray(operands);
     var ret = isReturn
-      ? binaryen._BinaryenReturnCall(this.ref, cStr, cArr, operands && operands.length || 0, returnType)
-      : binaryen._BinaryenCall(this.ref, cStr, cArr, operands && operands.length || 0, returnType);
-      binaryen._free(cArr);
+      ? binaryen._BinaryenReturnCall(this.ref, cStr, cArr, operands ? operands.length : 0, returnType)
+      : binaryen._BinaryenCall(this.ref, cStr, cArr, operands ? operands.length : 0, returnType);
+    binaryen._free(cArr);
     return ret;
   }
 
@@ -829,8 +860,8 @@ export class Module {
   ): ExpressionRef {
     var cArr = allocPtrArray(operands);
     var ret = isReturn
-      ? binaryen._BinaryenReturnCallIndirect(this.ref, index, cArr, operands && operands.length || 0, params, results)
-      : binaryen._BinaryenCallIndirect(this.ref, index, cArr, operands && operands.length || 0, params, results);
+      ? binaryen._BinaryenReturnCallIndirect(this.ref, index, cArr, operands ? operands.length : 0, params, results)
+      : binaryen._BinaryenCallIndirect(this.ref, index, cArr, operands ? operands.length : 0, params, results);
     binaryen._free(cArr);
     return ret;
   }
@@ -988,6 +1019,19 @@ export class Module {
     return binaryen._BinaryenRefFunc(this.ref, cStr);
   }
 
+  // tuples (pseudo instructions)
+
+  tuple_make(operands: ExpressionRef[]): ExpressionRef {
+    var cArr = allocPtrArray(operands);
+    var ret = binaryen._BinaryenTupleMake(this.ref, cArr, operands.length);
+    binaryen._free(cArr);
+    return ret;
+  }
+
+  tuple_extract(tuple: ExpressionRef, index: Index): ExpressionRef {
+    return binaryen._BinaryenTupleExtract(this.ref, tuple, index);
+  }
+
   // globals
 
   addGlobal(
@@ -1050,7 +1094,7 @@ export class Module {
     body: ExpressionRef
   ): FunctionRef {
     var cStr = this.allocStringCached(name);
-    var cArr = allocI32Array(varTypes);
+    var cArr = allocPtrArray(varTypes);
     var ret = binaryen._BinaryenAddFunction(this.ref, cStr, params, results, cArr, varTypes ? varTypes.length : 0, body);
     binaryen._free(cArr);
     return ret;
@@ -1073,7 +1117,7 @@ export class Module {
   addTemporaryFunction(result: NativeType, paramTypes: NativeType[] | null, body: ExpressionRef): FunctionRef {
     this.hasTemporaryFunction = assert(!this.hasTemporaryFunction);
     var tempName = this.allocStringCached("");
-    var cArr = allocI32Array(paramTypes);
+    var cArr = allocPtrArray(paramTypes);
     var ret = binaryen._BinaryenAddFunction(this.ref,
       tempName,
       createType(paramTypes),
@@ -1241,10 +1285,10 @@ export class Module {
         : this.i32(i64_low(offset));
       sizs[i] = buffer.length;
     }
-    var cArr1 = allocI32Array(segs);
+    var cArr1 = allocPtrArray(segs);
     var cArr2 = allocU8Array(psvs);
-    var cArr3 = allocI32Array(offs);
-    var cArr4 = allocI32Array(sizs);
+    var cArr3 = allocPtrArray(offs);
+    var cArr4 = allocU32Array(sizs);
     binaryen._BinaryenSetMemory(this.ref, initial, maximum, cStr, cArr1, cArr2, cArr3, cArr4, k, shared);
     binaryen._free(cArr4);
     binaryen._free(cArr3);
@@ -1269,7 +1313,7 @@ export class Module {
     for (let i = 0; i < numNames; ++i) {
       names[i] = this.allocStringCached(funcs[i]);
     }
-    var cArr = allocI32Array(names);
+    var cArr = allocPtrArray(names);
     binaryen._BinaryenSetFunctionTable(this.ref, initial, maximum, cArr, numNames, offset);
     binaryen._free(cArr);
   }
@@ -1367,63 +1411,211 @@ export class Module {
     binaryen._BinaryenModuleSetFeatures(this.ref, featureFlags);
   }
 
-  optimize(func: FunctionRef = 0): void {
+  runPass(pass: string, func: FunctionRef = 0): void {
+    var cStr = allocString(pass);
     if (func) {
-      binaryen._BinaryenFunctionOptimize(func, this.ref);
+      binaryen._BinaryenFunctionRunPasses(func, this.ref, cStr, 1);
     } else {
-      binaryen._BinaryenModuleOptimize(this.ref);
+      binaryen._BinaryenModuleRunPasses(this.ref, cStr, 1);
     }
+    binaryen._free(cStr);
   }
 
   runPasses(passes: string[], func: FunctionRef = 0): void {
     var numNames = passes.length;
-    var names = new Array<usize>(numNames);
+    var cStrs = new Array<usize>(numNames);
     for (let i = 0; i < numNames; ++i) {
-      names[i] = allocString(passes[i]);
+      cStrs[i] = allocString(passes[i]);
     }
-    var cArr = allocI32Array(names);
+    var cArr = allocPtrArray(cStrs);
     if (func) {
       binaryen._BinaryenFunctionRunPasses(func, this.ref, cArr, numNames);
     } else {
       binaryen._BinaryenModuleRunPasses(this.ref, cArr, numNames);
     }
     binaryen._free(cArr);
-    for (let i = numNames; i >= 0; --i) binaryen._free(names[i]);
+    for (let i = numNames; i >= 0; --i) binaryen._free(cStrs[i]);
   }
 
-  private cachedPrecomputeNames: usize = 0;
+  optimize(optimizeLevel: i32, shrinkLevel: i32, debugInfo: bool = false, usesARC: bool = true): void {
+    // Implicitly run costly non-LLVM optimizations on -O3 or -Oz
+    if (optimizeLevel >= 3 || shrinkLevel >= 2) optimizeLevel = 4;
 
-  precomputeExpression(expr: ExpressionRef): ExpressionRef {
-    // remember the previous optimize levels and set to max instead, to be sure
-    var previousOptimizeLevel = binaryen._BinaryenGetOptimizeLevel();
-    var previousShrinkLevel = binaryen._BinaryenGetShrinkLevel();
-    var previousDebugInfo = binaryen._BinaryenGetDebugInfo();
-    binaryen._BinaryenSetOptimizeLevel(4);
-    binaryen._BinaryenSetShrinkLevel(0);
-    binaryen._BinaryenSetDebugInfo(false);
+    binaryen._BinaryenSetOptimizeLevel(optimizeLevel);
+    binaryen._BinaryenSetShrinkLevel(shrinkLevel);
+    binaryen._BinaryenSetDebugInfo(debugInfo);
 
-    // wrap the expression in a temp. function and run the precompute pass on it
-    var type = binaryen._BinaryenExpressionGetType(expr);
-    var func = this.addTemporaryFunction(type, null, expr);
-    var names = this.cachedPrecomputeNames;
-    if (!names) {
-      this.cachedPrecomputeNames = names = allocI32Array([
-        this.allocStringCached("vacuum"),
-        this.allocStringCached("precompute")
-      ]);
+    // Tweak inlining limits based on optimization levels
+    if (optimizeLevel >= 2 && shrinkLevel === 0) {
+      binaryen._BinaryenSetAlwaysInlineMaxSize(12);
+      binaryen._BinaryenSetFlexibleInlineMaxSize(70);
+      binaryen._BinaryenSetOneCallerInlineMaxSize(200);
+    } else {
+      binaryen._BinaryenSetAlwaysInlineMaxSize(
+        optimizeLevel == 0 && shrinkLevel >= 0
+          ? 2
+          : 4
+      );
+      binaryen._BinaryenSetFlexibleInlineMaxSize(65);
+      binaryen._BinaryenSetOneCallerInlineMaxSize(80);
     }
-    binaryen._BinaryenFunctionRunPasses(func, this.ref, names, 2);
-    expr = binaryen._BinaryenFunctionGetBody(func);
-    if (binaryen._BinaryenExpressionGetId(expr) == ExpressionId.Return) {
-      expr = binaryen._BinaryenReturnGetValue(expr);
-    }
-    this.removeTemporaryFunction();
 
-    // reset optimize levels to previous
-    binaryen._BinaryenSetOptimizeLevel(previousOptimizeLevel);
-    binaryen._BinaryenSetShrinkLevel(previousShrinkLevel);
-    binaryen._BinaryenSetDebugInfo(previousDebugInfo);
-    return expr;
+    // Pass order here differs substantially from Binaryen's defaults
+    // see: Binaryen/src/pass.cpp
+    if (optimizeLevel > 0 || shrinkLevel > 0) {
+      let passes = new Array<string>();
+
+      // --- PassRunner::addDefaultGlobalOptimizationPrePasses ---
+
+      passes.push("duplicate-function-elimination");
+      passes.push("remove-unused-module-elements"); // +
+
+      // --- PassRunner::addDefaultFunctionOptimizationPasses ---
+
+      if (optimizeLevel >= 3 || shrinkLevel >= 1) {
+        passes.push("ssa-nomerge");
+      }
+      if (optimizeLevel >= 3) {
+        passes.push("flatten");
+        passes.push("simplify-locals-notee-nostructure");
+        passes.push("vacuum");
+        passes.push("code-folding");
+        passes.push("flatten");
+        passes.push("local-cse");
+        passes.push("reorder-locals");
+      }
+      if (optimizeLevel >= 2 || shrinkLevel >= 1) {
+        passes.push("rse");
+        passes.push("vacuum");
+      }
+      if (usesARC) {
+        if (optimizeLevel < 3) {
+          passes.push("flatten");
+        }
+        passes.push("post-assemblyscript");
+      }
+      passes.push("optimize-instructions");
+      passes.push("inlining");
+      passes.push("dce");
+      passes.push("remove-unused-brs");
+      passes.push("remove-unused-names");
+      passes.push("inlining-optimizing");
+      if (optimizeLevel >= 2 || shrinkLevel >= 1) {
+        passes.push("pick-load-signs");
+        passes.push("simplify-globals-optimizing");
+      }
+      if (optimizeLevel >= 3 || shrinkLevel >= 2) {
+        passes.push("precompute-propagate");
+      } else {
+        passes.push("precompute");
+      }
+      passes.push("vacuum");
+      if (optimizeLevel >= 3 && shrinkLevel <= 1) {
+        passes.push("licm");
+      }
+      passes.push("simplify-locals-nostructure");
+      passes.push("vacuum");
+      passes.push("reorder-locals");
+      passes.push("remove-unused-brs");
+      passes.push("coalesce-locals");
+      passes.push("simplify-locals");
+      passes.push("vacuum");
+      passes.push("reorder-locals");
+      passes.push("coalesce-locals");
+      passes.push("reorder-locals");
+      if (optimizeLevel >= 3 || shrinkLevel >= 1) {
+        passes.push("merge-locals");
+      }
+      passes.push("vacuum");
+      if (optimizeLevel >= 3 || shrinkLevel >= 1) {
+        passes.push("code-folding");
+      }
+      if (optimizeLevel >= 2 || shrinkLevel >= 1) {
+        passes.push("simplify-globals-optimizing");
+      }
+      passes.push("merge-blocks");
+      passes.push("remove-unused-brs");
+      passes.push("remove-unused-names");
+      passes.push("merge-blocks");
+      if (optimizeLevel >= 3) {
+        passes.push("optimize-instructions");
+      }
+      if (optimizeLevel >= 2 || shrinkLevel >= 1) {
+        passes.push("rse");
+      }
+      passes.push("vacuum");
+
+      // --- PassRunner::addDefaultGlobalOptimizationPostPasses ---
+
+      if (optimizeLevel >= 2 || shrinkLevel >= 1) {
+        passes.push("simplify-globals-optimizing");
+        passes.push("dae-optimizing");
+      }
+      if (optimizeLevel >= 2 || shrinkLevel >= 2) {
+        passes.push("inlining-optimizing");
+      }
+      if (binaryen._BinaryenGetLowMemoryUnused()) {
+        if (optimizeLevel >= 3 || shrinkLevel >= 1) {
+          passes.push("optimize-added-constants-propagate");
+        } else {
+          passes.push("optimize-added-constants");
+        }
+      }
+      passes.push("duplicate-import-elimination");
+      if (optimizeLevel >= 2 || shrinkLevel >= 2) {
+        passes.push("simplify-globals-optimizing");
+      } else {
+        passes.push("simplify-globals");
+        passes.push("vacuum");
+      }
+      // precompute works best after global optimizations
+      if (optimizeLevel >= 2 || shrinkLevel >= 1) {
+        passes.push("precompute-propagate");
+      } else {
+        passes.push("precompute");
+      }
+      passes.push("directize"); // replace indirect with direct calls
+      passes.push("dae-optimizing"); // reduce arity
+      passes.push("inlining-optimizing"); // and inline if possible
+      if (usesARC) {
+        // works best after inlining to cover most retains/releases
+        passes.push("post-assemblyscript-finalize");
+      }
+      if (optimizeLevel >= 2 || shrinkLevel >= 1) {
+        passes.push("rse");
+        // move code on early return (after CFG cleanup)
+        passes.push("code-pushing");
+        if (optimizeLevel >= 3) {
+          // very expensive, so O3 only
+          passes.push("simplify-globals");
+          passes.push("vacuum");
+          // replace indirect with direct calls again and inline
+          passes.push("inlining-optimizing");
+          passes.push("directize");
+          passes.push("dae-optimizing");
+          passes.push("precompute-propagate");
+          passes.push("vacuum");
+          passes.push("merge-locals");
+          passes.push("coalesce-locals");
+          passes.push("simplify-locals-nostructure");
+          passes.push("vacuum");
+          passes.push("inlining-optimizing");
+          passes.push("precompute-propagate");
+        }
+        passes.push("remove-unused-brs");
+        passes.push("remove-unused-names");
+        passes.push("vacuum");
+        passes.push("optimize-instructions");
+        passes.push("simplify-globals-optimizing");
+      }
+      // clean up
+      passes.push("duplicate-function-elimination");
+      passes.push("remove-unused-nonfunction-module-elements");
+      passes.push("memory-packing");
+      passes.push("remove-unused-module-elements");
+
+      this.runPasses(passes);
+    }
   }
 
   validate(): bool {
@@ -1434,26 +1626,21 @@ export class Module {
     binaryen._BinaryenModuleInterpret(this.ref);
   }
 
-  toBinary(sourceMapUrl: string | null): BinaryModule {
+  toBinary(sourceMapUrl: string | null = null): BinaryModule {
     var out = this.lit; // safe to reuse as long as..
     assert(binaryen._BinaryenSizeofLiteral() >= 12);
     var cStr = allocString(sourceMapUrl);
     var binaryPtr: usize = 0;
     var sourceMapPtr: usize = 0;
-    try {
-      binaryen._BinaryenModuleAllocateAndWrite(out, this.ref, cStr);
-      binaryPtr = binaryen.__i32_load(out);
-      let binaryLen = binaryen.__i32_load(out + 4);
-      sourceMapPtr = binaryen.__i32_load(out + 8);
-      let ret = new BinaryModule();
-      ret.output = readBuffer(binaryPtr, binaryLen);
-      ret.sourceMap = readString(sourceMapPtr);
-      return ret;
-    } finally {
-      if (cStr) binaryen._free(cStr);
-      if (binaryPtr) binaryen._free(binaryPtr);
-      if (sourceMapPtr) binaryen._free(sourceMapPtr);
-    }
+    binaryen._BinaryenModuleAllocateAndWrite(out, this.ref, cStr);
+    binaryPtr = assert(binaryen.__i32_load(out));
+    var binaryLen = binaryen.__i32_load(out + 4);
+    sourceMapPtr = binaryen.__i32_load(out + 8); // may be NULL
+    var binary = new BinaryModule(readBuffer(binaryPtr, binaryLen), readString(sourceMapPtr));
+    if (cStr) binaryen._free(cStr);
+    binaryen._free(binaryPtr);
+    if (sourceMapPtr) binaryen._free(sourceMapPtr);
+    return binary;
   }
 
   toText(): string {
@@ -1467,7 +1654,7 @@ export class Module {
   private cachedStrings: Map<string,usize> = new Map();
 
   private allocStringCached(str: string | null): usize {
-    if (str == null) return 0;
+    if (str === null) return 0;
     var cachedStrings = this.cachedStrings;
     if (cachedStrings.has(str)) return <usize>cachedStrings.get(str);
     var ptr = allocString(str);
@@ -1477,11 +1664,13 @@ export class Module {
 
   dispose(): void {
     assert(this.ref);
-    for (let ptr of this.cachedStrings.values()) binaryen._free(ptr);
+    // TODO: for (let ptr of this.cachedStrings.values()) {
+    for (let _values = Map_values(this.cachedStrings), i = 0, k = _values.length; i < k; ++i) {
+      let ptr = unchecked(_values[i]);
+      binaryen._free(ptr);
+    }
     this.cachedStrings = new Map();
     binaryen._free(this.lit);
-    binaryen._free(this.cachedPrecomputeNames);
-    this.cachedPrecomputeNames = 0;
     binaryen._BinaryenModuleDispose(this.ref);
     this.ref = 0;
   }
@@ -1503,28 +1692,28 @@ export class Module {
 
     switch (binaryen._BinaryenExpressionGetId(expr)) {
       case ExpressionId.Const: {
-        switch (binaryen._BinaryenExpressionGetType(expr)) {
-          case NativeType.I32: {
+        switch (<u32>binaryen._BinaryenExpressionGetType(expr)) {
+          case <u32>NativeType.I32: {
             return this.i32(binaryen._BinaryenConstGetValueI32(expr));
           }
-          case NativeType.I64: {
+          case <u32>NativeType.I64: {
             return this.i64(
               binaryen._BinaryenConstGetValueI64Low(expr),
               binaryen._BinaryenConstGetValueI64High(expr)
             );
           }
-          case NativeType.F32: {
+          case <u32>NativeType.F32: {
             return this.f32(binaryen._BinaryenConstGetValueF32(expr));
           }
-          case NativeType.F64: {
+          case <u32>NativeType.F64: {
             return this.f64(binaryen._BinaryenConstGetValueF64(expr));
           }
-          case NativeType.V128: {
+          case <u32>NativeType.V128: {
             // TODO
             return 0;
           }
           // Not possible to clone an anyref as it is opaque
-          case NativeType.Anyref: {
+          case <u32>NativeType.Anyref: {
             return 0;
           }
           default: {
@@ -1584,6 +1773,20 @@ export class Module {
     return 0;
   }
 
+  copyExpression(expr: ExpressionRef): ExpressionRef {
+    return binaryen._BinaryenExpressionCopy(expr, this.ref);
+  }
+
+  runExpression(expr: ExpressionRef, flags: ExpressionRunnerFlags, maxDepth: i32 = 50, maxLoopIterations: i32 = 1): ExpressionRef {
+    var runner = binaryen._ExpressionRunnerCreate(this.ref, flags, maxDepth, maxLoopIterations);
+    var precomp =  binaryen._ExpressionRunnerRunAndDispose(runner, expr);
+    if (precomp) {
+      assert(getExpressionId(precomp) == ExpressionId.Const);
+      assert(getExpressionType(precomp) == getExpressionType(expr));
+    }
+    return precomp;
+  }
+
   // source map generation
 
   addDebugInfoFile(name: string): Index {
@@ -1616,7 +1819,7 @@ export function createType(types: NativeType[] | null): NativeType {
     case 0: return NativeType.None;
     case 1: return types[0];
   }
-  var cArr = allocI32Array(types);
+  var cArr = allocPtrArray(types);
   var ret = binaryen._BinaryenTypeCreate(cArr, types.length);
   binaryen._free(cArr);
   return ret;
@@ -1626,8 +1829,8 @@ export function expandType(type: NativeType): NativeType[] {
   var arity = binaryen._BinaryenTypeArity(type);
   var cArr = binaryen._malloc(<usize>arity << 2);
   binaryen._BinaryenTypeExpand(type, cArr);
-  var types = new Array(arity);
-  for (let i = 0; i < arity; ++i) {
+  var types = new Array<NativeType>(arity);
+  for (let i: u32 = 0; i < arity; ++i) {
     types[i] = binaryen.__i32_load(cArr + (<usize>i << 2));
   }
   binaryen._free(cArr);
@@ -1660,7 +1863,7 @@ export function getConstValueF32(expr: ExpressionRef): f32 {
   return binaryen._BinaryenConstGetValueF32(expr);
 }
 
-export function getConstValueF64(expr: ExpressionRef): f32 {
+export function getConstValueF64(expr: ExpressionRef): f64 {
   return binaryen._BinaryenConstGetValueF64(expr);
 }
 
@@ -1834,7 +2037,7 @@ export function getFunctionName(func: FunctionRef): string | null {
   return readString(binaryen._BinaryenFunctionGetName(func));
 }
 
-export function getFunctionParams(func: FunctionRef): Index {
+export function getFunctionParams(func: FunctionRef): NativeType {
   return binaryen._BinaryenFunctionGetParams(func);
 }
 
@@ -1842,14 +2045,13 @@ export function getFunctionResults(func: FunctionRef): NativeType {
   return binaryen._BinaryenFunctionGetResults(func);
 }
 
-export function getFunctionVars(func: FunctionRef): NativeType {
-  // TODO: unify this on Binaryen's side?
+export function getFunctionVars(func: FunctionRef): NativeType[] {
   var count = binaryen._BinaryenFunctionGetNumVars(func);
   var types = new Array<NativeType>(count);
-  for (let i = 0; i < count; ++i) {
+  for (let i: Index = 0; i < count; ++i) {
     types[i] = binaryen._BinaryenFunctionGetVar(func, i);
   }
-  return createType(types);
+  return types;
 }
 
 // globals
@@ -1867,7 +2069,7 @@ export function isGlobalMutable(global: GlobalRef): bool {
 }
 
 export function getGlobalInit(global: GlobalRef): ExpressionRef {
-  return binaryen._BinaryenGlobalGetInit(global);
+  return binaryen._BinaryenGlobalGetInitExpr(global);
 }
 
 // events
@@ -1880,31 +2082,25 @@ export function getEventAttribute(event: EventRef): u32 {
   return binaryen._BinaryenEventGetAttribute(event);
 }
 
-export function getEventType(event: EventRef): string | null {
-  return readString(binaryen._BinaryenEventGetType(event));
+export function getEventParams(event: EventRef): NativeType {
+  return binaryen._BinaryenEventGetParams(event);
 }
 
-export function getEventParamCount(event: EventRef): Index {
-  return binaryen._BinaryenEventGetNumParams(event);
-}
-
-export function getEventParam(event: EventRef, index: Index): NativeType {
-  return binaryen._BinaryenEventGetParam(event, index);
+export function getEventResults(event: EventRef): NativeType {
+  return binaryen._BinaryenEventGetResults(event);
 }
 
 export class Relooper {
-
-  module: Module;
-  ref: RelooperRef;
+  constructor(
+    /** Module this relooper belongs to. */
+    public module: Module,
+    /** Binaryen relooper reference. */
+    public ref: RelooperRef
+  ) {}
 
   static create(module: Module): Relooper {
-    var relooper = new Relooper();
-    relooper.module = module;
-    relooper.ref = binaryen._RelooperCreate(module.ref);
-    return relooper;
+    return new Relooper(module, binaryen._RelooperCreate(module.ref));
   }
-
-  private constructor() {}
 
   addBlock(code: ExpressionRef): RelooperBlockRef {
     return binaryen._RelooperAddBlock(this.ref, code);
@@ -1939,6 +2135,96 @@ export class Relooper {
   }
 }
 
+/** Builds a switch using a sequence of `br_if`s. */
+export class SwitchBuilder {
+  // This is useful because Binaryen understands sequences of `br_if`s and
+  // knows how to make a `br_table` from such a sequence if switched over
+  // values are considered dense enough, respectively a size-efficient sequence
+  // of `if`s if not, depending on optimization levels.
+
+  private module: Module;
+  private condition: ExpressionRef;
+  private values: i32[] = new Array();
+  private indexes: i32[] = new Array();
+  private cases: ExpressionRef[][] = new Array();
+  private defaultIndex: i32 = -1;
+
+  /** Creates a new builder using the specified i32 condition. */
+  constructor(module: Module, condition: ExpressionRef) {
+    this.module = module;
+    this.condition = condition;
+  }
+
+  /** Links a case to the specified branch. */
+  addCase(value: i32, code: ExpressionRef[]): void {
+    var cases = this.cases;
+    var index = cases.indexOf(code);
+    if (index < 0) {
+      index = cases.length;
+      cases.push(code);
+    }
+    this.values.push(value);
+    this.indexes.push(index);
+  }
+
+  /** Links the default branch. */
+  addDefault(code: ExpressionRef[]): void {
+    assert(this.defaultIndex == -1);
+    var cases = this.cases;
+    this.defaultIndex = cases.length;
+    cases.push(code);
+  }
+
+  /** Renders the switch to a block. */
+  render(localIndex: i32, labelPostfix: string = ""): ExpressionRef {
+    var module = this.module;
+    var cases = this.cases;
+    var numCases = cases.length;
+    if (!numCases) {
+      return module.drop(this.condition);
+    }
+    var values = this.values;
+    var numValues = values.length;
+    var indexes = this.indexes;
+    var entry = new Array<ExpressionRef>(1 + numValues + 1);
+    var labels = new Array<string>(numCases);
+    for (let i = 0; i < numCases; ++i) {
+      labels[i] = "case" + i.toString() + labelPostfix;
+    }
+    entry[0] = module.local_set(localIndex, this.condition);
+    for (let i = 0; i < numValues; ++i) {
+      let index = indexes[i];
+      entry[1 + i] = module.br(labels[index],
+        module.binary(BinaryOp.EqI32,
+          module.local_get(localIndex, NativeType.I32),
+          module.i32(values[i])
+        )
+      );
+    }
+    var defaultIndex = this.defaultIndex;
+    var defaultLabel = "default" + labelPostfix;
+    entry[1 + numValues] = module.br(
+      ~defaultIndex
+        ? labels[defaultIndex]
+        : defaultLabel
+    );
+    var current = module.block(labels[0], entry);
+    for (let i = 1; i < numCases; ++i) {
+      let block = cases[i - 1];
+      block.unshift(current);
+      current = module.block(labels[i], block);
+    }
+    var lastCase = cases[numCases - 1];
+    lastCase.unshift(current);
+    return module.block(
+      ~defaultIndex
+        ? null
+        : defaultLabel,
+      lastCase
+    );
+  }
+}
+
 export enum SideEffects {
   None = 0 /* _BinaryenSideEffectNone */,
   Branches = 1 /* _BinaryenSideEffectBranches */,
@@ -1952,7 +2238,7 @@ export enum SideEffects {
   ImplicitTrap = 256 /* _BinaryenSideEffectImplicitTrap */,
   IsAtomic = 512 /* _BinaryenSideEffectIsAtomic */,
   Throws = 1024 /* _BinaryenSideEffectThrows */,
-  Any = 2047 /* _BinaryenSideEffectAny */,
+  Any = 2047 /* _BinaryenSideEffectAny */
 }
 
 export function getSideEffects(expr: ExpressionRef, features: FeatureFlags = FeatureFlags.All): SideEffects {
@@ -1989,8 +2275,30 @@ function allocI32Array(i32s: i32[] | null): usize {
   return ptr;
 }
 
+function allocU32Array(u32s: u32[] | null): usize {
+  if (!u32s) return 0;
+  var ptr = binaryen._malloc(u32s.length << 2);
+  var idx = ptr;
+  for (let i = 0, k = u32s.length; i < k; ++i) {
+    let val = u32s[i];
+    binaryen.__i32_store(idx, val);
+    idx += 4;
+  }
+  return ptr;
+}
+
 function allocPtrArray(ptrs: usize[] | null): usize {
-  return allocI32Array(ptrs); // TODO: WASM64 one day
+  if (!ptrs) return 0;
+  // TODO: WASM64
+  assert(ASC_TARGET != Target.WASM64);
+  var ptr = binaryen._malloc(ptrs.length << 2);
+  var idx = ptr;
+  for (let i = 0, k = ptrs.length; i < k; ++i) {
+    let val = ptrs[i];
+    binaryen.__i32_store(idx, <i32>val);
+    idx += 4;
+  }
+  return ptr;
 }
 
 function stringLengthUTF8(str: string): usize {
@@ -2018,7 +2326,7 @@ function stringLengthUTF8(str: string): usize {
 }
 
 function allocString(str: string | null): usize {
-  if (str == null) return 0;
+  if (str === null) return 0;
   var ptr = binaryen._malloc(stringLengthUTF8(str) + 1);
   // the following is based on Emscripten's stringToUTF8Array
   var idx = ptr;
@@ -2060,10 +2368,10 @@ function allocString(str: string | null): usize {
   return ptr;
 }
 
-function readBuffer(ptr: usize, length: usize): Uint8Array {
+function readBuffer(ptr: usize, length: i32): Uint8Array {
   var ret = new Uint8Array(length);
-  for (let i: usize = 0; i < length; ++i) {
-    ret[i] = binaryen.__i32_load8_u(ptr + i);
+  for (let i = 0; i < length; ++i) {
+    ret[i] = binaryen.__i32_load8_u(ptr + <usize>i);
   }
   return ret;
 }
@@ -2102,24 +2410,26 @@ export function readString(ptr: usize): string | null {
       }
     }
     arr.push(cp);
-    // if (cp < 0x10000) {
-    //   arr.push(cp);
-    // } else {
-    //   var ch = cp - 0x10000;
-    //   arr.push(0xD800 | (ch >> 10));
-    //   arr.push(0xDC00 | (ch & 0x3FF));
-    // }
+    if (cp < 0x10000) {
+      arr.push(cp);
+    } else {
+      let ch = cp - 0x10000;
+      arr.push(0xD800 | (ch >> 10));
+      arr.push(0xDC00 | (ch & 0x3FF));
+    }
   }
-  // return String.fromCharCodes(arr);
-  return String.fromCodePoints(arr);
+  return String.fromCharCodes(arr);
+  // return String.fromCodePoints(arr);
 }
 
 /** Result structure of {@link Module#toBinary}. */
 export class BinaryModule {
-  /** WebAssembly binary. */
-  output: Uint8Array;
-  /** Source map, if generated. */
-  sourceMap: string | null;
+  constructor(
+    /** WebAssembly binary. */
+    public output: Uint8Array,
+    /** Source map, if generated. */
+    public sourceMap: string | null
+  ) {}
 }
 
 /** Tests if an expression needs an explicit 'unreachable' when it is the terminating statement. */
@@ -2145,7 +2455,7 @@ export function needsExplicitUnreachable(expr: ExpressionRef): bool {
 export function traverse<T>(expr: ExpressionRef, data: T, visit: (expr: ExpressionRef, data: T) => void): bool {
   switch (getExpressionId(expr)) {
     case ExpressionId.Block: {
-      for (let i = 0, n = binaryen._BinaryenBlockGetNumChildren(expr); i < n; ++i) {
+      for (let i: Index = 0, n = binaryen._BinaryenBlockGetNumChildren(expr); i < n; ++i) {
         visit(binaryen._BinaryenBlockGetChild(expr, i), data);
       }
       break;
@@ -2171,13 +2481,13 @@ export function traverse<T>(expr: ExpressionRef, data: T, visit: (expr: Expressi
       break;
     }
     case ExpressionId.Call: {
-      for (let i = 0, n = binaryen._BinaryenCallGetNumOperands(expr); i < n; ++i) {
+      for (let i: Index = 0, n = binaryen._BinaryenCallGetNumOperands(expr); i < n; ++i) {
         visit(binaryen._BinaryenCallGetOperand(expr, i), data);
       }
       break;
     }
     case ExpressionId.CallIndirect: {
-      for (let i = 0, n = binaryen._BinaryenCallIndirectGetNumOperands(expr); i < n; ++i) {
+      for (let i: Index = 0, n = binaryen._BinaryenCallIndirectGetNumOperands(expr); i < n; ++i) {
         visit(binaryen._BinaryenCallIndirectGetOperand(expr, i), data);
       }
       break;
@@ -2232,7 +2542,7 @@ export function traverse<T>(expr: ExpressionRef, data: T, visit: (expr: Expressi
       break;
     }
     case ExpressionId.Host: {
-      for (let i = 0, n = binaryen._BinaryenHostGetNumOperands(expr); i < n; ++i) {
+      for (let i: Index = 0, n = binaryen._BinaryenHostGetNumOperands(expr); i < n; ++i) {
         visit(binaryen._BinaryenHostGetOperand(expr, i), data);
       }
       break;
@@ -2340,7 +2650,7 @@ export function traverse<T>(expr: ExpressionRef, data: T, visit: (expr: Expressi
       break;
     }
     case ExpressionId.Throw: {
-      for (let i = 0, n = binaryen._BinaryenThrowGetNumOperands(expr); i < n; ++i) {
+      for (let i: Index = 0, n = binaryen._BinaryenThrowGetNumOperands(expr); i < n; ++i) {
         visit(binaryen._BinaryenThrowGetOperand(expr, i), data);
       }
       break;
@@ -2351,6 +2661,15 @@ export function traverse<T>(expr: ExpressionRef, data: T, visit: (expr: Expressi
     }
     case ExpressionId.BrOnExn: {
       visit(binaryen._BinaryenBrOnExnGetExnref(expr), data);
+      break;
+    }
+    case ExpressionId.TupleMake: {
+      for (let i: Index = 0, n = binaryen._BinaryenTupleMakeGetNumOperands(expr); i < n; ++i) {
+        visit(binaryen._BinaryenTupleMakeGetOperand(expr, i), data);
+      }
+      break;
+    }
+    case ExpressionId.TupleExtract: {
       break;
     }
     default: assert(false);

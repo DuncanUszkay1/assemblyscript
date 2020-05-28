@@ -1083,11 +1083,23 @@ export namespace v128 {
 
   // @ts-ignore: decorator
   @builtin
+  export declare function bitmask<T>(a: v128): i32;
+
+  // @ts-ignore: decorator
+  @builtin
   export declare function min<T>(a: v128, b: v128): v128;
 
   // @ts-ignore: decorator
   @builtin
   export declare function max<T>(a: v128, b: v128): v128;
+
+  // @ts-ignore: decorator
+  @builtin
+  export declare function pmin<T>(a: v128, b: v128): v128;
+
+  // @ts-ignore: decorator
+  @builtin
+  export declare function pmax<T>(a: v128, b: v128): v128;
 
   // @ts-ignore: decorator
   @builtin
@@ -1217,6 +1229,10 @@ export namespace i8x16 {
 
   // @ts-ignore: decorator
   @builtin
+  export declare function abs(a: v128): v128;
+
+  // @ts-ignore: decorator
+  @builtin
   export declare function neg(a: v128): v128;
 
   // @ts-ignore: decorator
@@ -1254,6 +1270,10 @@ export namespace i8x16 {
   // @ts-ignore: decorator
   @builtin
   export declare function all_true(a: v128): bool;
+
+  // @ts-ignore: decorator
+  @builtin
+  export declare function bitmask(a: v128): i32;
 
   // @ts-ignore: decorator
   @builtin
@@ -1360,6 +1380,10 @@ export namespace i16x8 {
 
   // @ts-ignore: decorator
   @builtin
+  export declare function abs(a: v128): v128;
+
+  // @ts-ignore: decorator
+  @builtin
   export declare function neg(a: v128): v128;
 
   // @ts-ignore: decorator
@@ -1397,6 +1421,10 @@ export namespace i16x8 {
   // @ts-ignore: decorator
   @builtin
   export declare function all_true(a: v128): bool;
+
+  // @ts-ignore: decorator
+  @builtin
+  export declare function bitmask(a: v128): i32;
 
   // @ts-ignore: decorator
   @builtin
@@ -1523,6 +1551,10 @@ export namespace i32x4 {
 
   // @ts-ignore: decorator
   @builtin
+  export declare function abs(a: v128): v128;
+
+  // @ts-ignore: decorator
+  @builtin
   export declare function neg(a: v128): v128;
 
   // @ts-ignore: decorator
@@ -1544,6 +1576,10 @@ export namespace i32x4 {
   // @ts-ignore: decorator
   @builtin
   export declare function all_true(a: v128): bool;
+
+  // @ts-ignore: decorator
+  @builtin
+  export declare function bitmask(a: v128): i32;
 
   // @ts-ignore: decorator
   @builtin
@@ -1737,6 +1773,14 @@ export namespace f32x4 {
 
   // @ts-ignore: decorator
   @builtin
+  export declare function pmin(a: v128, b: v128): v128;
+
+  // @ts-ignore: decorator
+  @builtin
+  export declare function pmax(a: v128, b: v128): v128;
+
+  // @ts-ignore: decorator
+  @builtin
   export declare function abs(a: v128): v128;
 
   // @ts-ignore: decorator
@@ -1829,6 +1873,14 @@ export namespace f64x2 {
   // @ts-ignore: decorator
   @builtin
   export declare function max(a: v128, b: v128): v128;
+
+  // @ts-ignore: decorator
+  @builtin
+  export declare function pmin(a: v128, b: v128): v128;
+
+  // @ts-ignore: decorator
+  @builtin
+  export declare function pmax(a: v128, b: v128): v128;
 
   // @ts-ignore: decorator
   @builtin
@@ -1939,3 +1991,7 @@ declare function trace(
   a3?: f64,
   a4?: f64
 ): void;
+
+// @ts-ignore: decorator
+@external("env", "seed")
+declare function seed(): f64;
