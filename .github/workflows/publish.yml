@@ -5,7 +5,7 @@ on:
 jobs:
   publish:
     name: "Packages"
-    if: github.repository == 'AssemblyScript/assemblyscript'
+    if: github.repository == 'DuncanUszkay1/assemblyscript'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
