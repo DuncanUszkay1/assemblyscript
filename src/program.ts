@@ -134,8 +134,7 @@ import {
 } from "./resolver";
 
 import {
-  Flow,
-  LocalFlags
+  Flow
 } from "./flow";
 
 import {
