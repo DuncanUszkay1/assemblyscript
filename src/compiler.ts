@@ -8477,6 +8477,15 @@ export class Compiler extends DiagnosticEmitter {
         if (localClosureContextOffset > 0) {
           let contextLocal = assert(flow.lookupLocal(CommonNames.this_));
 
+          if (flow.isLocalFlag(local.index, LocalFlags.CONSTANT)) {
+            this.error(
+              DiagnosticCode.Not_implemented_0,
+              expression.range,
+              "Closed Over Constants"
+            );
+            return module.unreachable();
+          }
+
           // TODO: replace this with a class field access, once we are able to construct the class before
           // compiling
           return module.load(
