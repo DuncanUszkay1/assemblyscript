@@ -134,7 +134,8 @@ import {
 } from "./resolver";
 
 import {
-  Flow
+  Flow,
+  LocalFlags
 } from "./flow";
 
 import {
@@ -3575,6 +3576,10 @@ export class Function extends TypedElement {
       }
       if (parentResult.kind == ElementKind.LOCAL) {
         let local = changetype<Local>(parentResult);
+
+        // We don't need to assign a closure offset for inlined values
+        if (local.is(CommonFlags.INLINED)) return local;
+
         if (this.closedLocals.has(local.name)) return assert(this.closedLocals.get(local.name));
         let mask = local.type.byteSize - 1;
         let memoryOffset = this.nextGlobalClosureOffset;
