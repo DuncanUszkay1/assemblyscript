@@ -205,7 +205,7 @@ export class Resolver extends DiagnosticEmitter {
           if (type.is(TypeFlags.REFERENCE)) return type.asNullable();
           if (reportMode == ReportMode.REPORT) {
             this.error(
-              DiagnosticCode.Basic_type_0_cannot_be_nullable,
+              DiagnosticCode.Type_0_cannot_be_nullable,
               node.range, type.toString()
             );
           }
@@ -238,7 +238,7 @@ export class Resolver extends DiagnosticEmitter {
         if (node.isNullable) {
           if (reportMode == ReportMode.REPORT) {
             this.error(
-              DiagnosticCode.Basic_type_0_cannot_be_nullable,
+              DiagnosticCode.Type_0_cannot_be_nullable,
               node.range, element.name + "/i32"
             );
           }
@@ -283,7 +283,7 @@ export class Resolver extends DiagnosticEmitter {
           if (!type.is(TypeFlags.REFERENCE)) {
             if (reportMode == ReportMode.REPORT) {
               this.error(
-                DiagnosticCode.Basic_type_0_cannot_be_nullable,
+                DiagnosticCode.Type_0_cannot_be_nullable,
                 nameNode.range, nameNode.identifier.text
               );
             }
@@ -333,7 +333,7 @@ export class Resolver extends DiagnosticEmitter {
         if (!type.is(TypeFlags.REFERENCE)) {
           if (reportMode == ReportMode.REPORT) {
             this.error(
-              DiagnosticCode.Basic_type_0_cannot_be_nullable,
+              DiagnosticCode.Type_0_cannot_be_nullable,
               nameNode.range, nameNode.identifier.text
             );
           }
@@ -2384,6 +2384,17 @@ export class Resolver extends DiagnosticEmitter {
         if (!instance) return null;
         return instance.signature.returnType;
       }
+      case ElementKind.GLOBAL:
+      case ElementKind.LOCAL:
+      case ElementKind.FIELD: {
+        let varType = (<VariableLikeElement>target).type;
+        let varElement = this.getElementOfType(varType);
+        if (!varElement || varElement.kind != ElementKind.FUNCTION_TARGET) {
+          break;
+        }
+        target = varElement;
+        // fall-through
+      }
       case ElementKind.FUNCTION_TARGET: {
         return (<FunctionTarget>target).signature.returnType;
       }
@@ -2716,6 +2727,15 @@ export class Resolver extends DiagnosticEmitter {
         reportMode
       );
       if (!parameterType) return null;
+      if (parameterType == Type.void) {
+        if (reportMode == ReportMode.REPORT) {
+          this.error(
+            DiagnosticCode.Type_expected,
+            typeNode.range
+          );
+        }
+        return null;
+      }
       parameterTypes[i] = parameterType;
       parameterNames[i] = parameterDeclaration.name.text;
     }
@@ -3079,6 +3099,15 @@ export class Resolver extends DiagnosticEmitter {
                 instance.contextualTypeArguments,
                 reportMode
               );
+              if (fieldType == Type.void) {
+                if (reportMode == ReportMode.REPORT) {
+                  this.error(
+                    DiagnosticCode.Type_expected,
+                    fieldTypeNode.range
+                  );
+                }
+                break;
+              }
             }
             if (!fieldType) break; // did report above
             let fieldInstance = new Field(fieldPrototype, instance, fieldType);
