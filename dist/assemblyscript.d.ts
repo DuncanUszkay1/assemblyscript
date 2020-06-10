@@ -231,7 +231,7 @@ declare module "assemblyscript/src/diagnosticMessages.generated" {
         Conversion_from_type_0_to_1_will_require_an_explicit_cast_when_switching_between_32_64_bit = 201,
         Type_0_cannot_be_changed_to_type_1 = 202,
         Operation_0_cannot_be_applied_to_type_1 = 203,
-        Basic_type_0_cannot_be_nullable = 204,
+        Type_0_cannot_be_nullable = 204,
         Cannot_export_a_mutable_global = 205,
         Mutable_value_cannot_be_inlined = 206,
         Unmanaged_classes_cannot_extend_managed_classes_and_vice_versa = 207,
@@ -259,6 +259,7 @@ declare module "assemblyscript/src/diagnosticMessages.generated" {
         Property_0_only_has_a_setter_and_is_missing_a_getter = 229,
         _0_keyword_cannot_be_used_here = 230,
         A_class_with_a_constructor_explicitly_returning_something_else_than_this_must_be_final = 231,
+        Exported_generic_function_or_class_has_no_concrete_instances = 232,
         Type_0_is_cyclic_Module_will_include_deferred_garbage_collection = 900,
         Importing_the_table_disables_some_indirect_call_optimizations = 901,
         Exporting_the_table_disables_some_indirect_call_optimizations = 902,
@@ -3707,6 +3708,11 @@ declare module "assemblyscript/src/parser" {
     import { Tokenizer, CommentHandler } from "assemblyscript/src/tokenizer";
     import { DiagnosticEmitter, DiagnosticMessage } from "assemblyscript/src/diagnostics";
     import { Node, Source, TypeNode, TypeName, FunctionTypeNode, Expression, ClassExpression, FunctionExpression, Statement, BlockStatement, BreakStatement, ClassDeclaration, ContinueStatement, DecoratorNode, DoStatement, EnumDeclaration, EnumValueDeclaration, ExportImportStatement, ExportMember, ExportStatement, ExpressionStatement, ForOfStatement, FunctionDeclaration, IfStatement, ImportDeclaration, ImportStatement, IndexSignatureNode, NamespaceDeclaration, ParameterNode, ReturnStatement, SwitchCase, SwitchStatement, ThrowStatement, TryStatement, TypeDeclaration, TypeParameterNode, VariableStatement, VariableDeclaration, VoidStatement, WhileStatement } from "assemblyscript/src/ast";
+    class Dependee {
+        source: Source;
+        reportNode: Node;
+        constructor(source: Source, reportNode: Node);
+    }
     /** Parser interface. */
     export class Parser extends DiagnosticEmitter {
         /** Source file names to be requested next. */
@@ -3719,16 +3725,16 @@ declare module "assemblyscript/src/parser" {
         onComment: CommentHandler | null;
         /** Current file being parsed. */
         currentSource: Source | null;
-        /** Dependency map **/
-        dependees: Map<string, Source>;
+        /** Map of dependees being depended upon by a source, by path. */
+        dependees: Map<string, Dependee>;
         /** An array of parsed sources. */
         sources: Source[];
         /** Constructs a new parser. */
         constructor(diagnostics?: DiagnosticMessage[] | null, sources?: Source[] | null);
         /** Parses a file and adds its definitions to the program. */
         parseFile(
-        /** Source text of the file. */
-        text: string, 
+        /** Source text of the file, or `null` to indicate not found. */
+        text: string | null, 
         /** Normalized path of the file. */
         path: string, 
         /** Whether this is an entry file. */
@@ -3737,7 +3743,7 @@ declare module "assemblyscript/src/parser" {
         parseTopLevelStatement(tn: Tokenizer, namespace?: NamespaceDeclaration | null): Statement | null;
         /** Obtains the next file to parse. */
         nextFile(): string | null;
-        /** Obtains the dependee of the given imported file. */
+        /** Obtains the path of the dependee of the given imported file. */
         getDependee(dependent: string): string | null;
         /** Finishes parsing. */
         finish(): void;
@@ -3825,6 +3831,7 @@ declare module "assemblyscript/src/parser" {
         MEMBERACCESS = 20,
         GROUPING = 21
     }
+    export {};
 }
 declare module "assemblyscript/src/program" {
     /**
@@ -6176,8 +6183,8 @@ declare module "assemblyscript/src/index" {
     export function parse(
     /** Program reference. */
     program: Program, 
-    /** Source text of the file. */
-    text: string, 
+    /** Source text of the file, or `null` to indicate not found. */
+    text: string | null, 
     /** Normalized path of the file. */
     path: string, 
     /** Whether this is an entry file. */
