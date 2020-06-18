@@ -1,6 +1,5 @@
 (module
  (type $i32_=>_i32 (func (param i32) (result i32)))
- (type $none_=>_i32 (func (result i32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (memory $0 1)
@@ -187,29 +186,12 @@
   unreachable
  )
  (func $assert-nonnull/testFn (param $0 i32) (result i32)
-  (local $1 i32)
   local.get $0
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $0
-   i32.const 4
-   i32.shl
-   local.tee $0
-   i32.load
-   local.set $1
-   local.get $0
-   local.get $1
-   call_indirect (type $i32_=>_i32)
-  else
-   local.get $0
-   call_indirect (type $none_=>_i32)
-  end
+  local.get $0
+  i32.load
+  call_indirect (type $i32_=>_i32)
  )
  (func $assert-nonnull/testFn2 (param $0 i32) (result i32)
-  (local $1 i32)
   local.get $0
   i32.eqz
   if
@@ -221,47 +203,18 @@
    unreachable
   end
   local.get $0
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $0
-   i32.const 4
-   i32.shl
-   local.tee $0
-   i32.load
-   local.set $1
-   local.get $0
-   local.get $1
-   call_indirect (type $i32_=>_i32)
-  else
-   local.get $0
-   call_indirect (type $none_=>_i32)
-  end
+  local.get $0
+  i32.load
+  call_indirect (type $i32_=>_i32)
  )
  (func $assert-nonnull/testRet (param $0 i32) (result i32)
   (local $1 i32)
   local.get $0
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $0
-   i32.const 4
-   i32.shl
-   local.tee $0
-   i32.load
-   local.set $1
-   local.get $0
-   local.get $1
-   call_indirect (type $i32_=>_i32)
-  else
-   local.get $0
-   call_indirect (type $none_=>_i32)
-  end
-  local.tee $0
+  local.get $0
+  i32.load
+  call_indirect (type $i32_=>_i32)
+  local.tee $1
+  local.get $1
   i32.eqz
   if
    i32.const 0
@@ -271,56 +224,25 @@
    call $~lib/builtins/abort
    unreachable
   end
-  local.get $0
  )
  (func $assert-nonnull/testObjFn (param $0 i32) (result i32)
-  (local $1 i32)
   local.get $0
   i32.load offset=4
   local.tee $0
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $0
-   i32.const 4
-   i32.shl
-   local.tee $0
-   i32.load
-   local.set $1
-   local.get $0
-   local.get $1
-   call_indirect (type $i32_=>_i32)
-  else
-   local.get $0
-   call_indirect (type $none_=>_i32)
-  end
+  local.get $0
+  i32.load
+  call_indirect (type $i32_=>_i32)
  )
  (func $assert-nonnull/testObjRet (param $0 i32) (result i32)
   (local $1 i32)
   local.get $0
   i32.load offset=4
   local.tee $0
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $0
-   i32.const 4
-   i32.shl
-   local.tee $0
-   i32.load
-   local.set $1
-   local.get $0
-   local.get $1
-   call_indirect (type $i32_=>_i32)
-  else
-   local.get $0
-   call_indirect (type $none_=>_i32)
-  end
-  local.tee $0
+  local.get $0
+  i32.load
+  call_indirect (type $i32_=>_i32)
+  local.tee $1
+  local.get $1
   i32.eqz
   if
    i32.const 0
@@ -330,6 +252,5 @@
    call $~lib/builtins/abort
    unreachable
   end
-  local.get $0
  )
 )

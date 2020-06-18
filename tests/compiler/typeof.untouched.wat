@@ -1,7 +1,7 @@
 (module
- (type $none_=>_none (func))
- (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $i32_=>_none (func (param i32)))
+ (type $i32_=>_i32 (func (param i32) (result i32)))
+ (type $none_=>_none (func))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $i32_i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32 i32) (result i32)))
@@ -16,7 +16,7 @@
  (data (i32.const 224) "\0c\00\00\00\01\00\00\00\01\00\00\00\0c\00\00\00s\00t\00r\00i\00n\00g\00")
  (data (i32.const 256) "\12\00\00\00\01\00\00\00\01\00\00\00\12\00\00\00u\00n\00d\00e\00f\00i\00n\00e\00d\00")
  (table $0 2 funcref)
- (elem (i32.const 1) $start:typeof~anonymous|0~nonClosure)
+ (elem (i32.const 1) $start:typeof~anonymous|0)
  (global $typeof/SomeNamespace.a i32 (i32.const 1))
  (global $~lib/ASC_SHRINK_LEVEL i32 (i32.const 0))
  (global $typeof/b (mut i32) (i32.const 1))
@@ -25,9 +25,9 @@
  (global $typeof/I (mut i64) (i64.const 1))
  (global $typeof/F (mut f64) (f64.const 1))
  (global $typeof/s (mut i32) (i32.const 208))
- (global $typeof/fn (mut i32) (i32.const 1))
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
+ (global $typeof/fn (mut i32) (i32.const 0))
  (global $typeof/c (mut i32) (i32.const 0))
  (global $~started (mut i32) (i32.const 0))
  (global $~lib/heap/__heap_base i32 (i32.const 292))
@@ -246,7 +246,7 @@
   call $~lib/rt/stub/__release
   local.get $2
  )
- (func $start:typeof~anonymous|0~nonClosure
+ (func $start:typeof~anonymous|0 (param $0 i32)
   nop
  )
  (func $~lib/rt/stub/maybeGrowMemory (param $0 i32)
@@ -371,6 +371,7 @@
   local.get $0
  )
  (func $start:typeof
+  (local $0 i32)
   i32.const 1
   drop
   i32.const 32
@@ -603,6 +604,26 @@
    call $~lib/builtins/abort
    unreachable
   end
+  global.get $~lib/heap/__heap_base
+  i32.const 15
+  i32.add
+  i32.const 15
+  i32.const -1
+  i32.xor
+  i32.and
+  global.set $~lib/rt/stub/startOffset
+  global.get $~lib/rt/stub/startOffset
+  global.set $~lib/rt/stub/offset
+  i32.const 4
+  i32.const 0
+  call $~lib/rt/stub/__alloc
+  call $~lib/rt/stub/__retain
+  local.set $0
+  local.get $0
+  i32.const 1
+  i32.store
+  local.get $0
+  global.set $typeof/fn
   global.get $typeof/fn
   drop
   i32.const 144
@@ -617,16 +638,6 @@
    call $~lib/builtins/abort
    unreachable
   end
-  global.get $~lib/heap/__heap_base
-  i32.const 15
-  i32.add
-  i32.const 15
-  i32.const -1
-  i32.xor
-  i32.and
-  global.set $~lib/rt/stub/startOffset
-  global.get $~lib/rt/stub/startOffset
-  global.set $~lib/rt/stub/offset
   i32.const 0
   call $typeof/SomeClass#constructor
   global.set $typeof/c
@@ -696,6 +707,8 @@
    call $~lib/builtins/abort
    unreachable
   end
+  local.get $0
+  call $~lib/rt/stub/__release
  )
  (func $~start
   global.get $~started

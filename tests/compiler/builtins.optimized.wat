@@ -36,7 +36,7 @@
  (global $builtins/f (mut f32) (f32.const 0))
  (global $builtins/F (mut f64) (f64.const 0))
  (export "memory" (memory $0))
- (export "test" (func $start:builtins~anonymous|0~nonClosure))
+ (export "test" (func $builtins/test))
  (start $~start)
  (func $~lib/atomics/Atomics.isLockFree (param $0 i32) (result i32)
   i32.const 1
@@ -168,9 +168,6 @@
    return
   end
   i32.const 0
- )
- (func $start:builtins~anonymous|0~nonClosure
-  nop
  )
  (func $start:builtins
   i32.const 31
@@ -836,6 +833,9 @@
    call $~lib/builtins/abort
    unreachable
   end
+ )
+ (func $builtins/test
+  nop
  )
  (func $~start
   call $start:builtins

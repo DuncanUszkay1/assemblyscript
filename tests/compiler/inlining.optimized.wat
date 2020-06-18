@@ -1,17 +1,22 @@
 (module
+ (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $none_=>_none (func))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $none_=>_i32 (func (result i32)))
- (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (memory $0 1)
  (data (i32.const 1024) "\16\00\00\00\01\00\00\00\01\00\00\00\16\00\00\00i\00n\00l\00i\00n\00i\00n\00g\00.\00t\00s")
+ (table $0 2 funcref)
+ (elem (i32.const 1) $inlining/func_fe~anonymous|0)
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
  (export "memory" (memory $0))
  (export "test" (func $inlining/test))
  (start $~start)
  (func $inlining/test (result i32)
   i32.const 3
+ )
+ (func $inlining/func_fe~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+  local.get $1
  )
  (func $~lib/rt/stub/__alloc (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
@@ -178,8 +183,30 @@
   end
  )
  (func $~start
+  (local $0 i32)
   i32.const 1072
   global.set $~lib/rt/stub/offset
+  i32.const 4
+  i32.const 0
+  call $~lib/rt/stub/__alloc
+  local.tee $0
+  i32.const 1
+  i32.store
+  local.get $0
+  i32.const 2
+  local.get $0
+  i32.load
+  call_indirect (type $i32_i32_=>_i32)
+  i32.const 2
+  i32.ne
+  if
+   i32.const 0
+   i32.const 1040
+   i32.const 68
+   i32.const 3
+   call $~lib/builtins/abort
+   unreachable
+  end
   call $inlining/test_ctor
  )
 )

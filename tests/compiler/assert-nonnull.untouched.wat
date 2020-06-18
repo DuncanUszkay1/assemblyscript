@@ -1,6 +1,5 @@
 (module
  (type $i32_=>_i32 (func (param i32) (result i32)))
- (type $none_=>_i32 (func (result i32)))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_=>_none (func (param i32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
@@ -339,108 +338,35 @@
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
-  (local $4 i32)
-  (local $5 i32)
-  (local $6 i32)
+  local.get $0
+  call $~lib/rt/stub/__retain
+  local.set $0
   local.get $0
   local.set $1
   local.get $1
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $1
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
-  call $~lib/rt/stub/__retain
-  drop
+  i32.const 0
+  global.set $~argumentsLength
   local.get $1
-  local.set $0
+  i32.load
+  call_indirect (type $i32_=>_i32)
+  local.tee $2
+  local.set $3
   local.get $0
-  local.set $2
-  local.get $2
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $2
-   i32.const 4
-   i32.shl
-   i32.const 0
-   global.set $~argumentsLength
-   local.get $2
-   i32.const 4
-   i32.shl
-   i32.load
-   call_indirect (type $i32_=>_i32)
-   local.tee $3
-  else
-   i32.const 0
-   global.set $~argumentsLength
-   local.get $2
-   call_indirect (type $none_=>_i32)
-   local.tee $4
-  end
-  call $~lib/rt/stub/__retain
-  local.set $6
+  call $~lib/rt/stub/__release
   local.get $3
-  call $~lib/rt/stub/__release
-  local.get $4
-  call $~lib/rt/stub/__release
-  local.get $0
-  local.set $5
-  local.get $5
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $5
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
-  call $~lib/rt/stub/__release
-  local.get $6
  )
  (func $assert-nonnull/testFn2 (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
-  (local $5 i32)
-  (local $6 i32)
-  (local $7 i32)
-  (local $8 i32)
-  (local $9 i32)
   local.get $0
-  local.set $1
-  local.get $1
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $1
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/stub/__retain
-  drop
-  local.get $1
   local.set $0
   local.get $0
-  local.tee $2
+  local.tee $1
   if (result i32)
-   local.get $2
+   local.get $1
   else
    i32.const 0
    i32.const 32
@@ -449,141 +375,43 @@
    call $~lib/builtins/abort
    unreachable
   end
+  call $~lib/rt/stub/__retain
   local.set $2
   local.get $2
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $2
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
-  call $~lib/rt/stub/__retain
-  drop
-  local.get $2
-  local.set $3
-  local.get $3
+  local.set $1
+  local.get $1
+  i32.const 0
+  global.set $~argumentsLength
+  local.get $1
+  i32.load
+  call_indirect (type $i32_=>_i32)
+  local.tee $3
   local.set $4
-  local.get $4
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $4
-   i32.const 4
-   i32.shl
-   i32.const 0
-   global.set $~argumentsLength
-   local.get $4
-   i32.const 4
-   i32.shl
-   i32.load
-   call_indirect (type $i32_=>_i32)
-   local.tee $5
-  else
-   i32.const 0
-   global.set $~argumentsLength
-   local.get $4
-   call_indirect (type $none_=>_i32)
-   local.tee $6
-  end
-  call $~lib/rt/stub/__retain
-  local.set $9
-  local.get $5
-  call $~lib/rt/stub/__release
-  local.get $6
-  call $~lib/rt/stub/__release
   local.get $0
-  local.set $7
-  local.get $7
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $7
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/stub/__release
-  local.get $3
-  local.set $8
-  local.get $8
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $8
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
+  local.get $2
   call $~lib/rt/stub/__release
-  local.get $9
+  local.get $4
  )
  (func $assert-nonnull/testRet (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
-  (local $4 i32)
-  (local $5 i32)
-  (local $6 i32)
+  local.get $0
+  call $~lib/rt/stub/__retain
+  local.set $0
   local.get $0
   local.set $1
   local.get $1
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $1
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
-  call $~lib/rt/stub/__retain
-  drop
+  i32.const 0
+  global.set $~argumentsLength
   local.get $1
-  local.set $0
-  local.get $0
-  local.set $2
-  local.get $2
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
+  i32.load
+  call_indirect (type $i32_=>_i32)
+  local.tee $2
+  local.tee $3
   if (result i32)
-   local.get $2
-   i32.const 4
-   i32.shl
-   i32.const 0
-   global.set $~argumentsLength
-   local.get $2
-   i32.const 4
-   i32.shl
-   i32.load
-   call_indirect (type $i32_=>_i32)
-   local.tee $3
-  else
-   i32.const 0
-   global.set $~argumentsLength
-   local.get $2
-   call_indirect (type $none_=>_i32)
-   local.tee $4
-  end
-  local.tee $5
-  if (result i32)
-   local.get $5
+   local.get $3
   else
    i32.const 0
    i32.const 32
@@ -593,33 +421,17 @@
    unreachable
   end
   call $~lib/rt/stub/__retain
-  local.set $6
-  local.get $3
-  call $~lib/rt/stub/__release
-  local.get $4
+  local.set $3
+  local.get $2
   call $~lib/rt/stub/__release
   local.get $0
-  local.set $5
-  local.get $5
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $5
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/stub/__release
-  local.get $6
+  local.get $3
  )
  (func $assert-nonnull/testObjFn (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
-  (local $4 i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0
@@ -627,44 +439,21 @@
   i32.load offset=4
   local.set $1
   local.get $1
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $1
-   i32.const 4
-   i32.shl
-   i32.const 0
-   global.set $~argumentsLength
-   local.get $1
-   i32.const 4
-   i32.shl
-   i32.load
-   call_indirect (type $i32_=>_i32)
-   local.tee $2
-  else
-   i32.const 0
-   global.set $~argumentsLength
-   local.get $1
-   call_indirect (type $none_=>_i32)
-   local.tee $3
-  end
-  call $~lib/rt/stub/__retain
-  local.set $4
-  local.get $2
-  call $~lib/rt/stub/__release
-  local.get $3
-  call $~lib/rt/stub/__release
+  i32.const 0
+  global.set $~argumentsLength
+  local.get $1
+  i32.load
+  call_indirect (type $i32_=>_i32)
+  local.tee $2
+  local.set $3
   local.get $0
   call $~lib/rt/stub/__release
-  local.get $4
+  local.get $3
  )
  (func $assert-nonnull/testObjRet (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
-  (local $4 i32)
   local.get $0
   call $~lib/rt/stub/__retain
   local.set $0
@@ -672,32 +461,15 @@
   i32.load offset=4
   local.set $1
   local.get $1
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
+  i32.const 0
+  global.set $~argumentsLength
+  local.get $1
+  i32.load
+  call_indirect (type $i32_=>_i32)
+  local.tee $2
+  local.tee $3
   if (result i32)
-   local.get $1
-   i32.const 4
-   i32.shl
-   i32.const 0
-   global.set $~argumentsLength
-   local.get $1
-   i32.const 4
-   i32.shl
-   i32.load
-   call_indirect (type $i32_=>_i32)
-   local.tee $2
-  else
-   i32.const 0
-   global.set $~argumentsLength
-   local.get $1
-   call_indirect (type $none_=>_i32)
-   local.tee $3
-  end
-  local.tee $4
-  if (result i32)
-   local.get $4
+   local.get $3
   else
    i32.const 0
    i32.const 32
@@ -707,13 +479,11 @@
    unreachable
   end
   call $~lib/rt/stub/__retain
-  local.set $4
+  local.set $3
   local.get $2
-  call $~lib/rt/stub/__release
-  local.get $3
   call $~lib/rt/stub/__release
   local.get $0
   call $~lib/rt/stub/__release
-  local.get $4
+  local.get $3
  )
 )

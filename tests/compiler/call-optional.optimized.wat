@@ -1,10 +1,13 @@
 (module
+ (type $i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32) (result i32)))
  (type $none_=>_none (func))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (memory $0 1)
  (data (i32.const 1024) " \00\00\00\01\00\00\00\01\00\00\00 \00\00\00c\00a\00l\00l\00-\00o\00p\00t\00i\00o\00n\00a\00l\00.\00t\00s")
+ (table $0 2 funcref)
+ (elem (i32.const 1) $call-optional/opt@varargs)
  (global $~argumentsLength (mut i32) (i32.const 0))
  (export "memory" (memory $0))
  (start $~start)
@@ -85,10 +88,13 @@
   end
   i32.const 1
   global.set $~argumentsLength
+  i32.const 1
   i32.const 3
   i32.const 0
   i32.const 0
-  call $call-optional/opt@varargs
+  i32.const 1
+  i32.load
+  call_indirect (type $i32_i32_i32_i32_=>_i32)
   if
    i32.const 0
    i32.const 1040
@@ -99,10 +105,13 @@
   end
   i32.const 2
   global.set $~argumentsLength
+  i32.const 1
   i32.const 3
   i32.const 4
   i32.const 0
-  call $call-optional/opt@varargs
+  i32.const 1
+  i32.load
+  call_indirect (type $i32_i32_i32_i32_=>_i32)
   i32.const 5
   i32.ne
   if
@@ -115,10 +124,13 @@
   end
   i32.const 3
   global.set $~argumentsLength
+  i32.const 1
   i32.const 3
   i32.const 4
   i32.const 5
-  call $call-optional/opt@varargs
+  i32.const 1
+  i32.load
+  call_indirect (type $i32_i32_i32_i32_=>_i32)
   i32.const 12
   i32.ne
   if

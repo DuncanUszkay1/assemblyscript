@@ -20,7 +20,7 @@
  (data (i32.const 176) "\14\00\00\00\01\00\00\00\01\00\00\00\14\00\00\00c\00l\00o\00s\00u\00r\00e\00.\00t\00s\00")
  (data (i32.const 224) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
  (table $0 10 funcref)
- (elem (i32.const 1) $closure/testParam~inner $closure/testVar~inner $closure/testLet~inner $closure/complexCreateClosure~anonymous|0 $closure/complexCreateClosure~anonymous|1 $closure/nestedExecutionTest~anonymous|0 $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0 $closure/returnOverBoundary~anonymous|0~nonClosure)
+ (elem (i32.const 1) $closure/testParam~inner $closure/testVar~inner $closure/testLet~inner $closure/complexCreateClosure~anonymous|0 $closure/complexCreateClosure~anonymous|1 $closure/nestedExecutionTest~anonymous|0 $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0 $closure/returnOverBoundary~anonymous|0)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
@@ -1548,7 +1548,6 @@
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
-  (local $5 i32)
   i32.const 8
   i32.const 0
   call $~lib/rt/tlsf/__alloc
@@ -1563,30 +1562,11 @@
   local.get $1
   i32.store offset=4
   local.get $3
-  i32.const 4
-  i32.shr_s
-  i32.const -2147483648
-  i32.or
-  local.set $4
-  local.get $4
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $4
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/pure/__retain
-  drop
-  local.get $4
-  local.set $5
+  local.set $4
   local.get $2
   call $~lib/rt/pure/__release
-  local.get $5
+  local.get $4
  )
  (func $closure/testVar~inner (param $0 i32) (param $1 i32) (result i32)
   local.get $0
@@ -1597,7 +1577,6 @@
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
-  (local $4 i32)
   i32.const 0
   local.set $0
   i32.const 8
@@ -1614,30 +1593,11 @@
   local.get $0
   i32.store offset=4
   local.get $2
-  i32.const 4
-  i32.shr_s
-  i32.const -2147483648
-  i32.or
-  local.set $3
-  local.get $3
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $3
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/pure/__retain
-  drop
-  local.get $3
-  local.set $4
+  local.set $3
   local.get $1
   call $~lib/rt/pure/__release
-  local.get $4
+  local.get $3
  )
  (func $closure/testLet~inner (param $0 i32) (param $1 i32) (result i32)
   local.get $0
@@ -1648,7 +1608,6 @@
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
-  (local $4 i32)
   i32.const 0
   local.set $0
   i32.const 8
@@ -1665,30 +1624,11 @@
   local.get $0
   i32.store offset=4
   local.get $2
-  i32.const 4
-  i32.shr_s
-  i32.const -2147483648
-  i32.or
-  local.set $3
-  local.get $3
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $3
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/pure/__retain
-  drop
-  local.get $3
-  local.set $4
+  local.set $3
   local.get $1
   call $~lib/rt/pure/__release
-  local.get $4
+  local.get $3
  )
  (func $closure/complexCreateClosure~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
   local.get $0
@@ -1720,7 +1660,6 @@
   (local $7 i32)
   (local $8 i32)
   (local $9 i32)
-  (local $10 i32)
   i32.const 2
   local.set $1
   i32.const 3
@@ -1763,105 +1702,33 @@
   local.get $1
   i32.store offset=12
   local.get $8
-  i32.const 4
-  i32.shr_s
-  i32.const -2147483648
-  i32.or
-  local.set $9
-  local.get $9
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $9
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/pure/__retain
-  drop
-  local.get $9
-  local.set $10
+  local.set $9
   local.get $4
   call $~lib/rt/pure/__release
   local.get $6
   call $~lib/rt/pure/__release
-  local.get $10
+  local.get $9
  )
  (func $closure/nestedExecutionTest~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
-  (local $4 i32)
-  (local $5 i32)
-  (local $6 i32)
   local.get $1
-  local.set $1
-  local.get $1
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $1
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/pure/__retain
-  drop
+  local.set $1
   local.get $1
   local.set $1
   local.get $1
+  local.get $0
+  i32.load offset=4
+  i32.const 1
+  global.set $~argumentsLength
+  local.get $1
+  i32.load
+  call_indirect (type $i32_i32_=>_i32)
   local.set $2
-  local.get $2
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $2
-   i32.const 4
-   i32.shl
-   local.get $0
-   i32.load offset=4
-   i32.const 1
-   global.set $~argumentsLength
-   local.get $2
-   i32.const 4
-   i32.shl
-   i32.load
-   call_indirect (type $i32_i32_=>_i32)
-  else
-   local.get $0
-   i32.load offset=4
-   i32.const 1
-   global.set $~argumentsLength
-   local.get $2
-   call_indirect (type $i32_=>_i32)
-  end
-  local.set $3
   local.get $0
   i32.load offset=8
-  local.set $5
-  local.get $1
-  local.set $4
-  local.get $4
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $4
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
-  call $~lib/rt/pure/__release
-  local.get $5
  )
  (func $closure/nestedExecutionTest (param $0 i32) (result i32)
   (local $1 i32)
@@ -1869,7 +1736,6 @@
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
-  (local $6 i32)
   i32.const 7
   local.set $1
   local.get $0
@@ -1898,25 +1764,12 @@
   local.get $4
   i32.load
   call_indirect (type $i32_i32_=>_i32)
-  local.set $6
+  local.set $5
   local.get $3
   call $~lib/rt/pure/__release
   local.get $2
-  local.set $5
-  local.get $5
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $5
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/pure/__release
-  local.get $6
+  local.get $5
  )
  (func $closure/createClosure~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
   local.get $0
@@ -1929,7 +1782,6 @@
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
-  (local $5 i32)
   i32.const 8
   i32.const 0
   call $~lib/rt/tlsf/__alloc
@@ -1946,123 +1798,43 @@
   local.get $0
   i32.store offset=4
   local.get $3
-  i32.const 4
-  i32.shr_s
-  i32.const -2147483648
-  i32.or
-  local.set $4
-  local.get $4
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $4
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/pure/__retain
-  drop
-  local.get $4
-  local.set $5
+  local.set $4
   local.get $1
   call $~lib/rt/pure/__release
-  local.get $5
+  local.get $4
  )
  (func $closure/runClosure (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
-  (local $3 i32)
-  (local $4 i32)
+  local.get $0
+  call $~lib/rt/pure/__retain
+  local.set $0
   local.get $0
   local.set $1
   local.get $1
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $1
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
-  call $~lib/rt/pure/__retain
-  drop
+  i32.const 1
+  i32.const 1
+  global.set $~argumentsLength
   local.get $1
-  local.set $0
-  local.get $0
+  i32.load
+  call_indirect (type $i32_i32_=>_i32)
   local.set $2
-  local.get $2
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $2
-   i32.const 4
-   i32.shl
-   i32.const 1
-   i32.const 1
-   global.set $~argumentsLength
-   local.get $2
-   i32.const 4
-   i32.shl
-   i32.load
-   call_indirect (type $i32_i32_=>_i32)
-  else
-   i32.const 1
-   i32.const 1
-   global.set $~argumentsLength
-   local.get $2
-   call_indirect (type $i32_=>_i32)
-  end
-  local.set $4
   local.get $0
-  local.set $3
-  local.get $3
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $3
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/pure/__release
-  local.get $4
+  local.get $2
  )
  (func $closure/passItAround (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
-  (local $3 i32)
   local.get $0
   call $closure/createClosure
   local.tee $1
   call $closure/runClosure
-  local.set $3
-  local.get $1
   local.set $2
-  local.get $2
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $2
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
+  local.get $1
   call $~lib/rt/pure/__release
-  local.get $3
+  local.get $2
  )
  (func $closure/runInline~anonymous|0 (param $0 i32) (result i32)
   local.get $0
@@ -2099,33 +1871,13 @@
   local.get $2
   i32.store offset=12
   local.get $4
-  i32.const 4
-  i32.shr_s
-  i32.const -2147483648
-  i32.or
   local.set $5
   local.get $5
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $5
-   i32.const 4
-   i32.shl
-   i32.const 0
-   global.set $~argumentsLength
-   local.get $5
-   i32.const 4
-   i32.shl
-   i32.load
-   call_indirect (type $i32_=>_i32)
-  else
-   i32.const 0
-   global.set $~argumentsLength
-   local.get $5
-   call_indirect (type $none_=>_i32)
-  end
+  i32.const 0
+  global.set $~argumentsLength
+  local.get $5
+  i32.load
+  call_indirect (type $i32_=>_i32)
   local.set $6
   local.get $3
   call $~lib/rt/pure/__release
@@ -2134,121 +1886,52 @@
  (func $closure/fallOutOfScope (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
-  (local $3 i32)
   local.get $0
   call $closure/createClosure
   local.set $1
   i32.const 10
-  local.set $3
-  local.get $1
   local.set $2
-  local.get $2
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $2
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
+  local.get $1
   call $~lib/rt/pure/__release
-  local.get $3
+  local.get $2
  )
- (func $closure/returnOverBoundary~anonymous|0~nonClosure (result i32)
+ (func $closure/returnOverBoundary~anonymous|0 (param $0 i32) (result i32)
   i32.const 6
  )
  (func $closure/returnOverBoundary (result i32)
   (local $0 i32)
   (local $1 i32)
-  i32.const 9
+  (local $2 i32)
+  i32.const 4
+  i32.const 0
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
   local.set $0
   local.get $0
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $0
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
-  call $~lib/rt/pure/__retain
-  drop
+  i32.const 9
+  i32.store
   local.get $0
   local.set $1
   local.get $1
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if
-   i32.const 0
-   i32.const 192
-   i32.const 73
-   i32.const 3
-   call $~lib/builtins/abort
-   unreachable
-  else
-   nop
-  end
-  local.get $1
+  call $~lib/rt/pure/__retain
+  local.set $2
+  local.get $0
+  call $~lib/rt/pure/__release
+  i32.const 0
+  i32.const 192
+  i32.const 73
+  i32.const 3
+  call $~lib/builtins/abort
+  unreachable
  )
  (func $start:closure
-  (local $0 i32)
-  (local $1 i32)
-  (local $2 i32)
-  (local $3 i32)
   i32.const 1
   i32.const 2
   call $closure/testParam
-  local.set $0
-  local.get $0
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $0
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/pure/__release
   call $closure/testVar
-  local.set $1
-  local.get $1
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $1
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/pure/__release
   call $closure/testLet
-  local.set $2
-  local.get $2
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $2
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/pure/__release
   i32.const 1
   call $closure/nestedExecutionTest
@@ -2265,19 +1948,6 @@
   call $closure/fallOutOfScope
   drop
   call $closure/returnOverBoundary
-  local.set $3
-  local.get $3
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $3
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/pure/__release
  )
  (func $~start

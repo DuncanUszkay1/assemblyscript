@@ -1,6 +1,6 @@
 (module
- (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
+ (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $none_=>_none (func))
  (type $i32_=>_none (func (param i32)))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
@@ -20,83 +20,18 @@
  (data (i32.const 1760) "H\00\00\00\01\00\00\00\01\00\00\00H\00\00\000\001\002\003\004\005\006\007\008\009\00a\00b\00c\00d\00e\00f\00g\00h\00i\00j\00k\00l\00m\00n\00o\00p\00q\00r\00s\00t\00u\00v\00w\00x\00y\00z\00")
  (data (i32.const 1856) "\04\00\00\00\01\00\00\00\01\00\00\00\04\00\00\004\002\00")
  (table $0 4 funcref)
- (elem (i32.const 1) $start:resolve-function-expression~anonymous|0~nonClosure $start:resolve-function-expression~anonymous|1~nonClosure $start:resolve-function-expression~anonymous|2~nonClosure)
- (global $~argumentsLength (mut i32) (i32.const 0))
+ (elem (i32.const 1) $start:resolve-function-expression~anonymous|0 $start:resolve-function-expression~anonymous|1 $start:resolve-function-expression~anonymous|2)
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
+ (global $~argumentsLength (mut i32) (i32.const 0))
  (global $~lib/ASC_SHRINK_LEVEL i32 (i32.const 0))
  (global $~lib/heap/__heap_base i32 (i32.const 1876))
  (export "memory" (memory $0))
  (start $~start)
- (func $start:resolve-function-expression~anonymous|0~nonClosure (param $0 i32) (result i32)
-  local.get $0
+ (func $start:resolve-function-expression~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+  local.get $1
   i32.const 40
   i32.add
- )
- (func $start:resolve-function-expression~anonymous|1~nonClosure (param $0 i32) (result i32)
-  local.get $0
-  i32.const 41
-  i32.add
- )
- (func $start:resolve-function-expression~anonymous|2~nonClosure (param $0 i32) (result i32)
-  local.get $0
-  i32.const 42
-  i32.add
- )
- (func $~lib/util/number/decimalCount32 (param $0 i32) (result i32)
-  local.get $0
-  i32.const 100000
-  i32.lt_u
-  if
-   local.get $0
-   i32.const 100
-   i32.lt_u
-   if
-    i32.const 1
-    local.get $0
-    i32.const 10
-    i32.ge_u
-    i32.add
-    return
-   else
-    i32.const 3
-    local.get $0
-    i32.const 10000
-    i32.ge_u
-    i32.add
-    local.get $0
-    i32.const 1000
-    i32.ge_u
-    i32.add
-    return
-   end
-   unreachable
-  else
-   local.get $0
-   i32.const 10000000
-   i32.lt_u
-   if
-    i32.const 6
-    local.get $0
-    i32.const 1000000
-    i32.ge_u
-    i32.add
-    return
-   else
-    i32.const 8
-    local.get $0
-    i32.const 1000000000
-    i32.ge_u
-    i32.add
-    local.get $0
-    i32.const 100000000
-    i32.ge_u
-    i32.add
-    return
-   end
-   unreachable
-  end
-  unreachable
  )
  (func $~lib/rt/stub/maybeGrowMemory (param $0 i32)
   (local $1 i32)
@@ -206,6 +141,74 @@
   local.get $0
   i32.store offset=12
   local.get $2
+ )
+ (func $~lib/rt/stub/__retain (param $0 i32) (result i32)
+  local.get $0
+ )
+ (func $start:resolve-function-expression~anonymous|1 (param $0 i32) (param $1 i32) (result i32)
+  local.get $1
+  i32.const 41
+  i32.add
+ )
+ (func $start:resolve-function-expression~anonymous|2 (param $0 i32) (param $1 i32) (result i32)
+  local.get $1
+  i32.const 42
+  i32.add
+ )
+ (func $~lib/util/number/decimalCount32 (param $0 i32) (result i32)
+  local.get $0
+  i32.const 100000
+  i32.lt_u
+  if
+   local.get $0
+   i32.const 100
+   i32.lt_u
+   if
+    i32.const 1
+    local.get $0
+    i32.const 10
+    i32.ge_u
+    i32.add
+    return
+   else
+    i32.const 3
+    local.get $0
+    i32.const 10000
+    i32.ge_u
+    i32.add
+    local.get $0
+    i32.const 1000
+    i32.ge_u
+    i32.add
+    return
+   end
+   unreachable
+  else
+   local.get $0
+   i32.const 10000000
+   i32.lt_u
+   if
+    i32.const 6
+    local.get $0
+    i32.const 1000000
+    i32.ge_u
+    i32.add
+    return
+   else
+    i32.const 8
+    local.get $0
+    i32.const 1000000000
+    i32.ge_u
+    i32.add
+    local.get $0
+    i32.const 100000000
+    i32.ge_u
+    i32.add
+    return
+   end
+   unreachable
+  end
+  unreachable
  )
  (func $~lib/util/number/utoa32_dec_lut (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
@@ -570,9 +573,6 @@
    end
   end
  )
- (func $~lib/rt/stub/__retain (param $0 i32) (result i32)
-  local.get $0
- )
  (func $~lib/util/number/itoa32 (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
@@ -936,32 +936,41 @@
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
-  i32.const 1
+  (local $4 i32)
+  (local $5 i32)
+  (local $6 i32)
+  (local $7 i32)
+  (local $8 i32)
+  (local $9 i32)
+  global.get $~lib/heap/__heap_base
+  i32.const 15
+  i32.add
+  i32.const 15
+  i32.const -1
+  i32.xor
+  i32.and
+  global.set $~lib/rt/stub/startOffset
+  global.get $~lib/rt/stub/startOffset
+  global.set $~lib/rt/stub/offset
+  i32.const 4
+  i32.const 0
+  call $~lib/rt/stub/__alloc
+  call $~lib/rt/stub/__retain
   local.set $0
   local.get $0
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $0
-   i32.const 4
-   i32.shl
-   i32.const 2
-   i32.const 1
-   global.set $~argumentsLength
-   local.get $0
-   i32.const 4
-   i32.shl
-   i32.load
-   call_indirect (type $i32_i32_=>_i32)
-  else
-   i32.const 2
-   i32.const 1
-   global.set $~argumentsLength
-   local.get $0
-   call_indirect (type $i32_=>_i32)
-  end
+  i32.const 1
+  i32.store
+  local.get $0
+  local.set $1
+  local.get $1
+  local.set $2
+  local.get $2
+  i32.const 2
+  i32.const 1
+  global.set $~argumentsLength
+  local.get $2
+  i32.load
+  call_indirect (type $i32_i32_=>_i32)
   i32.const 42
   i32.eq
   i32.eqz
@@ -973,32 +982,25 @@
    call $~lib/builtins/abort
    unreachable
   end
+  i32.const 4
+  i32.const 0
+  call $~lib/rt/stub/__alloc
+  call $~lib/rt/stub/__retain
+  local.set $3
+  local.get $3
   i32.const 2
-  local.set $1
-  local.get $1
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $1
-   i32.const 4
-   i32.shl
-   i32.const 1
-   i32.const 1
-   global.set $~argumentsLength
-   local.get $1
-   i32.const 4
-   i32.shl
-   i32.load
-   call_indirect (type $i32_i32_=>_i32)
-  else
-   i32.const 1
-   i32.const 1
-   global.set $~argumentsLength
-   local.get $1
-   call_indirect (type $i32_=>_i32)
-  end
+  i32.store
+  local.get $3
+  local.set $4
+  local.get $4
+  local.set $5
+  local.get $5
+  i32.const 1
+  i32.const 1
+  global.set $~argumentsLength
+  local.get $5
+  i32.load
+  call_indirect (type $i32_i32_=>_i32)
   i32.const 42
   i32.eq
   i32.eqz
@@ -1010,45 +1012,28 @@
    call $~lib/builtins/abort
    unreachable
   end
-  global.get $~lib/heap/__heap_base
-  i32.const 15
-  i32.add
-  i32.const 15
-  i32.const -1
-  i32.xor
-  i32.and
-  global.set $~lib/rt/stub/startOffset
-  global.get $~lib/rt/stub/startOffset
-  global.set $~lib/rt/stub/offset
+  i32.const 4
+  i32.const 0
+  call $~lib/rt/stub/__alloc
+  call $~lib/rt/stub/__retain
+  local.set $6
+  local.get $6
   i32.const 3
-  local.set $2
-  local.get $2
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $2
-   i32.const 4
-   i32.shl
-   i32.const 0
-   i32.const 1
-   global.set $~argumentsLength
-   local.get $2
-   i32.const 4
-   i32.shl
-   i32.load
-   call_indirect (type $i32_i32_=>_i32)
-  else
-   i32.const 0
-   i32.const 1
-   global.set $~argumentsLength
-   local.get $2
-   call_indirect (type $i32_=>_i32)
-  end
+  i32.store
+  local.get $6
+  local.set $7
+  local.get $7
+  local.set $8
+  local.get $8
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  local.get $8
+  i32.load
+  call_indirect (type $i32_i32_=>_i32)
   i32.const 10
   call $~lib/number/I32#toString
-  local.tee $3
+  local.tee $9
   i32.const 1872
   call $~lib/string/String.__eq
   i32.eqz
@@ -1060,7 +1045,13 @@
    call $~lib/builtins/abort
    unreachable
   end
+  local.get $0
+  call $~lib/rt/stub/__release
   local.get $3
+  call $~lib/rt/stub/__release
+  local.get $6
+  call $~lib/rt/stub/__release
+  local.get $9
   call $~lib/rt/stub/__release
  )
  (func $~start

@@ -1,7 +1,7 @@
 (module
- (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
  (type $i32_i32_i32_i32_=>_i32 (func (param i32 i32 i32 i32) (result i32)))
  (type $none_=>_none (func))
+ (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (memory $0 1)
@@ -98,33 +98,14 @@
   global.get $call-optional/optIndirect
   local.set $0
   local.get $0
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $0
-   i32.const 4
-   i32.shl
-   i32.const 3
-   i32.const 0
-   i32.const 0
-   i32.const 1
-   global.set $~argumentsLength
-   local.get $0
-   i32.const 4
-   i32.shl
-   i32.load
-   call_indirect (type $i32_i32_i32_i32_=>_i32)
-  else
-   i32.const 3
-   i32.const 0
-   i32.const 0
-   i32.const 1
-   global.set $~argumentsLength
-   local.get $0
-   call_indirect (type $i32_i32_i32_=>_i32)
-  end
+  i32.const 3
+  i32.const 0
+  i32.const 0
+  i32.const 1
+  global.set $~argumentsLength
+  local.get $0
+  i32.load
+  call_indirect (type $i32_i32_i32_i32_=>_i32)
   i32.const 0
   i32.eq
   i32.eqz
@@ -139,33 +120,14 @@
   global.get $call-optional/optIndirect
   local.set $1
   local.get $1
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $1
-   i32.const 4
-   i32.shl
-   i32.const 3
-   i32.const 4
-   i32.const 0
-   i32.const 2
-   global.set $~argumentsLength
-   local.get $1
-   i32.const 4
-   i32.shl
-   i32.load
-   call_indirect (type $i32_i32_i32_i32_=>_i32)
-  else
-   i32.const 3
-   i32.const 4
-   i32.const 0
-   i32.const 2
-   global.set $~argumentsLength
-   local.get $1
-   call_indirect (type $i32_i32_i32_=>_i32)
-  end
+  i32.const 3
+  i32.const 4
+  i32.const 0
+  i32.const 2
+  global.set $~argumentsLength
+  local.get $1
+  i32.load
+  call_indirect (type $i32_i32_i32_i32_=>_i32)
   i32.const 5
   i32.eq
   i32.eqz
@@ -180,33 +142,14 @@
   global.get $call-optional/optIndirect
   local.set $2
   local.get $2
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $2
-   i32.const 4
-   i32.shl
-   i32.const 3
-   i32.const 4
-   i32.const 5
-   i32.const 3
-   global.set $~argumentsLength
-   local.get $2
-   i32.const 4
-   i32.shl
-   i32.load
-   call_indirect (type $i32_i32_i32_i32_=>_i32)
-  else
-   i32.const 3
-   i32.const 4
-   i32.const 5
-   i32.const 3
-   global.set $~argumentsLength
-   local.get $2
-   call_indirect (type $i32_i32_i32_=>_i32)
-  end
+  i32.const 3
+  i32.const 4
+  i32.const 5
+  i32.const 3
+  global.set $~argumentsLength
+  local.get $2
+  i32.load
+  call_indirect (type $i32_i32_i32_i32_=>_i32)
   i32.const 12
   i32.eq
   i32.eqz

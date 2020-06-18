@@ -140,7 +140,6 @@
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
-  (local $4 i32)
   i32.const 0
   local.set $0
   i32.const 8
@@ -157,50 +156,18 @@
   local.get $0
   i32.store offset=4
   local.get $2
-  i32.const 4
-  i32.shr_s
-  i32.const -2147483648
-  i32.or
-  local.set $3
-  local.get $3
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $3
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/stub/__retain
-  drop
-  local.get $3
-  local.set $4
+  local.set $3
   local.get $1
   call $~lib/rt/stub/__release
-  local.get $4
-  local.set $1
-  local.get $1
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if
-   i32.const 0
-   i32.const 32
-   i32.const 3
-   i32.const 3
-   call $~lib/builtins/abort
-   unreachable
-  else
-   nop
-  end
-  local.get $1
+  i32.const 0
+  i32.const 32
+  i32.const 3
+  i32.const 3
+  call $~lib/builtins/abort
+  unreachable
  )
  (func $start:closure-limitations-runtime
-  (local $0 i32)
   global.get $~lib/heap/__heap_base
   i32.const 15
   i32.add
@@ -212,19 +179,6 @@
   global.get $~lib/rt/stub/startOffset
   global.set $~lib/rt/stub/offset
   call $closure-limitations-runtime/exportedClosureReturns
-  local.set $0
-  local.get $0
-  i32.const -2147483648
-  i32.and
-  i32.const -2147483648
-  i32.eq
-  if (result i32)
-   local.get $0
-   i32.const 4
-   i32.shl
-  else
-   i32.const 0
-  end
   call $~lib/rt/stub/__release
  )
  (func $~start
