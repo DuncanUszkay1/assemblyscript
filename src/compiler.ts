@@ -1716,19 +1716,13 @@ export class Compiler extends DiagnosticEmitter {
     var type = instance.type;
     var nativeThisType = this.options.nativeSizeType;
     var nativeValueType = type.toNativeType();
-    var varTypes: NativeType[] | null = null;
     var module = this.module;
     var valueExpr = module.load(type.byteSize, type.is(TypeFlags.SIGNED),
       module.local_get(0, nativeThisType),
       nativeValueType, instance.memoryOffset
     );
-
-    if (type.isManaged) {
-      valueExpr = this.makeRetain(valueExpr, type);
-      varTypes = [ NativeType.I32 ];
-    }
-
-    instance.getterRef = module.addFunction(instance.internalGetterName, nativeThisType, nativeValueType, varTypes, valueExpr);
+    if (type.isManaged) this.makeRetain(valueExpr, type);
+    instance.getterRef = module.addFunction(instance.internalGetterName, nativeThisType, nativeValueType, null, valueExpr);
     if (instance.setterRef) {
       instance.set(CommonFlags.COMPILED);
     } else {
@@ -1748,7 +1742,7 @@ export class Compiler extends DiagnosticEmitter {
     var valueExpr: ExpressionRef;
     var varTypes: NativeType[] | null = null;
     if (type.isManaged) {
-      // Can't use makeReplace, makeRetain, or makeRelease here since there's no corresponding flow, so
+      // Can't use makeReplace here since there's no corresponding flow, so
       // 0: this, 1: value, 2: oldValue (temp)
       valueExpr = module.block(null, [
         module.if(
@@ -3624,8 +3618,7 @@ export class Compiler extends DiagnosticEmitter {
       var toSignature = toType.signatureReference;
       var fromSignature = fromType.signatureReference;
       if (toSignature !== null && fromSignature !== null && fromSignature.externalEquals(toSignature) && fromType.is(TypeFlags.IN_SCOPE_CLOSURE)) {
-        // When we convert from the closure type into a function pointer, we first
-        // update the local copy of the scope with the newest values
+        // When a closure leaves its initial scope, we copy in the closed over locals one last time
         var tempResult = this.currentFlow.getTempLocal(fromType);
         var convertExpr = module.block(null, [
           module.local_set(
@@ -6872,9 +6865,6 @@ export class Compiler extends DiagnosticEmitter {
         return module.unreachable();
       }
     }
-    // Once we get here, we have a function reference. With the new scheme, this function
-    // could possibly be a closure. So here we check to see if it's a closure, then apply
-    // the appropriate call logic
     signature = assert(signature); // FIXME: asc can't see this yet
     var returnType = signature.returnType;
     var tempFunctionReferenceLocal = this.currentFlow.getTempLocal(this.options.usizeType);
@@ -7551,19 +7541,15 @@ export class Compiler extends DiagnosticEmitter {
 
   /** Makes a retain call, retaining the expression's value. */
   makeRetain(expr: ExpressionRef, type: Type): ExpressionRef {
-    var module = this.module;
     var retainInstance = this.program.retainInstance;
     this.compileFunction(retainInstance);
-
-    return module.call(retainInstance.internalName, [ expr ], this.options.nativeSizeType);
+    return this.module.call(retainInstance.internalName, [ expr ], this.options.nativeSizeType);
   }
 
   /** Makes a release call, releasing the expression's value. Changes the current type to void.*/
   makeRelease(expr: ExpressionRef, type: Type): ExpressionRef {
-    var module = this.module;
     var releaseInstance = this.program.releaseInstance;
     this.compileFunction(releaseInstance);
-
     return this.module.call(releaseInstance.internalName, [ expr ], NativeType.None);
   }
 
@@ -8027,6 +8013,7 @@ export class Compiler extends DiagnosticEmitter {
     thisArg: ExpressionRef = 0,
     immediatelyDropped: bool = false
   ): ExpressionRef {
+    console.log(signature.parameterTypes);
     var numArguments = argumentExpressions.length;
 
     if (!this.checkCallSignature( // reports
@@ -8302,7 +8289,7 @@ export class Compiler extends DiagnosticEmitter {
         prototype.name,
         prototype,
         null,
-        prototype.hasNestedDefinition ? signature.toClosureSignature() : signature,
+        signature.toClosureSignature(),
         contextualTypeArguments
       );
       if (!this.compileFunction(instance)) return this.module.unreachable();
@@ -8513,6 +8500,7 @@ export class Compiler extends DiagnosticEmitter {
           this.currentType = localType;
           return module.unreachable();
         }
+        // If this local references a context offset, load its value from the closure context
         var localClosureContextOffset = local.closureContextOffset;
         if (localClosureContextOffset > 0) {
           let contextLocal = assert(flow.lookupLocal(CommonNames.this_));
