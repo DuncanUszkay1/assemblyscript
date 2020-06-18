@@ -1723,9 +1723,8 @@ export class Compiler extends DiagnosticEmitter {
       nativeValueType, instance.memoryOffset
     );
 
-    // We need to hardcode the local index used by makeRetain because there is no corresponding flow
     if (type.isManaged) {
-      valueExpr = this.makeRetain(valueExpr, type, 1);
+      valueExpr = this.makeRetain(valueExpr, type);
       varTypes = [ NativeType.I32 ];
     }
 
@@ -1765,9 +1764,9 @@ export class Compiler extends DiagnosticEmitter {
           ),
           module.block(null, [
             module.drop(
-              this.makeRetain(module.local_get(1, nativeValueType), type, 1)
+              this.makeRetain(module.local_get(1, nativeValueType), type)
             ),
-            this.makeRelease(module.local_get(2, nativeValueType), type, 2)
+            this.makeRelease(module.local_get(2, nativeValueType), type)
           ])
         ),
         module.local_get(1, nativeValueType)
@@ -2805,23 +2804,13 @@ export class Compiler extends DiagnosticEmitter {
     // Remember that this flow returns
     flow.set(FlowFlags.RETURNS | FlowFlags.TERMINATES);
 
-    // Prevent returning a closure in an exported function, since interop with closures is
-    // not yet supported
+    // TODO: implement interop so we can return function references in exported functions
     var returnSignature = returnType.signatureReference;
     if (returnSignature !== null && flow.parentFunction.is(CommonFlags.EXPORT)) {
       var returnValueLocalIndex = flow.getTempLocal(returnType).index;
       var nativeReturnType = returnType.toNativeType();
-      expr = module.flatten([
-        module.local_set(returnValueLocalIndex, expr),
-        this.ifClosure(
-          module.local_get(returnValueLocalIndex, nativeReturnType),
-          this.makeAbort(null, statement), // TODO: throw
-          module.nop()
-        ),
-        module.local_get(returnValueLocalIndex, nativeReturnType)
-      ], nativeReturnType);
+      expr = this.makeAbort(null, statement); // TODO: Use unimplemented here instead, since we know at compile time this will fail
     }
-
 
     // If the last statement anyway, make it the block's return value
     if (isLastInBody && expr != 0 && returnType != Type.void) {
@@ -3644,7 +3633,7 @@ export class Compiler extends DiagnosticEmitter {
             expr
           ),
           this.injectClosedLocals(tempResult),
-          this.getClosureReference(module.local_get(tempResult.index, fromType.toNativeType()))
+          module.local_get(tempResult.index, fromType.toNativeType())
         ], toType.toNativeType());
 
         // this.currentFlow.freeTempLocal(tempResult);
@@ -6774,36 +6763,21 @@ export class Compiler extends DiagnosticEmitter {
     var usize = this.options.nativeSizeType;
     return module.block(null, [
       module.local_set(tempFunctionReferenceLocal.index, indexArg),
-      this.ifClosure(
-        module.local_get(tempFunctionReferenceLocal.index, usize),
-        this.compileCallIndirect( // If this is a closure
-          signature.toClosureSignature(),
-          module.block(null, [
-            module.load(
-              4,
-              true,
-              this.getClosurePtr(
-                module.local_get(tempFunctionReferenceLocal.index, usize),
-              ),
-              usize,
-              0
-            ),
-          ], this.options.nativeSizeType),
-          expression.args,
-          expression,
-          this.getClosurePtr(
+      this.compileCallIndirect( // If this is a closure
+        signature.toClosureSignature(),
+        module.block(null, [
+          module.load(
+            4,
+            true,
             module.local_get(tempFunctionReferenceLocal.index, usize),
+            usize,
+            0
           ),
-          contextualType == Type.void
-        ),
-        this.compileCallIndirect( // If this function isn't a closure
-          signature,
-          module.local_get(tempFunctionReferenceLocal.index, usize),
-          expression.args,
-          expression,
-          0,
-          contextualType == Type.void
-        )
+        ], this.options.nativeSizeType),
+        expression.args,
+        expression,
+        module.local_get(tempFunctionReferenceLocal.index, usize),
+        contextualType == Type.void
       )
     ], constraints & Constraints.WILL_DROP ? contextualType.toNativeType() : returnType.toNativeType());
   }
@@ -7458,75 +7432,20 @@ export class Compiler extends DiagnosticEmitter {
   // <reference-counting>
 
   /** Makes a retain call, retaining the expression's value. */
-  makeRetain(expr: ExpressionRef, type: Type, exprLocalIndex: i32 = -1): ExpressionRef {
+  makeRetain(expr: ExpressionRef, type: Type): ExpressionRef {
     var module = this.module;
     var retainInstance = this.program.retainInstance;
     this.compileFunction(retainInstance);
-    if (type !== null && type.isFunctionIndex) {
-      if (exprLocalIndex < 0) {
-        var exprLocal = this.currentFlow.getTempLocal(type);
-        exprLocalIndex = exprLocal.index;
-      }
-      var nativeType = type.toNativeType();
-      var usize = this.options.nativeSizeType;
-      var functionRetainCall = module.block(null, [
-        module.local_set(exprLocalIndex, expr),
-        module.drop(
-          module.call(
-            retainInstance.internalName,
-            [
-              this.ifClosure(
-                module.local_get(exprLocalIndex, nativeType),
-                this.getClosurePtr(module.local_get(exprLocalIndex, nativeType)),
-                usize == NativeType.I32 ? module.i32(0) : module.i64(0)
-              )
-            ],
-            usize
-          )
-        ),
-        module.local_get(exprLocalIndex, nativeType)
-      ], nativeType);
-
-      // this.currentFlow.freeTempLocal(exprLocal);
-
-      return functionRetainCall;
-    }
 
     return module.call(retainInstance.internalName, [ expr ], this.options.nativeSizeType);
   }
 
   /** Makes a release call, releasing the expression's value. Changes the current type to void.*/
-  makeRelease(expr: ExpressionRef, type: Type, exprLocalIndex: i32 = -1): ExpressionRef {
+  makeRelease(expr: ExpressionRef, type: Type): ExpressionRef {
     var module = this.module;
     var releaseInstance = this.program.releaseInstance;
     this.compileFunction(releaseInstance);
 
-    if (type !== null && type.isFunctionIndex) {
-      if (exprLocalIndex < 0) {
-        var exprLocal = this.currentFlow.getTempLocal(type);
-        exprLocalIndex = exprLocal.index;
-      }
-      var nativeType = type.toNativeType();
-      var functionReleaseCall = module.block(null, [
-        module.local_set(exprLocalIndex, expr),
-        module.call(
-          releaseInstance.internalName,
-          [
-            this.ifClosure(
-              module.local_get(exprLocalIndex, nativeType),
-              this.getClosurePtr(module.local_get(exprLocalIndex, nativeType)),
-              this.options.nativeSizeType == NativeType.I32 ? module.i32(0) : module.i64(0)
-            )
-          ],
-          NativeType.None
-        )
-      ], NativeType.None);
-
-      // TODO: fix a bug in which this free causes some overwrites
-      // this.currentFlow.freeTempLocal(exprLocal);
-
-      return functionReleaseCall;
-    }
     return this.module.call(releaseInstance.internalName, [ expr ], NativeType.None);
   }
 
@@ -8330,55 +8249,6 @@ export class Compiler extends DiagnosticEmitter {
     // flow.freeTempLocal(tempLocal);
 
     return closureExpr;
-  }
-
-  private ifClosure(
-    indexExpr: ExpressionRef,
-    thenExpr: ExpressionRef,
-    elseExpr: ExpressionRef
-  ): ExpressionRef {
-    var module = this.module;
-    var wasm64 = this.options.nativeSizeType == NativeType.I64;
-
-    return module.if(
-      module.binary(
-        wasm64 ? BinaryOp.EqI64 : BinaryOp.EqI32,
-        module.binary(
-          wasm64 ? BinaryOp.AndI64 : BinaryOp.AndI32,
-          indexExpr,
-          wasm64 ? module.i64(CLOSURE_TAG) : module.i32(CLOSURE_TAG)
-        ),
-        wasm64 ? module.i64(CLOSURE_TAG) : module.i32(CLOSURE_TAG)
-      ),
-      thenExpr,
-      elseExpr
-    );
-  }
-
-  private getClosurePtr(closureExpr: ExpressionRef): ExpressionRef {
-    var module = this.module;
-    var wasm64 = this.options.nativeSizeType == NativeType.I64;
-
-    return module.binary(
-      wasm64 ? BinaryOp.ShlI64 : BinaryOp.ShlI32,
-      closureExpr,
-      wasm64 ? module.i64(4) : module.i32(4)
-    );
-  }
-
-  private getClosureReference(closureExpr: ExpressionRef): ExpressionRef {
-    var module = this.module;
-    var wasm64 = this.options.nativeSizeType == NativeType.I64;
-
-    return module.binary(
-      wasm64 ? BinaryOp.OrI64 : BinaryOp.OrI32,
-      module.binary(
-        wasm64 ? BinaryOp.ShrI64 : BinaryOp.ShrI32,
-        closureExpr,
-        wasm64 ? module.i64(4) : module.i32(4)
-      ),
-      wasm64 ? module.i64(CLOSURE_TAG) : module.i32(CLOSURE_TAG)
-    );
   }
 
   /** Makes sure the enclosing source file of the specified expression has been compiled. */
