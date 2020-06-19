@@ -6949,6 +6949,9 @@ export class Compiler extends DiagnosticEmitter {
     // cannot call an instance method without a `this` argument (TODO: `.call`?)
     var thisType = signature.thisType;
     if (hasThis != (thisType != null)) {
+      console.log("signature " + signature)
+      console.log("hasThis " + hasThis)
+      assert(false);
       this.error(
         DiagnosticCode.The_this_types_of_each_signature_are_incompatible,
         reportNode.range
@@ -8289,7 +8292,7 @@ export class Compiler extends DiagnosticEmitter {
         prototype.name,
         prototype,
         null,
-        signature.toClosureSignature(),
+        prototype.hasNestedDefinition ? signature.toClosureSignature() : signature,
         contextualTypeArguments
       );
       if (!this.compileFunction(instance)) return this.module.unreachable();

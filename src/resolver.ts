@@ -2781,7 +2781,8 @@ export class Resolver extends DiagnosticEmitter {
     var signature = new Signature(this.program, parameterTypes, returnType, thisType);
     signature.parameterNames = parameterNames;
     signature.requiredParameters = requiredParameters;
-    signature = signature.toClosureSignature();
+
+    signature = prototype.hasNestedDefinition ? signature.toClosureSignature() : signature;
 
     var nameInclTypeParameters = prototype.name;
     if (instanceKey.length) nameInclTypeParameters += "<" + instanceKey + ">";

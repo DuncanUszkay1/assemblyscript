@@ -3388,6 +3388,11 @@ export class FunctionPrototype extends DeclaredElement {
            );
   }
 
+  get hasNestedDefinition(): bool {
+    var parent = this.parent;
+    return parent.kind == ElementKind.FUNCTION;
+  }
+
   /** Creates a clone of this prototype that is bound to a concrete class instead. */
   toBound(classInstance: Class): FunctionPrototype {
     assert(this.is(CommonFlags.INSTANCE));

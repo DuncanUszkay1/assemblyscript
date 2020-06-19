@@ -2,8 +2,8 @@
  (type $i32_=>_none (func (param i32)))
  (type $i32_i32_=>_none (func (param i32 i32)))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
- (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
+ (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $none_=>_none (func))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $none_=>_i32 (func (result i32)))
@@ -34,7 +34,7 @@
  (export "Basic#set:val" (func $implicit-getter-setter/Basic#set:val))
  (export "Basic#constructor" (func $implicit-getter-setter/Basic#constructor))
  (export "Managed" (global $implicit-getter-setter/Managed))
- (export "Managed#get:foo" (func $implicit-getter-setter/Managed#get:foo))
+ (export "Managed#get:foo" (func $implicit-getter-setter/Basic#get:val))
  (export "Managed#set:foo" (func $implicit-getter-setter/Managed#set:foo))
  (export "Managed#constructor" (func $implicit-getter-setter/Managed#constructor))
  (func $~lib/rt/tlsf/removeBlock (param $0 i32) (param $1 i32)
@@ -1152,11 +1152,6 @@
   call $~lib/rt/pure/__retain
   i32.store
   local.get $0
- )
- (func $implicit-getter-setter/Managed#get:foo (param $0 i32) (result i32)
-  local.get $0
-  i32.load
-  call $~lib/rt/pure/__retain
  )
  (func $implicit-getter-setter/Managed#set:foo (param $0 i32) (param $1 i32)
   (local $2 i32)
