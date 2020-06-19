@@ -8005,7 +8005,6 @@ export class Compiler extends DiagnosticEmitter {
     thisArg: ExpressionRef = 0,
     immediatelyDropped: bool = false
   ): ExpressionRef {
-    console.log(signature.parameterTypes);
     var numArguments = argumentExpressions.length;
 
     if (!this.checkCallSignature( // reports
