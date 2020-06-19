@@ -2798,14 +2798,6 @@ export class Compiler extends DiagnosticEmitter {
     // Remember that this flow returns
     flow.set(FlowFlags.RETURNS | FlowFlags.TERMINATES);
 
-    // TODO: implement interop so we can return function references in exported functions
-    var returnSignature = returnType.signatureReference;
-    if (returnSignature !== null && flow.parentFunction.is(CommonFlags.EXPORT)) {
-      var returnValueLocalIndex = flow.getTempLocal(returnType).index;
-      var nativeReturnType = returnType.toNativeType();
-      expr = this.makeAbort(null, statement); // TODO: Use unimplemented here instead, since we know at compile time this will fail
-    }
-
     // If the last statement anyway, make it the block's return value
     if (isLastInBody && expr != 0 && returnType != Type.void) {
       if (!stmts.length) return expr;
@@ -6949,9 +6941,6 @@ export class Compiler extends DiagnosticEmitter {
     // cannot call an instance method without a `this` argument (TODO: `.call`?)
     var thisType = signature.thisType;
     if (hasThis != (thisType != null)) {
-      console.log("signature " + signature)
-      console.log("hasThis " + hasThis)
-      assert(false);
       this.error(
         DiagnosticCode.The_this_types_of_each_signature_are_incompatible,
         reportNode.range
