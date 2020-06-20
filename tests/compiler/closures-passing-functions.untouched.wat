@@ -1,10 +1,10 @@
 (module
  (type $i32_i32_=>_none (func (param i32 i32)))
- (type $i32_=>_none (func (param i32)))
- (type $i32_=>_i32 (func (param i32) (result i32)))
- (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
+ (type $i32_=>_none (func (param i32)))
  (type $none_=>_none (func))
+ (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
+ (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $none_=>_i32 (func (result i32)))
@@ -13,20 +13,26 @@
  (data (i32.const 16) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00t\00l\00s\00f\00.\00t\00s\00")
  (data (i32.const 64) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00")
  (data (i32.const 128) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s\00")
- (data (i32.const 176) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
- (table $0 1 funcref)
+ (data (i32.const 176) ":\00\00\00\01\00\00\00\01\00\00\00:\00\00\00c\00l\00o\00s\00u\00r\00e\00s\00-\00p\00a\00s\00s\00i\00n\00g\00-\00f\00u\00n\00c\00t\00i\00o\00n\00s\00.\00t\00s\00")
+ (data (i32.const 256) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
+ (table $0 2 funcref)
+ (elem (i32.const 1) $closures-passing-functions/add~anonymous|0)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
  (global $~lib/gc/gc.auto (mut i32) (i32.const 1))
- (global $~lib/rt/__rtti_base i32 (i32.const 176))
- (global $~lib/heap/__heap_base i32 (i32.const 204))
+ (global $closures-passing-functions/addResult (mut i32) (i32.const 0))
+ (global $~argumentsLength (mut i32) (i32.const 0))
+ (global $closures-passing-functions/applyResult (mut i32) (i32.const 0))
+ (global $~lib/rt/__rtti_base i32 (i32.const 256))
+ (global $~lib/heap/__heap_base i32 (i32.const 284))
  (export "memory" (memory $0))
  (export "__alloc" (func $~lib/rt/tlsf/__alloc))
  (export "__retain" (func $~lib/rt/pure/__retain))
  (export "__release" (func $~lib/rt/pure/__release))
  (export "__collect" (func $~lib/rt/pure/__collect))
  (export "__rtti_base" (global $~lib/rt/__rtti_base))
+ (start $~start)
  (func $~lib/rt/tlsf/removeBlock (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -1526,6 +1532,75 @@
    i32.sub
    call $~lib/rt/pure/decrement
   end
+ )
+ (func $closures-passing-functions/add (param $0 i32) (param $1 i32) (result i32)
+  local.get $0
+  local.get $1
+  i32.add
+ )
+ (func $closures-passing-functions/add~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+  local.get $1
+  local.get $2
+  i32.add
+ )
+ (func $closures-passing-functions/apply_to_pair (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+  (local $3 i32)
+  (local $4 i32)
+  local.get $2
+  call $~lib/rt/pure/__retain
+  local.set $2
+  local.get $2
+  local.set $3
+  local.get $3
+  local.get $0
+  local.get $1
+  i32.const 2
+  global.set $~argumentsLength
+  local.get $3
+  i32.load
+  call_indirect (type $i32_i32_i32_=>_i32)
+  local.set $4
+  local.get $2
+  call $~lib/rt/pure/__release
+  local.get $4
+ )
+ (func $start:closures-passing-functions
+  i32.const 1
+  i32.const 1
+  call $closures-passing-functions/add
+  global.set $closures-passing-functions/addResult
+  i32.const 1
+  i32.const 2
+  i32.const 1
+  call $closures-passing-functions/apply_to_pair
+  global.set $closures-passing-functions/applyResult
+  global.get $closures-passing-functions/addResult
+  i32.const 2
+  i32.eq
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 192
+   i32.const 11
+   i32.const 1
+   call $~lib/builtins/abort
+   unreachable
+  end
+  global.get $closures-passing-functions/applyResult
+  i32.const 3
+  i32.eq
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 192
+   i32.const 12
+   i32.const 1
+   call $~lib/builtins/abort
+   unreachable
+  end
+ )
+ (func $~start
+  call $start:closures-passing-functions
  )
  (func $~lib/rt/pure/__collect
   i32.const 1

@@ -3454,6 +3454,7 @@ export class Compiler extends DiagnosticEmitter {
     this.currentType = contextualType;
     if (contextualType == Type.void) constraints |= Constraints.WILL_DROP;
     var expr: ExpressionRef;
+
     switch (expression.kind) {
       case NodeKind.ASSERTION: {
         expr = this.compileAssertionExpression(<AssertionExpression>expression, contextualType, constraints);
@@ -6619,6 +6620,7 @@ export class Compiler extends DiagnosticEmitter {
         local.closureContextOffset
       );
     }
+
     return module.block(null, exprs);
   }
 
@@ -6755,8 +6757,11 @@ export class Compiler extends DiagnosticEmitter {
         }
         if (signature) {
           if (local.is(CommonFlags.INLINED)) {
+            console.log('torch2424 asldjklasd')
             indexArg = module.i32(i64_low(local.constantIntegerValue));
           } else {
+            console.log('torch2424 yyyyyyy');
+            console.log('index', local.index);
             indexArg = module.local_get(local.index, NativeType.I32);
           }
           break;
@@ -6861,6 +6866,12 @@ export class Compiler extends DiagnosticEmitter {
     var returnType = signature.returnType;
     var tempFunctionReferenceLocal = this.currentFlow.getTempLocal(this.options.usizeType);
     var usize = this.options.nativeSizeType;
+    console.log('torch2424 6871');
+    console.log('signature', Object.keys(signature));
+    console.log(signature.toString());
+    console.log(signature.toClosureSignature().toString());
+    console.log(tempFunctionReferenceLocal.index);
+
     return module.block(null, [
       module.local_set(tempFunctionReferenceLocal.index, indexArg),
       this.compileCallIndirect( // If this is a closure
@@ -8578,18 +8589,38 @@ export class Compiler extends DiagnosticEmitter {
           return module.unreachable();
         }
 
-        let functionInstance = this.resolver.resolveFunction(
+        // Find the original function from our prototype
+        let functionInstanceCtxTypes = makeMap<string,Type>(flow.contextualTypeArguments);
+        let originalFunctionInstance = this.resolver.resolveFunction(
           functionPrototype,
           null,
-          makeMap<string,Type>(flow.contextualTypeArguments)
+          functionInstanceCtxTypes 
         );
-        if (!functionInstance || !this.compileFunction(functionInstance)) return module.unreachable();
+        if (!originalFunctionInstance || !this.compileFunction(originalFunctionInstance)) return module.unreachable();
+
+        // Create a new closure function for our original function
+        let closureFunctionInstance = new Function(
+          functionPrototype.name + "~anonymous|" + (actualFunction.nextAnonymousId++).toString(),
+          functionPrototype,
+          null,
+          originalFunctionInstance.signature.toClosureSignature(),
+          functionInstanceCtxTypes
+        );
+        if (!this.compileFunction(closureFunctionInstance)) return this.module.unreachable();
+
         if (contextualType.is(TypeFlags.HOST | TypeFlags.REFERENCE)) {
           this.currentType = Type.anyref;
-          return module.ref_func(functionInstance.internalName);
+          return module.ref_func(closureFunctionInstance.internalName);
         }
-        let index = this.ensureFunctionTableEntry(functionInstance);
-        this.currentType = functionInstance.signature.type;
+        console.log('torch2424 8615');
+
+        // Enter our closure function into our closures table
+        let index = this.ensureFunctionTableEntry(closureFunctionInstance);
+
+        // Set the param type of the function to the original function
+        this.currentType = originalFunctionInstance.signature.type;
+
+        // Return the closure function index
         return module.i32(index);
       }
     }

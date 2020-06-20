@@ -1,28 +1,34 @@
 (module
+ (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
+ (type $none_=>_none (func))
  (type $i32_=>_none (func (param i32)))
  (type $i32_i32_=>_none (func (param i32 i32)))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
- (type $none_=>_none (func))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $none_=>_i32 (func (result i32)))
  (type $i32_=>_i32 (func (param i32) (result i32)))
- (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (memory $0 1)
  (data (i32.const 1024) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00t\00l\00s\00f\00.\00t\00s")
  (data (i32.const 1072) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e")
  (data (i32.const 1136) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s")
- (data (i32.const 1184) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 ")
+ (data (i32.const 1184) ":\00\00\00\01\00\00\00\01\00\00\00:\00\00\00c\00l\00o\00s\00u\00r\00e\00s\00-\00p\00a\00s\00s\00i\00n\00g\00-\00f\00u\00n\00c\00t\00i\00o\00n\00s\00.\00t\00s")
+ (data (i32.const 1264) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 ")
+ (table $0 2 funcref)
+ (elem (i32.const 1) $closures-passing-functions/add~anonymous|0)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
- (global $~lib/rt/__rtti_base i32 (i32.const 1184))
+ (global $closures-passing-functions/addResult (mut i32) (i32.const 0))
+ (global $closures-passing-functions/applyResult (mut i32) (i32.const 0))
+ (global $~lib/rt/__rtti_base i32 (i32.const 1264))
  (export "memory" (memory $0))
  (export "__alloc" (func $~lib/rt/tlsf/__alloc))
  (export "__retain" (func $~lib/rt/pure/__retain))
  (export "__release" (func $~lib/rt/pure/__release))
  (export "__collect" (func $~lib/rt/pure/__collect))
  (export "__rtti_base" (global $~lib/rt/__rtti_base))
+ (start $~start)
  (func $~lib/rt/tlsf/removeBlock (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -603,11 +609,11 @@
    if
     unreachable
    end
-   i32.const 1216
+   i32.const 1296
    local.tee $0
    i32.const 0
    i32.store
-   i32.const 2784
+   i32.const 2864
    i32.const 0
    i32.store
    loop $for-loop|0
@@ -618,7 +624,7 @@
      local.get $1
      i32.const 2
      i32.shl
-     i32.const 1216
+     i32.const 1296
      i32.add
      i32.const 0
      i32.store offset=4
@@ -636,7 +642,7 @@
        i32.add
        i32.const 2
        i32.shl
-       i32.const 1216
+       i32.const 1296
        i32.add
        i32.const 0
        i32.store offset=96
@@ -654,13 +660,13 @@
      br $for-loop|0
     end
    end
-   i32.const 1216
-   i32.const 2800
+   i32.const 1296
+   i32.const 2880
    memory.size
    i32.const 16
    i32.shl
    call $~lib/rt/tlsf/addMemory
-   i32.const 1216
+   i32.const 1296
    global.set $~lib/rt/tlsf/ROOT
   end
   local.get $0
@@ -1039,7 +1045,7 @@
   (local $1 i32)
   (local $2 i32)
   local.get $0
-  i32.const 1212
+  i32.const 1292
   i32.gt_u
   if
    local.get $0
@@ -1086,13 +1092,54 @@
  )
  (func $~lib/rt/pure/__release (param $0 i32)
   local.get $0
-  i32.const 1212
+  i32.const 1292
   i32.gt_u
   if
    local.get $0
    i32.const 16
    i32.sub
    call $~lib/rt/pure/decrement
+  end
+ )
+ (func $closures-passing-functions/add~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+  local.get $1
+  local.get $2
+  i32.add
+ )
+ (func $~start
+  (local $0 i32)
+  i32.const 2
+  global.set $closures-passing-functions/addResult
+  i32.const 1
+  i32.const 1
+  i32.const 2
+  i32.const 1
+  i32.load
+  call_indirect (type $i32_i32_i32_=>_i32)
+  i32.const 1
+  call $~lib/rt/pure/__release
+  global.set $closures-passing-functions/applyResult
+  global.get $closures-passing-functions/addResult
+  i32.const 2
+  i32.ne
+  if
+   i32.const 0
+   i32.const 1200
+   i32.const 11
+   i32.const 1
+   call $~lib/builtins/abort
+   unreachable
+  end
+  global.get $closures-passing-functions/applyResult
+  i32.const 3
+  i32.ne
+  if
+   i32.const 0
+   i32.const 1200
+   i32.const 12
+   i32.const 1
+   call $~lib/builtins/abort
+   unreachable
   end
  )
  (func $~lib/rt/pure/__collect
@@ -1137,7 +1184,7 @@
      local.tee $1
      if
       local.get $1
-      i32.const 1212
+      i32.const 1292
       i32.ge_u
       if
        local.get $1

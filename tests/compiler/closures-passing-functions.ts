@@ -5,6 +5,8 @@ function apply_to_pair(x: i32, y: i32, fn: (x:i32, y:i32) => i32): i32 {
   return fn(x,y);
 }
 
-let result = apply_to_pair(1, 2, add);
+let addResult = add(1, 1);
+let applyResult = apply_to_pair(1, 2, add);
 
-assert(result == 3);
+assert(addResult == 2);
+assert(applyResult == 3);
