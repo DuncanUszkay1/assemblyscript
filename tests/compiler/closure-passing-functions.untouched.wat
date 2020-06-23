@@ -13,17 +13,17 @@
  (data (i32.const 16) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00t\00l\00s\00f\00.\00t\00s\00")
  (data (i32.const 64) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00")
  (data (i32.const 128) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s\00")
- (data (i32.const 176) ":\00\00\00\01\00\00\00\01\00\00\00:\00\00\00c\00l\00o\00s\00u\00r\00e\00s\00-\00p\00a\00s\00s\00i\00n\00g\00-\00f\00u\00n\00c\00t\00i\00o\00n\00s\00.\00t\00s\00")
+ (data (i32.const 176) "8\00\00\00\01\00\00\00\01\00\00\008\00\00\00c\00l\00o\00s\00u\00r\00e\00-\00p\00a\00s\00s\00i\00n\00g\00-\00f\00u\00n\00c\00t\00i\00o\00n\00s\00.\00t\00s\00")
  (data (i32.const 256) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
  (table $0 2 funcref)
- (elem (i32.const 1) $closures-passing-functions/add~anonymous|0)
+ (elem (i32.const 1) $closure-passing-functions/add~anonymous|0)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
  (global $~lib/gc/gc.auto (mut i32) (i32.const 1))
- (global $closures-passing-functions/addResult (mut i32) (i32.const 0))
+ (global $closure-passing-functions/addResult (mut i32) (i32.const 0))
  (global $~argumentsLength (mut i32) (i32.const 0))
- (global $closures-passing-functions/applyResult (mut i32) (i32.const 0))
+ (global $closure-passing-functions/applyResult (mut i32) (i32.const 0))
  (global $~lib/rt/__rtti_base i32 (i32.const 256))
  (global $~lib/heap/__heap_base i32 (i32.const 284))
  (export "memory" (memory $0))
@@ -1533,17 +1533,17 @@
    call $~lib/rt/pure/decrement
   end
  )
- (func $closures-passing-functions/add (param $0 i32) (param $1 i32) (result i32)
+ (func $closure-passing-functions/add (param $0 i32) (param $1 i32) (result i32)
   local.get $0
   local.get $1
   i32.add
  )
- (func $closures-passing-functions/add~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $closure-passing-functions/add~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   local.get $1
   local.get $2
   i32.add
  )
- (func $closures-passing-functions/apply_to_pair (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $closure-passing-functions/apply_to_pair (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   (local $4 i32)
   local.get $2
@@ -1564,13 +1564,13 @@
   call $~lib/rt/pure/__release
   local.get $4
  )
- (func $start:closures-passing-functions
+ (func $start:closure-passing-functions
   (local $0 i32)
   (local $1 i32)
   i32.const 1
   i32.const 1
-  call $closures-passing-functions/add
-  global.set $closures-passing-functions/addResult
+  call $closure-passing-functions/add
+  global.set $closure-passing-functions/addResult
   i32.const 1
   i32.const 2
   i32.const 4
@@ -1584,9 +1584,9 @@
   local.get $0
   local.set $1
   local.get $1
-  call $closures-passing-functions/apply_to_pair
-  global.set $closures-passing-functions/applyResult
-  global.get $closures-passing-functions/addResult
+  call $closure-passing-functions/apply_to_pair
+  global.set $closure-passing-functions/applyResult
+  global.get $closure-passing-functions/addResult
   i32.const 2
   i32.eq
   i32.eqz
@@ -1598,7 +1598,7 @@
    call $~lib/builtins/abort
    unreachable
   end
-  global.get $closures-passing-functions/applyResult
+  global.get $closure-passing-functions/applyResult
   i32.const 3
   i32.eq
   i32.eqz
@@ -1614,7 +1614,7 @@
   call $~lib/rt/pure/__release
  )
  (func $~start
-  call $start:closures-passing-functions
+  call $start:closure-passing-functions
  )
  (func $~lib/rt/pure/__collect
   i32.const 1

@@ -13,14 +13,14 @@
  (data (i32.const 1024) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00t\00l\00s\00f\00.\00t\00s")
  (data (i32.const 1072) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e")
  (data (i32.const 1136) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s")
- (data (i32.const 1184) ":\00\00\00\01\00\00\00\01\00\00\00:\00\00\00c\00l\00o\00s\00u\00r\00e\00s\00-\00p\00a\00s\00s\00i\00n\00g\00-\00f\00u\00n\00c\00t\00i\00o\00n\00s\00.\00t\00s")
+ (data (i32.const 1184) "8\00\00\00\01\00\00\00\01\00\00\008\00\00\00c\00l\00o\00s\00u\00r\00e\00-\00p\00a\00s\00s\00i\00n\00g\00-\00f\00u\00n\00c\00t\00i\00o\00n\00s\00.\00t\00s")
  (data (i32.const 1264) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 ")
  (table $0 2 funcref)
- (elem (i32.const 1) $closures-passing-functions/add~anonymous|0)
+ (elem (i32.const 1) $closure-passing-functions/add~anonymous|0)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
- (global $closures-passing-functions/addResult (mut i32) (i32.const 0))
- (global $closures-passing-functions/applyResult (mut i32) (i32.const 0))
+ (global $closure-passing-functions/addResult (mut i32) (i32.const 0))
+ (global $closure-passing-functions/applyResult (mut i32) (i32.const 0))
  (global $~lib/rt/__rtti_base i32 (i32.const 1264))
  (export "memory" (memory $0))
  (export "__alloc" (func $~lib/rt/tlsf/__alloc))
@@ -1101,7 +1101,7 @@
    call $~lib/rt/pure/decrement
   end
  )
- (func $closures-passing-functions/add~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $closure-passing-functions/add~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   local.get $1
   local.get $2
   i32.add
@@ -1111,7 +1111,7 @@
   (local $1 i32)
   (local $2 i32)
   i32.const 2
-  global.set $closures-passing-functions/addResult
+  global.set $closure-passing-functions/addResult
   i32.const 4
   i32.const 0
   call $~lib/rt/tlsf/__alloc
@@ -1129,8 +1129,8 @@
   call_indirect (type $i32_i32_i32_=>_i32)
   local.get $1
   call $~lib/rt/pure/__release
-  global.set $closures-passing-functions/applyResult
-  global.get $closures-passing-functions/addResult
+  global.set $closure-passing-functions/applyResult
+  global.get $closure-passing-functions/addResult
   i32.const 2
   i32.ne
   if
@@ -1141,7 +1141,7 @@
    call $~lib/builtins/abort
    unreachable
   end
-  global.get $closures-passing-functions/applyResult
+  global.get $closure-passing-functions/applyResult
   i32.const 3
   i32.ne
   if
