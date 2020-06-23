@@ -1,6 +1,6 @@
 {
-  "name": "assemblyscript",
-  "description": "Definitely not a TypeScript to WebAssembly compiler.",
+  "name": "assemblyscript-closures-beta",
+  "description": "AssemblyScript, but with Closures! (experimental).",
   "keywords": [
     "typescript",
     "webassembly",
