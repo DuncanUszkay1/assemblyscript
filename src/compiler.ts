@@ -3454,7 +3454,6 @@ export class Compiler extends DiagnosticEmitter {
     this.currentType = contextualType;
     if (contextualType == Type.void) constraints |= Constraints.WILL_DROP;
     var expr: ExpressionRef;
-
     switch (expression.kind) {
       case NodeKind.ASSERTION: {
         expr = this.compileAssertionExpression(<AssertionExpression>expression, contextualType, constraints);
@@ -6620,7 +6619,6 @@ export class Compiler extends DiagnosticEmitter {
         local.closureContextOffset
       );
     }
-
     return module.block(null, exprs);
   }
 
@@ -6759,8 +6757,6 @@ export class Compiler extends DiagnosticEmitter {
           if (local.is(CommonFlags.INLINED)) {
             indexArg = module.i32(i64_low(local.constantIntegerValue));
           } else {
-            console.log('torch2424 yyyyyyy');
-            console.log('index', local.index);
             indexArg = module.local_get(local.index, NativeType.I32);
           }
           break;
@@ -6865,15 +6861,6 @@ export class Compiler extends DiagnosticEmitter {
     var returnType = signature.returnType;
     var tempFunctionReferenceLocal = this.currentFlow.getTempLocal(this.options.usizeType);
     var usize = this.options.nativeSizeType;
-    console.log('torch2424 6871');
-    console.log('signature', Object.keys(signature));
-    console.log(signature.toString());
-    console.log(signature.toClosureSignature().toString());
-    console.log(tempFunctionReferenceLocal.index);
-    console.log(indexArg);
-    console.log(usize);
-    console.log(this.options);
-    console.log(Object.keys(tempFunctionReferenceLocal));
 
     return module.block(null, [
       module.local_set(tempFunctionReferenceLocal.index, indexArg),
@@ -8615,8 +8602,8 @@ export class Compiler extends DiagnosticEmitter {
           this.currentType = Type.anyref;
           return module.ref_func(closureFunctionInstance.internalName);
         }
-        console.log('torch2424 8615');
 
+        // This is all essentially from compileFunctionExpression for getting closures
         // Set the param type of the function to the original function
         var instance = closureFunctionInstance;
         this.currentType = instance.signature.type;
