@@ -1108,15 +1108,26 @@
  )
  (func $~start
   (local $0 i32)
+  (local $1 i32)
+  (local $2 i32)
   i32.const 2
   global.set $closures-passing-functions/addResult
+  i32.const 4
+  i32.const 0
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.tee $0
   i32.const 1
+  i32.store
+  local.get $0
+  call $~lib/rt/pure/__retain
+  local.tee $1
   i32.const 1
   i32.const 2
-  i32.const 1
+  local.get $1
   i32.load
   call_indirect (type $i32_i32_i32_=>_i32)
-  i32.const 1
+  local.get $1
   call $~lib/rt/pure/__release
   global.set $closures-passing-functions/applyResult
   global.get $closures-passing-functions/addResult
@@ -1141,6 +1152,8 @@
    call $~lib/builtins/abort
    unreachable
   end
+  local.get $0
+  call $~lib/rt/pure/__release
  )
  (func $~lib/rt/pure/__collect
   nop

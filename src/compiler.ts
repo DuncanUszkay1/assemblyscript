@@ -6757,7 +6757,6 @@ export class Compiler extends DiagnosticEmitter {
         }
         if (signature) {
           if (local.is(CommonFlags.INLINED)) {
-            console.log('torch2424 asldjklasd')
             indexArg = module.i32(i64_low(local.constantIntegerValue));
           } else {
             console.log('torch2424 yyyyyyy');
@@ -6871,6 +6870,10 @@ export class Compiler extends DiagnosticEmitter {
     console.log(signature.toString());
     console.log(signature.toClosureSignature().toString());
     console.log(tempFunctionReferenceLocal.index);
+    console.log(indexArg);
+    console.log(usize);
+    console.log(this.options);
+    console.log(Object.keys(tempFunctionReferenceLocal));
 
     return module.block(null, [
       module.local_set(tempFunctionReferenceLocal.index, indexArg),
@@ -8614,14 +8617,62 @@ export class Compiler extends DiagnosticEmitter {
         }
         console.log('torch2424 8615');
 
+        // Set the param type of the function to the original function
+        var instance = closureFunctionInstance;
+        this.currentType = instance.signature.type;
+
         // Enter our closure function into our closures table
         let index = this.ensureFunctionTableEntry(closureFunctionInstance);
 
-        // Set the param type of the function to the original function
-        this.currentType = originalFunctionInstance.signature.type;
+        if(index < 0) return this.module.unreachable();
 
-        // Return the closure function index
-        return module.i32(index);
+        var nativeUsize = this.options.nativeSizeType;
+        var wasm64 = nativeUsize == NativeType.I64;
+
+        this.warning(
+          DiagnosticCode.Closure_support_is_experimental,
+          instance.prototype.declaration.range
+        );
+
+        // Append the appropriate signature and flags for this closure type, then set it to currentType
+        this.currentType = Type.closure32;
+        this.currentType.signatureReference = originalFunctionInstance.signature;
+
+        // create a local which will hold our closure
+        var tempLocal = flow.getAutoreleaseLocal(this.currentType);
+        var tempLocalIndex = tempLocal.index;
+
+        // copied closed locals into type
+        this.currentType.locals = instance.closedLocals;
+
+        const closureSize = instance.nextGlobalClosureOffset;
+
+        var allocInstance = this.program.allocInstance;
+        this.compileFunction(allocInstance);
+
+        var closureExpr = this.module.flatten([
+          this.module.local_set( // Allocate memory for the closure
+            tempLocalIndex,
+            this.makeRetain(
+              this.module.call(allocInstance.internalName, [
+                wasm64 ? this.module.i64(closureSize) : this.module.i32(closureSize),
+                wasm64 ? this.module.i64(0) : this.module.i32(0)
+              ], nativeUsize),
+              this.currentType
+            )
+          ),
+          this.module.store( // Store the function pointer at the first index
+            4,
+            this.module.local_get(tempLocalIndex, nativeUsize),
+            wasm64 ? this.module.i64(index) : this.module.i32(index),
+            nativeUsize,
+            0
+          ),
+          this.module.local_get(tempLocalIndex, nativeUsize) // load the closure locals index
+        ], nativeUsize);
+
+        // Return the closure
+        return closureExpr;
       }
     }
     assert(false);

@@ -1565,13 +1565,25 @@
   local.get $4
  )
  (func $start:closures-passing-functions
+  (local $0 i32)
+  (local $1 i32)
   i32.const 1
   i32.const 1
   call $closures-passing-functions/add
   global.set $closures-passing-functions/addResult
   i32.const 1
   i32.const 2
+  i32.const 4
+  i32.const 0
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.set $0
+  local.get $0
   i32.const 1
+  i32.store
+  local.get $0
+  local.set $1
+  local.get $1
   call $closures-passing-functions/apply_to_pair
   global.set $closures-passing-functions/applyResult
   global.get $closures-passing-functions/addResult
@@ -1598,6 +1610,8 @@
    call $~lib/builtins/abort
    unreachable
   end
+  local.get $0
+  call $~lib/rt/pure/__release
  )
  (func $~start
   call $start:closures-passing-functions
