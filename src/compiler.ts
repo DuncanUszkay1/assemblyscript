@@ -8164,6 +8164,66 @@ export class Compiler extends DiagnosticEmitter {
     return module.unreachable();
   }
 
+  private makeClosureFunction(
+    instance: Function,
+    flow: Flow
+  ): ExpressionRef {
+    this.currentType = instance.signature.type;
+
+    var index = this.ensureFunctionTableEntry(instance); // reports
+
+    if(index < 0) return this.module.unreachable();
+
+    var nativeUsize = this.options.nativeSizeType;
+    var wasm64 = nativeUsize == NativeType.I64;
+
+    this.warning(
+      DiagnosticCode.Closure_support_is_experimental,
+      instance.prototype.declaration.range
+    );
+
+    // Append the appropriate signature and flags for this closure type, then set it to currentType
+    this.currentType = Type.closure32;
+    this.currentType.signatureReference = instance.signature;
+
+    // create a local which will hold our closure
+    var tempLocal = flow.getAutoreleaseLocal(this.currentType);
+    var tempLocalIndex = tempLocal.index;
+
+    // copied closed locals into type
+    this.currentType.locals = instance.closedLocals;
+
+    const closureSize = instance.nextGlobalClosureOffset;
+
+    var allocInstance = this.program.allocInstance;
+    this.compileFunction(allocInstance);
+
+    var closureExpr = this.module.flatten([
+      this.module.local_set( // Allocate memory for the closure
+        tempLocalIndex,
+        this.makeRetain(
+          this.module.call(allocInstance.internalName, [
+            wasm64 ? this.module.i64(closureSize) : this.module.i32(closureSize),
+            wasm64 ? this.module.i64(0) : this.module.i32(0)
+          ], nativeUsize),
+          this.currentType
+        )
+      ),
+      this.module.store( // Store the function pointer at the first index
+        4,
+        this.module.local_get(tempLocalIndex, nativeUsize),
+        wasm64 ? this.module.i64(index) : this.module.i32(index),
+        nativeUsize,
+        0
+      ),
+      this.module.local_get(tempLocalIndex, nativeUsize) // load the closure locals index
+    ], nativeUsize);
+
+    // flow.freeTempLocal(tempLocal);
+
+    return closureExpr;
+  }
+
   private compileFunctionExpression(
     expression: FunctionExpression,
     contextualSignature: Signature | null,
@@ -8291,60 +8351,10 @@ export class Compiler extends DiagnosticEmitter {
       this.compileFunction(instance);
     }
 
-    this.currentType = instance.signature.type;
-
-    var index = this.ensureFunctionTableEntry(instance); // reports
-
-    if(index < 0) return this.module.unreachable();
-
-    var nativeUsize = this.options.nativeSizeType;
-    var wasm64 = nativeUsize == NativeType.I64;
-
-    this.warning(
-      DiagnosticCode.Closure_support_is_experimental,
-      instance.prototype.declaration.range
+    return this.makeClosureFunction(
+      instance,
+      flow
     );
-
-    // Append the appropriate signature and flags for this closure type, then set it to currentType
-    this.currentType = Type.closure32;
-    this.currentType.signatureReference = instance.signature;
-
-    // create a local which will hold our closure
-    var tempLocal = flow.getAutoreleaseLocal(this.currentType);
-    var tempLocalIndex = tempLocal.index;
-
-    // copied closed locals into type
-    this.currentType.locals = instance.closedLocals;
-
-    const closureSize = instance.nextGlobalClosureOffset;
-
-    var allocInstance = this.program.allocInstance;
-    this.compileFunction(allocInstance);
-
-    var closureExpr = this.module.flatten([
-      this.module.local_set( // Allocate memory for the closure
-        tempLocalIndex,
-        this.makeRetain(
-          this.module.call(allocInstance.internalName, [
-            wasm64 ? this.module.i64(closureSize) : this.module.i32(closureSize),
-            wasm64 ? this.module.i64(0) : this.module.i32(0)
-          ], nativeUsize),
-          this.currentType
-        )
-      ),
-      this.module.store( // Store the function pointer at the first index
-        4,
-        this.module.local_get(tempLocalIndex, nativeUsize),
-        wasm64 ? this.module.i64(index) : this.module.i32(index),
-        nativeUsize,
-        0
-      ),
-      this.module.local_get(tempLocalIndex, nativeUsize) // load the closure locals index
-    ], nativeUsize);
-
-    // flow.freeTempLocal(tempLocal);
-
-    return closureExpr;
   }
 
   /** Makes sure the enclosing source file of the specified expression has been compiled. */
@@ -8578,19 +8588,34 @@ export class Compiler extends DiagnosticEmitter {
           return module.unreachable();
         }
 
-        let functionInstance = this.resolver.resolveFunction(
+        // Find the original function from our prototype
+        let functionInstanceCtxTypes = makeMap<string,Type>(flow.contextualTypeArguments);
+        let originalFunctionInstance = this.resolver.resolveFunction(
           functionPrototype,
           null,
-          makeMap<string,Type>(flow.contextualTypeArguments)
+          functionInstanceCtxTypes 
         );
-        if (!functionInstance || !this.compileFunction(functionInstance)) return module.unreachable();
+        if (!originalFunctionInstance || !this.compileFunction(originalFunctionInstance)) return module.unreachable();
+
+        // Create a new closure function for our original function
+        let closureFunctionInstance = new Function(
+          functionPrototype.name + "~anonymous|" + (actualFunction.nextAnonymousId++).toString(),
+          functionPrototype,
+          null,
+          originalFunctionInstance.signature.toClosureSignature(),
+          functionInstanceCtxTypes
+        );
+        if (!this.compileFunction(closureFunctionInstance)) return this.module.unreachable();
+
         if (contextualType.is(TypeFlags.HOST | TypeFlags.REFERENCE)) {
           this.currentType = Type.anyref;
-          return module.ref_func(functionInstance.internalName);
+          return module.ref_func(closureFunctionInstance.internalName);
         }
-        let index = this.ensureFunctionTableEntry(functionInstance);
-        this.currentType = functionInstance.signature.type;
-        return module.i32(index);
+
+        return this.makeClosureFunction(
+          closureFunctionInstance,
+          flow
+        );
       }
     }
     assert(false);
