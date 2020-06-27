@@ -669,6 +669,10 @@ export class Compiler extends DiagnosticEmitter {
       );
       module.addFunctionExport(BuiltinNames.setArgumentsLength, ExportNames.setArgumentsLength);
     }
+
+    console.log('torch2424');
+    // console.log(module.toText())
+
     return module;
   }
 
@@ -6632,6 +6636,16 @@ export class Compiler extends DiagnosticEmitter {
     constraints: Constraints
   ): ExpressionRef {
 
+    // TODO: torch2424 call-optional test is broken because it's trying to 
+    // directly call a closure function, when it should call_indirect
+    // Playing with the text, seems to be unhappy with the optIndirect calls
+    // not with the direct op calls,
+    // May be something where the var args calls are hard coded to call direct
+    // More likely it is because we are setting the function to a global (shown in logs before)
+    // And then that makes some old incorrect assumptions.
+    // Actually I am like 99% sure it is the varargs direct call
+
+
     var module = this.module;
     var flow = this.currentFlow;
 
@@ -6683,6 +6697,10 @@ export class Compiler extends DiagnosticEmitter {
     var target = this.resolver.lookupExpression(expression.expression, flow); // reports
     if (!target) return module.unreachable();
     var thisExpression = this.resolver.currentThisExpression;
+
+    // console.log('torch2424');
+    // console.log(expression.range.source.text.substring(expression.range.start, expression.range.end));
+    // console.log(target.kind);
 
     var signature: Signature | null;
     var indexArg: ExpressionRef;
@@ -7316,7 +7334,56 @@ export class Compiler extends DiagnosticEmitter {
     assert(operandIndex == maxOperands);
 
     var stmts: ExpressionRef[] = [ body ];
+    
+   
+    // TODO: torch2424 find out if original is a function or a closure function
+    // And then do a direct call or indirect call
+    console.log('torch2424', 'varargs', original.internalName, forwardedOperands, returnType.toNativeType());
     var theCall = module.call(original.internalName, forwardedOperands, returnType.toNativeType());
+
+    /*
+    module.block(null, [
+      this.injectClosedLocals(local),
+      this.compileCallIndirect(
+        assert(signature),
+        module.load(
+          local.type.byteSize,
+          local.type.is(TypeFlags.SIGNED),
+          module.local_get(local.index, nativeSizeType),
+          this.options.nativeSizeType,
+          0
+        ),
+        expression.args,
+        expression,
+        module.local_get(local.index, nativeSizeType),
+        contextualType == Type.void
+      )
+    ], signature.returnType.toNativeType());
+
+    or
+
+    return module.block(null, [
+    module.local_set(tempFunctionReferenceLocal.index, indexArg),
+    this.compileCallIndirect( // If this is a closure
+    signature.toClosureSignature(),
+    module.block(null, [
+    module.load(
+    4,
+    true,
+    module.local_get(tempFunctionReferenceLocal.index, usize),
+    usize,
+    0
+    ),
+    ], this.options.nativeSizeType),
+    expression.args,
+    expression,
+    module.local_get(tempFunctionReferenceLocal.index, usize),
+    contextualType == Type.void
+    )
+    ], constraints & Constraints.WILL_DROP ? contextualType.toNativeType() : returnType.toNativeType());
+    */
+    
+     
     if (returnType != Type.void) {
       this.performAutoreleasesWithValue(flow, theCall, returnType, stmts);
     } else {
@@ -8611,7 +8678,7 @@ export class Compiler extends DiagnosticEmitter {
           this.currentType = Type.anyref;
           return module.ref_func(closureFunctionInstance.internalName);
         }
-
+      
         return this.makeClosureFunction(
           closureFunctionInstance,
           flow
