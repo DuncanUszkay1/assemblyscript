@@ -63,8 +63,6 @@ export function returnOverBoundary(): () => i32 {
 }
 returnOverBoundary();
 
-let myVar = (x: i32 = 3): i32 => { return x }
-
 // KNOWN BUGS
 
 // causes a memory leak, copyFunction is properly released
