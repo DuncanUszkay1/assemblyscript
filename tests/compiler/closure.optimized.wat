@@ -18,11 +18,10 @@
  (data (i32.const 1072) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e")
  (data (i32.const 1136) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s")
  (data (i32.const 1184) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 ")
- (table $0 8 funcref)
- (elem (i32.const 1) $closure/testParam~inner $closure/testParam~inner $closure/testParam~inner $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0 $closure/returnOverBoundary~anonymous|0 $start:closure~anonymous|0@varargs)
+ (table $0 7 funcref)
+ (elem (i32.const 1) $closure/testParam~inner $closure/testParam~inner $closure/testParam~inner $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0 $closure/returnOverBoundary~anonymous|0)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
- (global $~argumentsLength (mut i32) (i32.const 0))
  (global $~lib/rt/__rtti_base i32 (i32.const 1184))
  (export "memory" (memory $0))
  (export "__alloc" (func $~lib/rt/tlsf/__alloc))
@@ -1215,10 +1214,7 @@
   call $closure/createClosure
   local.tee $1
   call $~lib/rt/pure/__retain
-  local.set $0
-  i32.const 1
-  global.set $~argumentsLength
-  local.get $0
+  local.tee $0
   i32.const 1
   local.get $0
   i32.load
@@ -1244,8 +1240,6 @@
   local.get $0
   i32.const 1
   i32.store offset=12
-  i32.const 0
-  global.set $~argumentsLength
   local.get $0
   local.get $0
   i32.load
@@ -1256,15 +1250,6 @@
   call $closure/createClosure
   call $~lib/rt/pure/__release
   call $closure/returnOverBoundary
-  call $~lib/rt/pure/__release
-  i32.const 4
-  i32.const 0
-  call $~lib/rt/tlsf/__alloc
-  call $~lib/rt/pure/__retain
-  local.tee $0
-  i32.const 7
-  i32.store
-  local.get $0
   call $~lib/rt/pure/__release
  )
  (func $~start
@@ -1371,19 +1356,5 @@
    i32.or
    i32.store offset=4
   end
- )
- (func $start:closure~anonymous|0@varargs (param $0 i32) (param $1 i32) (result i32)
-  block $1of1
-   block $0of1
-    block $outOfRange
-     global.get $~argumentsLength
-     br_table $0of1 $1of1 $outOfRange
-    end
-    unreachable
-   end
-   i32.const 3
-   local.set $1
-  end
-  local.get $1
  )
 )
