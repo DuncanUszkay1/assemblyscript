@@ -1,7 +1,7 @@
 (module
- (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $i32_=>_none (func (param i32)))
+ (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_i32_=>_none (func (param i32 i32)))
  (type $none_=>_i32 (func (result i32)))
  (type $none_=>_none (func))
@@ -17,17 +17,16 @@
  (data (i32.const 16) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00t\00l\00s\00f\00.\00t\00s\00")
  (data (i32.const 64) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00")
  (data (i32.const 128) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s\00")
- (data (i32.const 176) "\14\00\00\00\01\00\00\00\01\00\00\00\14\00\00\00c\00l\00o\00s\00u\00r\00e\00.\00t\00s\00")
- (data (i32.const 224) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
- (table $0 10 funcref)
- (elem (i32.const 1) $closure/testParam~inner $closure/testVar~inner $closure/testLet~inner $closure/complexCreateClosure~anonymous|0 $closure/complexCreateClosure~anonymous|1 $closure/nestedExecutionTest~anonymous|0 $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0 $closure/returnOverBoundary~anonymous|0)
+ (data (i32.const 176) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
+ (table $0 7 funcref)
+ (elem (i32.const 1) $closure/testParam~inner $closure/testVar~inner $closure/testLet~inner $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0 $closure/returnOverBoundary~anonymous|0)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
  (global $~lib/gc/gc.auto (mut i32) (i32.const 1))
  (global $~argumentsLength (mut i32) (i32.const 0))
- (global $~lib/rt/__rtti_base i32 (i32.const 224))
- (global $~lib/heap/__heap_base i32 (i32.const 252))
+ (global $~lib/rt/__rtti_base i32 (i32.const 176))
+ (global $~lib/heap/__heap_base i32 (i32.const 204))
  (export "memory" (memory $0))
  (export "__alloc" (func $~lib/rt/tlsf/__alloc))
  (export "__retain" (func $~lib/rt/pure/__retain))
@@ -1630,147 +1629,6 @@
   call $~lib/rt/pure/__release
   local.get $3
  )
- (func $closure/complexCreateClosure~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
-  local.get $0
-  i32.load offset=4
-  local.get $0
-  i32.load offset=8
-  i32.add
-  local.get $0
-  i32.load offset=12
-  i32.sub
- )
- (func $closure/complexCreateClosure~anonymous|1 (param $0 i32) (param $1 i32) (result i32)
-  local.get $0
-  i32.load offset=4
-  local.get $0
-  i32.load offset=8
-  i32.sub
-  local.get $0
-  i32.load offset=12
-  i32.add
- )
- (func $closure/complexCreateClosure (param $0 i32) (result i32)
-  (local $1 i32)
-  (local $2 i32)
-  (local $3 i32)
-  (local $4 i32)
-  (local $5 i32)
-  (local $6 i32)
-  (local $7 i32)
-  (local $8 i32)
-  (local $9 i32)
-  i32.const 2
-  local.set $1
-  i32.const 3
-  local.set $2
-  i32.const 4
-  local.set $3
-  i32.const 16
-  i32.const 0
-  call $~lib/rt/tlsf/__alloc
-  call $~lib/rt/pure/__retain
-  local.set $4
-  local.get $4
-  i32.const 4
-  i32.store
-  local.get $4
-  local.set $5
-  i32.const 16
-  i32.const 0
-  call $~lib/rt/tlsf/__alloc
-  call $~lib/rt/pure/__retain
-  local.set $6
-  local.get $6
-  i32.const 5
-  i32.store
-  local.get $6
-  local.set $7
-  i32.const 7
-  local.set $1
-  i32.const 11
-  local.set $2
-  local.get $7
-  local.set $8
-  local.get $8
-  local.get $2
-  i32.store offset=4
-  local.get $8
-  local.get $3
-  i32.store offset=8
-  local.get $8
-  local.get $1
-  i32.store offset=12
-  local.get $8
-  call $~lib/rt/pure/__retain
-  local.set $9
-  local.get $4
-  call $~lib/rt/pure/__release
-  local.get $6
-  call $~lib/rt/pure/__release
-  local.get $9
- )
- (func $closure/nestedExecutionTest~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
-  (local $2 i32)
-  (local $3 i32)
-  local.get $1
-  call $~lib/rt/pure/__retain
-  local.set $1
-  local.get $1
-  local.set $1
-  local.get $1
-  local.get $0
-  i32.load offset=4
-  i32.const 1
-  global.set $~argumentsLength
-  local.get $1
-  i32.load
-  call_indirect (type $i32_i32_=>_i32)
-  local.set $2
-  local.get $0
-  i32.load offset=8
- )
- (func $closure/nestedExecutionTest (param $0 i32) (result i32)
-  (local $1 i32)
-  (local $2 i32)
-  (local $3 i32)
-  (local $4 i32)
-  (local $5 i32)
-  i32.const 7
-  local.set $1
-  local.get $0
-  call $closure/complexCreateClosure
-  local.set $2
-  i32.const 12
-  i32.const 0
-  call $~lib/rt/tlsf/__alloc
-  call $~lib/rt/pure/__retain
-  local.set $3
-  local.get $3
-  i32.const 6
-  i32.store
-  local.get $3
-  local.set $4
-  local.get $4
-  local.get $0
-  i32.store offset=4
-  local.get $4
-  local.get $1
-  i32.store offset=8
-  local.get $4
-  local.get $2
-  i32.const 1
-  global.set $~argumentsLength
-  local.get $4
-  i32.load
-  call_indirect (type $i32_i32_=>_i32)
-  local.set $5
-  local.get $3
-  call $~lib/rt/pure/__release
-  local.get $2
-  call $~lib/rt/pure/__release
-  local.get $5
- )
  (func $closure/createClosure~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
   local.get $0
   i32.load offset=4
@@ -1788,7 +1646,7 @@
   call $~lib/rt/pure/__retain
   local.set $1
   local.get $1
-  i32.const 7
+  i32.const 4
   i32.store
   local.get $1
   local.set $2
@@ -1857,7 +1715,7 @@
   call $~lib/rt/pure/__retain
   local.set $3
   local.get $3
-  i32.const 8
+  i32.const 5
   i32.store
   local.get $3
   local.set $4
@@ -1908,7 +1766,7 @@
   call $~lib/rt/pure/__retain
   local.set $0
   local.get $0
-  i32.const 9
+  i32.const 6
   i32.store
   local.get $0
   local.set $1
@@ -1917,12 +1775,7 @@
   local.set $2
   local.get $0
   call $~lib/rt/pure/__release
-  i32.const 0
-  i32.const 192
-  i32.const 73
-  i32.const 3
-  call $~lib/builtins/abort
-  unreachable
+  local.get $2
  )
  (func $start:closure
   i32.const 1
@@ -1933,9 +1786,6 @@
   call $~lib/rt/pure/__release
   call $closure/testLet
   call $~lib/rt/pure/__release
-  i32.const 1
-  call $closure/nestedExecutionTest
-  drop
   i32.const 1
   call $closure/passItAround
   drop

@@ -1,6 +1,6 @@
 (module
- (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_=>_none (func (param i32)))
+ (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $none_=>_none (func))
  (type $none_=>_i32 (func (result i32)))
@@ -17,13 +17,12 @@
  (data (i32.const 1024) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00t\00l\00s\00f\00.\00t\00s")
  (data (i32.const 1072) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e")
  (data (i32.const 1136) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s")
- (data (i32.const 1184) "\14\00\00\00\01\00\00\00\01\00\00\00\14\00\00\00c\00l\00o\00s\00u\00r\00e\00.\00t\00s")
- (data (i32.const 1232) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 ")
- (table $0 10 funcref)
- (elem (i32.const 1) $closure/testParam~inner $closure/testParam~inner $closure/testParam~inner $closure/complexCreateClosure~anonymous|0 $closure/complexCreateClosure~anonymous|1 $closure/nestedExecutionTest~anonymous|0 $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0 $closure/returnOverBoundary~anonymous|0)
+ (data (i32.const 1184) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 ")
+ (table $0 7 funcref)
+ (elem (i32.const 1) $closure/testParam~inner $closure/testParam~inner $closure/testParam~inner $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0 $closure/returnOverBoundary~anonymous|0)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
- (global $~lib/rt/__rtti_base i32 (i32.const 1232))
+ (global $~lib/rt/__rtti_base i32 (i32.const 1184))
  (export "memory" (memory $0))
  (export "__alloc" (func $~lib/rt/tlsf/__alloc))
  (export "__retain" (func $~lib/rt/pure/__retain))
@@ -612,11 +611,11 @@
    if
     unreachable
    end
-   i32.const 1264
+   i32.const 1216
    local.tee $0
    i32.const 0
    i32.store
-   i32.const 2832
+   i32.const 2784
    i32.const 0
    i32.store
    loop $for-loop|0
@@ -627,7 +626,7 @@
      local.get $1
      i32.const 2
      i32.shl
-     i32.const 1264
+     i32.const 1216
      i32.add
      i32.const 0
      i32.store offset=4
@@ -645,7 +644,7 @@
        i32.add
        i32.const 2
        i32.shl
-       i32.const 1264
+       i32.const 1216
        i32.add
        i32.const 0
        i32.store offset=96
@@ -663,13 +662,13 @@
      br $for-loop|0
     end
    end
-   i32.const 1264
-   i32.const 2848
+   i32.const 1216
+   i32.const 2800
    memory.size
    i32.const 16
    i32.shl
    call $~lib/rt/tlsf/addMemory
-   i32.const 1264
+   i32.const 1216
    global.set $~lib/rt/tlsf/ROOT
   end
   local.get $0
@@ -1050,7 +1049,7 @@
   (local $1 i32)
   (local $2 i32)
   local.get $0
-  i32.const 1260
+  i32.const 1212
   i32.gt_u
   if
    local.get $0
@@ -1099,7 +1098,7 @@
  )
  (func $~lib/rt/pure/__release (param $0 i32)
   local.get $0
-  i32.const 1260
+  i32.const 1212
   i32.gt_u
   if
    local.get $0
@@ -1111,39 +1110,6 @@
  (func $closure/testParam~inner (param $0 i32) (param $1 i32) (result i32)
   local.get $0
   i32.load offset=4
- )
- (func $closure/complexCreateClosure~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
-  local.get $0
-  i32.load offset=4
-  local.get $0
-  i32.load offset=8
-  i32.add
-  local.get $0
-  i32.load offset=12
-  i32.sub
- )
- (func $closure/complexCreateClosure~anonymous|1 (param $0 i32) (param $1 i32) (result i32)
-  local.get $0
-  i32.load offset=12
-  local.get $0
-  i32.load offset=4
-  local.get $0
-  i32.load offset=8
-  i32.sub
-  i32.add
- )
- (func $closure/nestedExecutionTest~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
-  local.get $1
-  call $~lib/rt/pure/__retain
-  local.tee $1
-  local.get $0
-  i32.load offset=4
-  local.get $1
-  i32.load
-  call_indirect (type $i32_i32_=>_i32)
-  drop
-  local.get $0
-  i32.load offset=8
  )
  (func $closure/createClosure~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
   local.get $1
@@ -1159,7 +1125,7 @@
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
   local.tee $0
-  i32.const 7
+  i32.const 4
   i32.store
   local.get $0
   i32.const 1
@@ -1184,105 +1150,8 @@
  )
  (func $closure/returnOverBoundary (result i32)
   (local $0 i32)
-  i32.const 4
-  i32.const 0
-  call $~lib/rt/tlsf/__alloc
-  call $~lib/rt/pure/__retain
-  local.tee $0
-  i32.const 9
-  i32.store
-  local.get $0
-  call $~lib/rt/pure/__retain
-  drop
-  local.get $0
-  call $~lib/rt/pure/__release
-  i32.const 0
-  i32.const 1200
-  i32.const 73
-  i32.const 3
-  call $~lib/builtins/abort
-  unreachable
- )
- (func $start:closure
-  (local $0 i32)
   (local $1 i32)
-  (local $2 i32)
-  i32.const 8
-  i32.const 0
-  call $~lib/rt/tlsf/__alloc
-  call $~lib/rt/pure/__retain
-  local.tee $0
-  i32.const 1
-  i32.store
-  local.get $0
-  i32.const 2
-  i32.store offset=4
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.get $0
-  call $~lib/rt/pure/__release
-  call $~lib/rt/pure/__release
-  i32.const 8
-  i32.const 0
-  call $~lib/rt/tlsf/__alloc
-  call $~lib/rt/pure/__retain
-  local.tee $0
-  i32.const 2
-  i32.store
-  local.get $0
-  i32.const 0
-  i32.store offset=4
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.get $0
-  call $~lib/rt/pure/__release
-  call $~lib/rt/pure/__release
-  i32.const 8
-  i32.const 0
-  call $~lib/rt/tlsf/__alloc
-  call $~lib/rt/pure/__retain
-  local.tee $0
-  i32.const 3
-  i32.store
-  local.get $0
-  i32.const 0
-  i32.store offset=4
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.get $0
-  call $~lib/rt/pure/__release
-  call $~lib/rt/pure/__release
-  i32.const 16
-  i32.const 0
-  call $~lib/rt/tlsf/__alloc
-  call $~lib/rt/pure/__retain
-  local.tee $2
   i32.const 4
-  i32.store
-  i32.const 16
-  i32.const 0
-  call $~lib/rt/tlsf/__alloc
-  call $~lib/rt/pure/__retain
-  local.tee $0
-  i32.const 5
-  i32.store
-  local.get $0
-  i32.const 11
-  i32.store offset=4
-  local.get $0
-  i32.const 4
-  i32.store offset=8
-  local.get $0
-  i32.const 7
-  i32.store offset=12
-  local.get $0
-  call $~lib/rt/pure/__retain
-  local.set $1
-  local.get $2
-  call $~lib/rt/pure/__release
-  local.get $0
-  call $~lib/rt/pure/__release
-  i32.const 12
   i32.const 0
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
@@ -1290,20 +1159,57 @@
   i32.const 6
   i32.store
   local.get $0
-  i32.const 1
-  i32.store offset=4
-  local.get $0
-  i32.const 7
-  i32.store offset=8
-  local.get $0
-  local.get $1
-  local.get $0
-  i32.load
-  call_indirect (type $i32_i32_=>_i32)
-  drop
+  call $~lib/rt/pure/__retain
   local.get $0
   call $~lib/rt/pure/__release
-  local.get $1
+ )
+ (func $start:closure
+  (local $0 i32)
+  (local $1 i32)
+  i32.const 8
+  i32.const 0
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.tee $0
+  i32.const 1
+  i32.store
+  local.get $0
+  i32.const 2
+  i32.store offset=4
+  local.get $0
+  call $~lib/rt/pure/__retain
+  local.get $0
+  call $~lib/rt/pure/__release
+  call $~lib/rt/pure/__release
+  i32.const 8
+  i32.const 0
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.tee $0
+  i32.const 2
+  i32.store
+  local.get $0
+  i32.const 0
+  i32.store offset=4
+  local.get $0
+  call $~lib/rt/pure/__retain
+  local.get $0
+  call $~lib/rt/pure/__release
+  call $~lib/rt/pure/__release
+  i32.const 8
+  i32.const 0
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.tee $0
+  i32.const 3
+  i32.store
+  local.get $0
+  i32.const 0
+  i32.store offset=4
+  local.get $0
+  call $~lib/rt/pure/__retain
+  local.get $0
+  call $~lib/rt/pure/__release
   call $~lib/rt/pure/__release
   call $closure/createClosure
   local.tee $1
@@ -1323,7 +1229,7 @@
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
   local.tee $0
-  i32.const 8
+  i32.const 5
   i32.store
   local.get $0
   i32.const 1
@@ -1393,7 +1299,7 @@
      local.tee $1
      if
       local.get $1
-      i32.const 1260
+      i32.const 1212
       i32.ge_u
       if
        local.get $1
