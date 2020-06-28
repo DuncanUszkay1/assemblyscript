@@ -1,7 +1,7 @@
 (module
+ (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $i32_=>_none (func (param i32)))
- (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_i32_=>_none (func (param i32 i32)))
  (type $none_=>_i32 (func (result i32)))
  (type $none_=>_none (func))
@@ -18,13 +18,14 @@
  (data (i32.const 64) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00")
  (data (i32.const 128) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s\00")
  (data (i32.const 176) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
- (table $0 7 funcref)
- (elem (i32.const 1) $closure/testParam~inner $closure/testVar~inner $closure/testLet~inner $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0 $closure/returnOverBoundary~anonymous|0)
+ (table $0 8 funcref)
+ (elem (i32.const 1) $closure/testParam~inner $closure/testVar~inner $closure/testLet~inner $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0 $closure/returnOverBoundary~anonymous|0 $start:closure~anonymous|0@varargs)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
  (global $~lib/gc/gc.auto (mut i32) (i32.const 1))
  (global $~argumentsLength (mut i32) (i32.const 0))
+ (global $closure/myVar (mut i32) (i32.const 0))
  (global $~lib/rt/__rtti_base i32 (i32.const 176))
  (global $~lib/heap/__heap_base i32 (i32.const 204))
  (export "memory" (memory $0))
@@ -1777,7 +1778,11 @@
   call $~lib/rt/pure/__release
   local.get $2
  )
+ (func $start:closure~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+  local.get $1
+ )
  (func $start:closure
+  (local $0 i32)
   i32.const 1
   i32.const 2
   call $closure/testParam
@@ -1798,6 +1803,18 @@
   call $closure/fallOutOfScope
   drop
   call $closure/returnOverBoundary
+  call $~lib/rt/pure/__release
+  i32.const 4
+  i32.const 0
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.set $0
+  local.get $0
+  i32.const 7
+  i32.store
+  local.get $0
+  global.set $closure/myVar
+  local.get $0
   call $~lib/rt/pure/__release
  )
  (func $~start
@@ -1920,6 +1937,22 @@
    i32.or
    i32.store offset=4
   end
+ )
+ (func $start:closure~anonymous|0@varargs (param $0 i32) (param $1 i32) (result i32)
+  block $1of1
+   block $0of1
+    block $outOfRange
+     global.get $~argumentsLength
+     br_table $0of1 $1of1 $outOfRange
+    end
+    unreachable
+   end
+   i32.const 3
+   local.set $1
+  end
+  local.get $0
+  local.get $1
+  call $start:closure~anonymous|0
  )
  (func $~lib/rt/pure/__visit (param $0 i32) (param $1 i32)
   local.get $0

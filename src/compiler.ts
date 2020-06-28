@@ -7220,18 +7220,21 @@ export class Compiler extends DiagnosticEmitter {
     var stub = original.varargsStub;
     if (stub) return stub;
 
+    // this stub relies on the existence of the argumentsLength global
+    this.ensureArgumentsLength();
+
     var originalSignature = original.signature;
     var originalParameterTypes = originalSignature.parameterTypes;
     var originalParameterDeclarations = original.prototype.functionTypeNode.parameters;
     var returnType = originalSignature.returnType;
-    var isInstance = original.is(CommonFlags.INSTANCE);
+    var thisType = originalSignature.thisType;
 
     // arguments excl. `this`, operands incl. `this`
     var minArguments = originalSignature.requiredParameters;
     var minOperands = minArguments;
     var maxArguments = originalParameterTypes.length;
     var maxOperands = maxArguments;
-    if (isInstance) {
+    if (thisType !== null) {
       ++minOperands;
       ++maxOperands;
     }
@@ -7242,7 +7245,7 @@ export class Compiler extends DiagnosticEmitter {
 
     // forward `this` if applicable
     var module = this.module;
-    if (isInstance) {
+    if (thisType !== null) {
       forwardedOperands[0] = module.local_get(0, this.options.nativeSizeType);
       operandIndex = 1;
     }
