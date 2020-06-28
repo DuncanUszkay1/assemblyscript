@@ -2,17 +2,14 @@
  (type $none_=>_none (func))
  (type $i32_=>_none (func (param i32)))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
- (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $none_=>_i32 (func (result i32)))
  (type $i32_=>_i32 (func (param i32) (result i32)))
- (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
- (memory $0 1)
- (data (i32.const 16) "<\00\00\00\01\00\00\00\01\00\00\00<\00\00\00c\00l\00o\00s\00u\00r\00e\00-\00l\00i\00m\00i\00t\00a\00t\00i\00o\00n\00s\00-\00r\00u\00n\00t\00i\00m\00e\00.\00t\00s\00")
+ (memory $0 0)
  (table $0 2 funcref)
  (elem (i32.const 1) $closure-limitations-runtime/exportedClosureReturns~inner)
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
- (global $~lib/heap/__heap_base i32 (i32.const 92))
+ (global $~lib/heap/__heap_base i32 (i32.const 8))
  (export "memory" (memory $0))
  (export "exportedClosureReturns" (func $closure-limitations-runtime/exportedClosureReturns))
  (start $~start)
@@ -160,12 +157,7 @@
   local.set $3
   local.get $1
   call $~lib/rt/stub/__release
-  i32.const 0
-  i32.const 32
-  i32.const 3
-  i32.const 3
-  call $~lib/builtins/abort
-  unreachable
+  local.get $3
  )
  (func $start:closure-limitations-runtime
   global.get $~lib/heap/__heap_base

@@ -1,10 +1,8 @@
 (module
- (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $i32_i32_f32_i32_i32_=>_i32 (func (param i32 i32 f32 i32 i32) (result i32)))
  (type $none_=>_none (func))
- (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
+ (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $f32_=>_f32 (func (param f32) (result f32)))
- (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (memory $0 1)
  (data (i32.const 1024) " \00\00\00\01\00\00\00\01\00\00\00 \00\00\00i\00n\00f\00e\00r\00-\00g\00e\00n\00e\00r\00i\00c\00.\00t\00s")
  (data (i32.const 1072) "\0c\00\00\00\01\00\00\00\00\00\00\00\0c\00\00\00\00\00\80?\00\00\00@\00\00@@")
@@ -14,8 +12,8 @@
  (export "memory" (memory $0))
  (export "test1" (func $infer-generic/test1))
  (export "test2" (func $infer-generic/test2))
- (export "test3" (func $infer-generic/test3))
- (export "test4" (func $infer-generic/test4))
+ (export "test3" (func $infer-generic/test2))
+ (export "test4" (func $infer-generic/test2))
  (start $~start)
  (func $start:infer-generic~anonymous|0 (param $0 i32) (param $1 i32) (param $2 f32) (param $3 i32) (param $4 i32) (result i32)
   local.get $2
@@ -30,22 +28,6 @@
  )
  (func $infer-generic/test2 (param $0 i32) (result i32)
   local.get $0
- )
- (func $infer-generic/test3 (param $0 i32) (result i32)
-  i32.const 0
-  i32.const 1040
-  i32.const 28
-  i32.const 3
-  call $~lib/builtins/abort
-  unreachable
- )
- (func $infer-generic/test4 (param $0 i32) (result i32)
-  i32.const 0
-  i32.const 1040
-  i32.const 38
-  i32.const 3
-  call $~lib/builtins/abort
-  unreachable
  )
  (func $~start
   (local $0 i32)

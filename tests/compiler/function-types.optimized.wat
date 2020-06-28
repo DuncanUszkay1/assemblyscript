@@ -5,12 +5,11 @@
  (type $i32_i64_i64_=>_i64 (func (param i32 i64 i64) (result i64)))
  (type $i32_f64_f64_=>_f64 (func (param i32 f64 f64) (result f64)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
- (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (memory $0 1)
  (data (i32.const 1024) "\"\00\00\00\01\00\00\00\01\00\00\00\"\00\00\00f\00u\00n\00c\00t\00i\00o\00n\00-\00t\00y\00p\00e\00s\00.\00t\00s")
  (table $0 5 funcref)
- (elem (i32.const 1) $function-types/makeAdder<i32>~anonymous|0 $function-types/makeAdder<i64>~anonymous|0 $function-types/makeAdder<f64>~anonymous|0 $function-types/addI32)
+ (elem (i32.const 1) $function-types/makeAdder<i32>~anonymous|0 $function-types/makeAdder<i64>~anonymous|0 $function-types/makeAdder<f64>~anonymous|0 $function-types/makeAdder<i32>~anonymous|0)
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
  (global $function-types/i32Adder (mut i32) (i32.const 0))
  (global $function-types/i64Adder (mut i32) (i32.const 0))
@@ -112,11 +111,6 @@
   local.get $2
   i32.load
   call_indirect (type $i32_i32_i32_=>_i32)
- )
- (func $function-types/addI32 (param $0 i32) (param $1 i32) (result i32)
-  local.get $0
-  local.get $1
-  i32.add
  )
  (func $start:function-types
   (local $0 i32)
@@ -220,9 +214,13 @@
    call $~lib/builtins/abort
    unreachable
   end
+  call $~lib/rt/stub/__alloc
+  local.tee $0
+  i32.const 4
+  i32.store
   i32.const 4
   i32.const 5
-  i32.const 4
+  local.get $0
   call $function-types/doAddWithFn<i32>
   i32.const 9
   i32.ne

@@ -311,12 +311,7 @@
   local.set $1
   local.get $0
   call $~lib/rt/stub/__release
-  i32.const 0
-  i32.const 32
-  i32.const 28
-  i32.const 3
-  call $~lib/builtins/abort
-  unreachable
+  local.get $1
  )
  (func $infer-generic/inferEncapsulatedFunctionMixed<f32,f64> (param $0 i32) (result i32)
   local.get $0
@@ -334,12 +329,7 @@
   local.set $1
   local.get $0
   call $~lib/rt/stub/__release
-  i32.const 0
-  i32.const 32
-  i32.const 38
-  i32.const 3
-  call $~lib/builtins/abort
-  unreachable
+  local.get $1
  )
  (func $~start
   call $start:infer-generic
