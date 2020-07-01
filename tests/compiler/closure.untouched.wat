@@ -1,9 +1,9 @@
 (module
+ (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $i32_=>_none (func (param i32)))
- (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
- (type $i32_i32_=>_none (func (param i32 i32)))
  (type $none_=>_i32 (func (result i32)))
+ (type $i32_i32_=>_none (func (param i32 i32)))
  (type $none_=>_none (func))
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
@@ -17,16 +17,17 @@
  (data (i32.const 16) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00t\00l\00s\00f\00.\00t\00s\00")
  (data (i32.const 64) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00")
  (data (i32.const 128) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s\00")
- (data (i32.const 176) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
- (table $0 7 funcref)
- (elem (i32.const 1) $closure/testParam~inner $closure/testVar~inner $closure/testLet~inner $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0 $closure/returnOverBoundary~anonymous|0)
+ (data (i32.const 176) "\14\00\00\00\01\00\00\00\01\00\00\00\14\00\00\00c\00l\00o\00s\00u\00r\00e\00.\00t\00s\00")
+ (data (i32.const 224) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
+ (table $0 9 funcref)
+ (elem (i32.const 1) $closure/testParam~inner $closure/testVar~inner $closure/testLet~inner $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0 $closure/returnOverBoundary~anonymous|0 $closure/createMutationClosure~anonymous|0 $closure/mutableInScope~anonymous|0)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
  (global $~lib/gc/gc.auto (mut i32) (i32.const 1))
  (global $~argumentsLength (mut i32) (i32.const 0))
- (global $~lib/rt/__rtti_base i32 (i32.const 176))
- (global $~lib/heap/__heap_base i32 (i32.const 204))
+ (global $~lib/rt/__rtti_base i32 (i32.const 224))
+ (global $~lib/heap/__heap_base i32 (i32.const 252))
  (export "memory" (memory $0))
  (export "__alloc" (func $~lib/rt/tlsf/__alloc))
  (export "__retain" (func $~lib/rt/pure/__retain))
@@ -1777,6 +1778,197 @@
   call $~lib/rt/pure/__release
   local.get $2
  )
+ (func $closure/createMutationClosure~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+  local.get $0
+  local.get $0
+  i32.load offset=4
+  local.get $1
+  i32.mul
+  i32.store offset=4
+  local.get $0
+  i32.load offset=4
+  drop
+  local.get $0
+  i32.load offset=4
+ )
+ (func $closure/createMutationClosure (param $0 i32) (result i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  i32.const 8
+  i32.const 0
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.set $1
+  local.get $1
+  i32.const 7
+  i32.store
+  local.get $1
+  local.set $2
+  local.get $2
+  local.get $0
+  i32.store offset=4
+  local.get $2
+  call $~lib/rt/pure/__retain
+  local.set $3
+  local.get $1
+  call $~lib/rt/pure/__release
+  local.get $3
+ )
+ (func $closure/mutableOutOfScope (result i32)
+  (local $0 i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  i32.const 1
+  call $closure/createMutationClosure
+  local.set $0
+  local.get $0
+  local.set $1
+  local.get $1
+  i32.const 2
+  i32.const 1
+  global.set $~argumentsLength
+  local.get $1
+  i32.load
+  call_indirect (type $i32_i32_=>_i32)
+  local.set $2
+  local.get $0
+  local.set $3
+  local.get $3
+  i32.const 3
+  i32.const 1
+  global.set $~argumentsLength
+  local.get $3
+  i32.load
+  call_indirect (type $i32_i32_=>_i32)
+  local.set $4
+  local.get $0
+  call $~lib/rt/pure/__release
+  local.get $4
+ )
+ (func $closure/mutableInScope~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+  local.get $0
+  local.get $0
+  i32.load offset=4
+  local.get $1
+  i32.mul
+  i32.store offset=4
+  local.get $0
+  i32.load offset=4
+  drop
+  local.get $0
+  i32.load offset=4
+ )
+ (func $closure/mutableInScope (result i32)
+  (local $0 i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  (local $6 i32)
+  i32.const 1
+  local.set $0
+  i32.const 8
+  i32.const 0
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.set $1
+  local.get $1
+  i32.const 8
+  i32.store
+  local.get $1
+  local.set $2
+  local.get $2
+  local.get $0
+  i32.store offset=4
+  local.get $2
+  i32.const 2
+  i32.const 1
+  global.set $~argumentsLength
+  local.get $2
+  i32.load
+  call_indirect (type $i32_i32_=>_i32)
+  local.set $3
+  local.get $2
+  i32.load offset=4
+  local.set $0
+  local.get $3
+  local.set $4
+  local.get $2
+  local.get $0
+  i32.store offset=4
+  local.get $2
+  i32.const 3
+  i32.const 1
+  global.set $~argumentsLength
+  local.get $2
+  i32.load
+  call_indirect (type $i32_i32_=>_i32)
+  local.set $5
+  local.get $2
+  i32.load offset=4
+  local.set $0
+  local.get $5
+  local.set $6
+  local.get $1
+  call $~lib/rt/pure/__release
+  local.get $6
+ )
+ (func $closure/complexCreateMutationClosure (param $0 i32) (result i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  i32.const 1
+  call $closure/createMutationClosure
+  local.set $1
+  local.get $1
+  local.set $2
+  local.get $2
+  i32.const 3
+  i32.const 1
+  global.set $~argumentsLength
+  local.get $2
+  i32.load
+  call_indirect (type $i32_i32_=>_i32)
+  local.set $3
+  local.get $1
+ )
+ (func $closure/complexMutable (result i32)
+  (local $0 i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  i32.const 1
+  call $closure/complexCreateMutationClosure
+  local.set $0
+  local.get $0
+  local.set $1
+  local.get $1
+  i32.const 5
+  i32.const 1
+  global.set $~argumentsLength
+  local.get $1
+  i32.load
+  call_indirect (type $i32_i32_=>_i32)
+  local.set $2
+  local.get $0
+  local.set $3
+  local.get $3
+  i32.const 7
+  i32.const 1
+  global.set $~argumentsLength
+  local.get $3
+  i32.load
+  call_indirect (type $i32_i32_=>_i32)
+  local.set $4
+  local.get $0
+  call $~lib/rt/pure/__release
+  local.get $4
+ )
  (func $start:closure
   i32.const 1
   i32.const 2
@@ -1799,6 +1991,48 @@
   drop
   call $closure/returnOverBoundary
   call $~lib/rt/pure/__release
+  call $closure/mutableOutOfScope
+  i32.const 6
+  i32.eq
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 192
+   i32.const 51
+   i32.const 1
+   call $~lib/builtins/abort
+   unreachable
+  end
+  call $closure/mutableInScope
+  i32.const 2
+  i32.const 3
+  i32.mul
+  i32.eq
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 192
+   i32.const 62
+   i32.const 1
+   call $~lib/builtins/abort
+   unreachable
+  end
+  call $closure/complexMutable
+  i32.const 3
+  i32.const 5
+  i32.mul
+  i32.const 7
+  i32.mul
+  i32.eq
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 192
+   i32.const 69
+   i32.const 1
+   call $~lib/builtins/abort
+   unreachable
+  end
  )
  (func $~start
   call $start:closure

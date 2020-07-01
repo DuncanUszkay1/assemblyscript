@@ -37,6 +37,39 @@ function fallOutOfScope(arg: i32): i32 {
 }
 fallOutOfScope(1);
 
+// Ensure that non-closures do not abort upon returning
+export function returnOverBoundary(): () => i32 {
+  return function(): i32 { return 6; };
+}
+returnOverBoundary();
+
+function mutableOutOfScope(): i32 {
+  let fn = createMutationClosure(1);
+  let y = fn(2);
+  return fn(3);
+}
+assert(mutableOutOfScope() == 6);
+
+function mutableInScope(): i32 {
+  let x = 1;
+  let fn = (arg: i32): i32 => {
+    x = x * arg;
+    return x;
+  }
+  let y = fn(2);
+  return fn(3);
+}
+assert(mutableInScope() == 2 * 3);
+
+function complexMutable(): i32 {
+  let fn = complexCreateMutationClosure(1);
+  let z = fn(5);
+  return fn(7);
+}
+assert(complexMutable() == 3 * 5 * 7);
+
+// HELPER METHODS
+
 function createClosure(arg: i32): (x3: i32) => i32 {
   var closure = (x3: i32): i32 => { return arg + x3; };
   return closure;
@@ -57,11 +90,19 @@ function runClosure(closureToRun: (x3: i32) => i32): i32 {
   return closureToRun(1);
 }
 
-// Ensure that non-closures do not abort upon returning
-export function returnOverBoundary(): () => i32 {
-  return function(): i32 { return 6; };
+function complexCreateMutationClosure(arg: i32): (x3: i32) => i32 {
+  let fn = createMutationClosure(1);
+  let x = fn(3);
+  return fn;
 }
-returnOverBoundary();
+
+function createMutationClosure(arg: i32): (x3: i32) => i32 {
+  return (x3: i32): i32 => {
+    arg = arg * x3;
+    return arg;
+  }
+}
+
 
 // KNOWN BUGS
 
@@ -81,3 +122,10 @@ returnOverBoundary();
 //}
 //nestedExecutionTest(1);
 
+// It seems that just calling fn(2) causing some kind of drop issue
+//function mutableOutOfScope(): i32 {
+  //let fn = createMutationClosure(1);
+  //fn(2);
+  //return fn(3);
+//}
+//assert(mutableOutOfScope() == 6);

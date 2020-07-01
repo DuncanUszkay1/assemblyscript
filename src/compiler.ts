@@ -6207,15 +6207,6 @@ export class Compiler extends DiagnosticEmitter {
     switch (target.kind) {
       case ElementKind.LOCAL: {
         let local = <Local>target;
-        if (local.closureContextOffset > 0) {
-          // TODO: ability to update closed over locals
-          this.error(
-            DiagnosticCode.Not_implemented_0,
-            valueExpression.range,
-            "Updating closed locals"
-          );
-          return module.unreachable();
-        }
         if (flow.isLocalFlag(local.index, LocalFlags.CONSTANT, true)) {
           this.error(
             DiagnosticCode.Cannot_assign_to_0_because_it_is_a_constant_or_a_read_only_property,
@@ -6223,6 +6214,25 @@ export class Compiler extends DiagnosticEmitter {
           );
           this.currentType = tee ? local.type : Type.void;
           return module.unreachable();
+        }
+        if (local.closureContextOffset > 0) {
+          var nativeType = valueType.toNativeType();
+          return module.block(null, [
+            module.store(
+              local.type.byteSize,
+              module.local_get(0, this.options.nativeSizeType),
+              valueExpr,
+              valueType.toNativeType(),
+              local.closureContextOffset
+            ),
+            module.load(
+              local.type.byteSize,
+              valueType.is(TypeFlags.SIGNED),
+              module.local_get(0, this.options.nativeSizeType),
+              valueType.toNativeType(),
+              local.closureContextOffset
+            )
+          ], nativeType);
         }
         return this.makeLocalAssignment(local, valueExpr, valueType, tee);
       }
@@ -6622,6 +6632,33 @@ export class Compiler extends DiagnosticEmitter {
     return module.block(null, exprs);
   }
 
+  private writebackClosedLocals(
+    closureContextLocal: Local
+  ): ExpressionRef {
+    var module = this.module;
+    var type = closureContextLocal.type;
+    var locals = assert(type.locals);
+    let _values = Map_values(locals);
+    var exprs = new Array<ExpressionRef>(_values.length);
+    assert(type.is(TypeFlags.REFERENCE));
+    for (let i = 0, k = _values.length; i < k; ++i) {
+      let local = unchecked(_values[i]);
+      let nativeType = local.type.toNativeType();
+      assert(local.closureContextOffset > 0);
+      exprs[i] = module.local_set(
+        local.index,
+        module.load(
+          local.type.byteSize,
+          local.type.is(TypeFlags.SIGNED),
+          module.local_get(closureContextLocal.index, this.options.nativeSizeType),
+          nativeType,
+          local.closureContextOffset
+        )
+      );
+    }
+    return module.block(null, exprs);
+  }
+
   /** Compiles a call expression according to the specified context. */
   private compileCallExpression(
     /** Call expression to compile. */
@@ -6735,23 +6772,33 @@ export class Compiler extends DiagnosticEmitter {
           }
           // If we're calling a local we know to be a closure, then we must still be in the creator functions
           // scope. Because of this, we should update the values of locals that are still available
-          return module.block(null, [
-            this.injectClosedLocals(local),
-            this.compileCallIndirect(
-              assert(signature),
-              module.load(
-                local.type.byteSize,
-                local.type.is(TypeFlags.SIGNED),
-                module.local_get(local.index, nativeSizeType),
-                this.options.nativeSizeType,
-                0
-              ),
-              expression.args,
-              expression,
+          var nativeContextualType = contextualType.toNativeType();
+          var immediatelyDropped = contextualType == Type.void;
+          var exprs = Array<ExpressionRef>(immediatelyDropped ? 3 : 4)
+
+          exprs[0] = this.injectClosedLocals(local);
+          exprs[1] = this.compileCallIndirect(
+            assert(signature),
+            module.load(
+              local.type.byteSize,
+              local.type.is(TypeFlags.SIGNED),
               module.local_get(local.index, nativeSizeType),
-              contextualType == Type.void
-            )
-          ], signature.returnType.toNativeType());
+              this.options.nativeSizeType,
+              0
+            ),
+            expression.args,
+            expression,
+            module.local_get(local.index, nativeSizeType),
+            immediatelyDropped
+          );
+          exprs[2] = this.writebackClosedLocals(local)
+
+          if(!immediatelyDropped) {
+            let result_local = this.currentFlow.getTempLocal(contextualType);
+            exprs[1] = module.local_set(result_local.index, exprs[1]);
+            exprs[3] = module.local_get(result_local.index, nativeContextualType);
+          }
+          return module.block(null, exprs, nativeContextualType);
         }
         if (signature) {
           if (local.is(CommonFlags.INLINED)) {
@@ -8596,7 +8643,7 @@ export class Compiler extends DiagnosticEmitter {
         let originalFunctionInstance = this.resolver.resolveFunction(
           functionPrototype,
           null,
-          functionInstanceCtxTypes 
+          functionInstanceCtxTypes
         );
         if (!originalFunctionInstance || !this.compileFunction(originalFunctionInstance)) return module.unreachable();
 
