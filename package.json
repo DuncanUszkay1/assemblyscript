@@ -82,6 +82,7 @@
     "check:config": "tsc --noEmit -p src --diagnostics --listFiles",
     "check:require": "tsc --noEmit --target ESNEXT --module commonjs --experimentalDecorators tests/require/index",
     "check:lint": "eslint --max-warnings 0 --ext js . && eslint --max-warnings 0 --ext ts .",
+    "check:lint:fix": "eslint --max-warnings 0 --ext js . && eslint --max-warnings 0 --ext ts . --fix",
     "test": "npm run test:parser && npm run test:compiler && npm run test:packages && npm run test:extension",
     "test:parser": "node tests/parser",
     "test:compiler": "node tests/compiler",

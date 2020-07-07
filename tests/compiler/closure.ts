@@ -66,18 +66,18 @@ returnOverBoundary();
 // KNOWN BUGS
 
 // causes a memory leak, copyFunction is properly released
-//const func = (i: i32): i32 => i;
-//let copyFunction: (i: i32) => i32 = func;
+// const func = (i: i32): i32 => i;
+// let copyFunction: (i: i32) => i32 = func;
 
 // also causes a memory leak
-//function nestedExecutionTest(arg: i32): i32 {
-  //var x = 7;
-  //var f = complexCreateClosure(arg);
-  //var g = (fn: (x3: i32) => i32): i32 => {
-    //var first = fn(arg);
-    //return x;
-  //};
-  //return g(f);
-//}
-//nestedExecutionTest(1);
+// function nestedExecutionTest(arg: i32): i32 {
+// var x = 7;
+// var f = complexCreateClosure(arg);
+// var g = (fn: (x3: i32) => i32): i32 => {
+// var first = fn(arg);
+// return x;
+// };
+// return g(f);
+// }
+// nestedExecutionTest(1);
 

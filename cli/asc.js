@@ -655,7 +655,6 @@ exports.main = function main(argv, options, callback) {
     stats.validateCount++;
     stats.validateTime += measure(() => {
       if (!module.validate()) {
-        console.log(module.toText())
         module.dispose();
         return callback(Error("Validate error"));
       }
