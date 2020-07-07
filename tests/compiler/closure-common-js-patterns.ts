@@ -32,7 +32,7 @@ let myInstanceThing = ((): IIFEReturn => {
     myFunc: (x: i32) => {
       return x + 1;
     }
-  }
+  };
 })();
 
 assert(myInstanceThing.myBool == true);
@@ -46,10 +46,10 @@ type generatedFunc = () => i32;
 let myFactory = (x: i32): generatedFunc => {
   let myFunc = (): i32 => {
     return 24 + x;
-  }
+  };
 
   return myFunc;
-}
+};
 
 let generatedPlusOne: generatedFunc = myFactory(1);
 let generatedPlusTwo: generatedFunc = myFactory(2);

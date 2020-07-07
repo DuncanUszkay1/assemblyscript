@@ -195,8 +195,6 @@ import {
   isPowerOf2
 } from "./util";
 
-const CLOSURE_TAG = 1 << 31;
-
 /** Compiler options. */
 export class Options {
 
