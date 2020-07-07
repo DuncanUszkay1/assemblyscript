@@ -1,5 +1,6 @@
 (module
  (type $none_=>_none (func))
+ (type $i32_=>_none (func (param i32)))
  (type $anyref_=>_anyref (func (param anyref) (result anyref)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $anyref_=>_none (func (param anyref)))
@@ -23,6 +24,12 @@
  (export "internal" (func $features/reference-types/internal))
  (start $~start)
  (func $features/reference-types/someFunc
+  nop
+ )
+ (func $features/reference-types/someFunc~anonymous|0 (param $0 i32)
+  nop
+ )
+ (func $features/reference-types/someFunc~anonymous|1 (param $0 i32)
   nop
  )
  (func $start:features/reference-types
@@ -136,9 +143,9 @@
    call $~lib/builtins/abort
    unreachable
   end
-  ref.func $features/reference-types/someFunc
+  ref.func $features/reference-types/someFunc~anonymous|0
   global.set $features/reference-types/funcGlobal
-  ref.func $features/reference-types/someFunc
+  ref.func $features/reference-types/someFunc~anonymous|1
   local.set $1
  )
  (func $features/reference-types/internal (param $0 anyref) (result anyref)
