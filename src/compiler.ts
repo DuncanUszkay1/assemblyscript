@@ -8600,10 +8600,11 @@ export class Compiler extends DiagnosticEmitter {
         if (!originalFunctionInstance || !this.compileFunction(originalFunctionInstance)) return module.unreachable();
 
         // Create a new closure function for our original function
+        // TODO: Figure out why recursive closures don't work.
         let anonymousFunctionName = functionPrototype.name + "~anonymous|" + (actualFunction.nextAnonymousId++).toString();
         // Check if we are recursively calling the original actual function from our closure
         if (actualFunction.name.includes( functionPrototype.name + "~anonymous|")) {
-          anonymousFunctionName += "~recursive|" + (Function.nextAnonymousRecursiveId++).toString();
+          // anonymousFunctionName += "~recursive|" + (Function.nextAnonymousRecursiveId++).toString();
         }
         let closureFunctionInstance = new Function(
           anonymousFunctionName,
