@@ -8234,10 +8234,11 @@ export class Compiler extends DiagnosticEmitter {
     assert(!declaration.typeParameters); // function expression cannot be generic
     var flow = this.currentFlow;
     var actualFunction = flow.actualFunction;
+    var anonymousFunctionName = declaration.name.text.length
+      ? declaration.name.text
+      : "~anonymous|" + (actualFunction.nextAnonymousId++).toString();
     var prototype = new FunctionPrototype(
-      declaration.name.text.length
-        ? declaration.name.text
-        : "anonymous|" + (actualFunction.nextAnonymousId++).toString(),
+      anonymousFunctionName,
       actualFunction,
       declaration,
       DecoratorFlags.NONE
@@ -8599,8 +8600,13 @@ export class Compiler extends DiagnosticEmitter {
         if (!originalFunctionInstance || !this.compileFunction(originalFunctionInstance)) return module.unreachable();
 
         // Create a new closure function for our original function
+        let anonymousFunctionName = functionPrototype.name + "~anonymous|" + (actualFunction.nextAnonymousId++).toString();
+        // Check if we are recursively calling the original actual function from our closure
+        if (actualFunction.name.includes( functionPrototype.name + "~anonymous|")) {
+          anonymousFunctionName += "~recursive|" + (Function.nextAnonymousRecursiveId++).toString();
+        }
         let closureFunctionInstance = new Function(
-          functionPrototype.name + "~anonymous|" + (actualFunction.nextAnonymousId++).toString(),
+          anonymousFunctionName,
           functionPrototype,
           null,
           originalFunctionInstance.signature.toClosureSignature(),

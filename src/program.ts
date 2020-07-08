@@ -3477,6 +3477,7 @@ export class Function extends TypedElement {
   nextInlineId: i32 = 0;
   /** Counting id of anonymous inner functions. */
   nextAnonymousId: i32 = 0;
+  static nextAnonymousRecursiveId: i32 = 0;
   /** Counting id of autorelease variables. */
   nextAutoreleaseId: i32 = 0;
 
@@ -4532,6 +4533,7 @@ export class Interface extends Class { // FIXME
 
 /** Registers a concrete element with a program. */
 function registerConcreteElement(program: Program, element: Element): void {
+  console.log('Yoooo', element.internalName);
   assert(!program.instancesByName.has(element.internalName));
   program.instancesByName.set(element.internalName, element);
 }
