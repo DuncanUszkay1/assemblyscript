@@ -14,7 +14,7 @@
  (data (i32.const 64) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00")
  (data (i32.const 128) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s\00")
  (table $0 7 funcref)
- (elem (i32.const 1) $start:retain-return~anonymous|0 $start:retain-return~anonymous|1 $start:retain-return~anonymous|2 $start:retain-return~anonymous|3 $start:retain-return~anonymous|4 $start:retain-return~anonymous|5)
+ (elem (i32.const 1) $start:retain-return~~anonymous|0 $start:retain-return~~anonymous|1 $start:retain-return~~anonymous|2 $start:retain-return~~anonymous|3 $start:retain-return~~anonymous|4 $start:retain-return~~anonymous|5)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
@@ -1558,32 +1558,32 @@
   global.get $retain-return/ref
   call $~lib/rt/pure/__retain
  )
- (func $start:retain-return~anonymous|0 (param $0 i32) (result i32)
+ (func $start:retain-return~~anonymous|0 (param $0 i32) (result i32)
   i32.const 0
   call $retain-return/Ref#constructor
  )
- (func $start:retain-return~anonymous|1 (param $0 i32) (param $1 i32) (result i32)
+ (func $start:retain-return~~anonymous|1 (param $0 i32) (param $1 i32) (result i32)
   local.get $1
   call $~lib/rt/pure/__retain
   local.set $1
   local.get $1
  )
- (func $start:retain-return~anonymous|2 (param $0 i32) (result i32)
+ (func $start:retain-return~~anonymous|2 (param $0 i32) (result i32)
   global.get $retain-return/ref
   call $~lib/rt/pure/__retain
  )
- (func $start:retain-return~anonymous|3 (param $0 i32) (result i32)
+ (func $start:retain-return~~anonymous|3 (param $0 i32) (result i32)
   i32.const 0
   call $retain-return/Ref#constructor
  )
- (func $start:retain-return~anonymous|4 (param $0 i32) (result i32)
+ (func $start:retain-return~~anonymous|4 (param $0 i32) (result i32)
   (local $1 i32)
   i32.const 0
   call $retain-return/Ref#constructor
   local.set $0
   local.get $0
  )
- (func $start:retain-return~anonymous|5 (param $0 i32) (result i32)
+ (func $start:retain-return~~anonymous|5 (param $0 i32) (result i32)
   global.get $retain-return/ref
   call $~lib/rt/pure/__retain
  )

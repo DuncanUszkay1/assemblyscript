@@ -8,14 +8,14 @@
  (data (i32.const 1072) "\0c\00\00\00\01\00\00\00\00\00\00\00\0c\00\00\00\00\00\80?\00\00\00@\00\00@@")
  (data (i32.const 1104) "\10\00\00\00\01\00\00\00\03\00\00\00\10\00\00\00@\04\00\00@\04\00\00\0c\00\00\00\03")
  (table $0 2 funcref)
- (elem (i32.const 1) $start:infer-generic~anonymous|0)
+ (elem (i32.const 1) $start:infer-generic~~anonymous|0)
  (export "memory" (memory $0))
  (export "test1" (func $infer-generic/test1))
  (export "test2" (func $infer-generic/test2))
  (export "test3" (func $infer-generic/test2))
  (export "test4" (func $infer-generic/test2))
  (start $~start)
- (func $start:infer-generic~anonymous|0 (param $0 i32) (param $1 i32) (param $2 f32) (param $3 i32) (param $4 i32) (result i32)
+ (func $start:infer-generic~~anonymous|0 (param $0 i32) (param $1 i32) (param $2 f32) (param $3 i32) (param $4 i32) (result i32)
   local.get $2
   f32.const 0
   f32.ne

@@ -19,7 +19,7 @@
  (data (i32.const 128) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s\00")
  (data (i32.const 176) "\03\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00")
  (table $0 7 funcref)
- (elem (i32.const 1) $closure/testParam~inner $closure/testVar~inner $closure/testLet~inner $closure/createClosure~anonymous|0 $closure/runInline~anonymous|0 $closure/returnOverBoundary~anonymous|0)
+ (elem (i32.const 1) $closure/testParam~inner $closure/testVar~inner $closure/testLet~inner $closure/createClosure~~anonymous|0 $closure/runInline~~anonymous|0 $closure/returnOverBoundary~~anonymous|0)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
@@ -1629,7 +1629,7 @@
   call $~lib/rt/pure/__release
   local.get $3
  )
- (func $closure/createClosure~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+ (func $closure/createClosure~~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
   local.get $0
   i32.load offset=4
   local.get $1
@@ -1694,7 +1694,7 @@
   call $~lib/rt/pure/__release
   local.get $2
  )
- (func $closure/runInline~anonymous|0 (param $0 i32) (result i32)
+ (func $closure/runInline~~anonymous|0 (param $0 i32) (result i32)
   local.get $0
   i32.load offset=4
   local.get $0
@@ -1753,7 +1753,7 @@
   call $~lib/rt/pure/__release
   local.get $2
  )
- (func $closure/returnOverBoundary~anonymous|0 (param $0 i32) (result i32)
+ (func $closure/returnOverBoundary~~anonymous|0 (param $0 i32) (result i32)
   i32.const 6
  )
  (func $closure/returnOverBoundary (result i32)

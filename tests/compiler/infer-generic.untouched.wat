@@ -14,7 +14,7 @@
  (data (i32.const 64) "\0c\00\00\00\01\00\00\00\00\00\00\00\0c\00\00\00\00\00\80?\00\00\00@\00\00@@")
  (data (i32.const 96) "\10\00\00\00\01\00\00\00\03\00\00\00\10\00\00\00P\00\00\00P\00\00\00\0c\00\00\00\03\00\00\00")
  (table $0 2 funcref)
- (elem (i32.const 1) $start:infer-generic~anonymous|0)
+ (elem (i32.const 1) $start:infer-generic~~anonymous|0)
  (global $infer-generic/arr i32 (i32.const 112))
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
@@ -37,7 +37,7 @@
  (func $~lib/rt/stub/__release (param $0 i32)
   nop
  )
- (func $start:infer-generic~anonymous|0 (param $0 i32) (param $1 i32) (param $2 f32) (param $3 i32) (param $4 i32) (result i32)
+ (func $start:infer-generic~~anonymous|0 (param $0 i32) (param $1 i32) (param $2 f32) (param $3 i32) (param $4 i32) (result i32)
   (local $5 i32)
   local.get $4
   call $~lib/rt/stub/__retain

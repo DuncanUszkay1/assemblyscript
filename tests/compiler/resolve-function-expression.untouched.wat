@@ -20,7 +20,7 @@
  (data (i32.const 1760) "H\00\00\00\01\00\00\00\01\00\00\00H\00\00\000\001\002\003\004\005\006\007\008\009\00a\00b\00c\00d\00e\00f\00g\00h\00i\00j\00k\00l\00m\00n\00o\00p\00q\00r\00s\00t\00u\00v\00w\00x\00y\00z\00")
  (data (i32.const 1856) "\04\00\00\00\01\00\00\00\01\00\00\00\04\00\00\004\002\00")
  (table $0 4 funcref)
- (elem (i32.const 1) $start:resolve-function-expression~anonymous|0 $start:resolve-function-expression~anonymous|1 $start:resolve-function-expression~anonymous|2)
+ (elem (i32.const 1) $start:resolve-function-expression~~anonymous|0 $start:resolve-function-expression~~anonymous|1 $start:resolve-function-expression~~anonymous|2)
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
  (global $~argumentsLength (mut i32) (i32.const 0))
@@ -28,7 +28,7 @@
  (global $~lib/heap/__heap_base i32 (i32.const 1876))
  (export "memory" (memory $0))
  (start $~start)
- (func $start:resolve-function-expression~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+ (func $start:resolve-function-expression~~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
   local.get $1
   i32.const 40
   i32.add
@@ -145,12 +145,12 @@
  (func $~lib/rt/stub/__retain (param $0 i32) (result i32)
   local.get $0
  )
- (func $start:resolve-function-expression~anonymous|1 (param $0 i32) (param $1 i32) (result i32)
+ (func $start:resolve-function-expression~~anonymous|1 (param $0 i32) (param $1 i32) (result i32)
   local.get $1
   i32.const 41
   i32.add
  )
- (func $start:resolve-function-expression~anonymous|2 (param $0 i32) (param $1 i32) (result i32)
+ (func $start:resolve-function-expression~~anonymous|2 (param $0 i32) (param $1 i32) (result i32)
   local.get $1
   i32.const 42
   i32.add

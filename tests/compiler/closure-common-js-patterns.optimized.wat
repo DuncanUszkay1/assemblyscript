@@ -16,7 +16,7 @@
  (data (i32.const 1184) ":\00\00\00\01\00\00\00\01\00\00\00:\00\00\00c\00l\00o\00s\00u\00r\00e\00-\00c\00o\00m\00m\00o\00n\00-\00j\00s\00-\00p\00a\00t\00t\00e\00r\00n\00s\00.\00t\00s")
  (data (i32.const 1264) "\04\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 \00\00\00\00\00\00\00 ")
  (table $0 6 funcref)
- (elem (i32.const 1) $start:closure-common-js-patterns~anonymous|0 $start:closure-common-js-patterns~anonymous|1~anonymous|0 $start:closure-common-js-patterns~anonymous|1 $start:closure-common-js-patterns~anonymous|2~anonymous|0 $start:closure-common-js-patterns~anonymous|2)
+ (elem (i32.const 1) $start:closure-common-js-patterns~~anonymous|0 $start:closure-common-js-patterns~~anonymous|1~~anonymous|0 $start:closure-common-js-patterns~~anonymous|1 $start:closure-common-js-patterns~~anonymous|2~~anonymous|0 $start:closure-common-js-patterns~~anonymous|2)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
  (global $closure-common-js-patterns/myData (mut i32) (i32.const 0))
@@ -1104,15 +1104,15 @@
    call $~lib/rt/pure/decrement
   end
  )
- (func $start:closure-common-js-patterns~anonymous|0 (param $0 i32) (result i32)
+ (func $start:closure-common-js-patterns~~anonymous|0 (param $0 i32) (result i32)
   i32.const 1
  )
- (func $start:closure-common-js-patterns~anonymous|1~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+ (func $start:closure-common-js-patterns~~anonymous|1~~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
   local.get $1
   i32.const 1
   i32.add
  )
- (func $start:closure-common-js-patterns~anonymous|1 (param $0 i32) (result i32)
+ (func $start:closure-common-js-patterns~~anonymous|1 (param $0 i32) (result i32)
   (local $1 i32)
   i32.const 8
   i32.const 3
@@ -1142,13 +1142,13 @@
   call $~lib/rt/pure/__release
   local.get $0
  )
- (func $start:closure-common-js-patterns~anonymous|2~anonymous|0 (param $0 i32) (result i32)
+ (func $start:closure-common-js-patterns~~anonymous|2~~anonymous|0 (param $0 i32) (result i32)
   local.get $0
   i32.load offset=4
   i32.const 24
   i32.add
  )
- (func $start:closure-common-js-patterns~anonymous|2 (param $0 i32) (param $1 i32) (result i32)
+ (func $start:closure-common-js-patterns~~anonymous|2 (param $0 i32) (param $1 i32) (result i32)
   i32.const 8
   i32.const 0
   call $~lib/rt/tlsf/__alloc

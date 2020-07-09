@@ -12,7 +12,7 @@
  (memory $0 1)
  (data (i32.const 16) "\"\00\00\00\01\00\00\00\01\00\00\00\"\00\00\00f\00u\00n\00c\00t\00i\00o\00n\00-\00t\00y\00p\00e\00s\00.\00t\00s\00")
  (table $0 5 funcref)
- (elem (i32.const 1) $function-types/makeAdder<i32>~anonymous|0 $function-types/makeAdder<i64>~anonymous|0 $function-types/makeAdder<f64>~anonymous|0 $function-types/addI32~anonymous|0)
+ (elem (i32.const 1) $function-types/makeAdder<i32>~~anonymous|0 $function-types/makeAdder<i64>~~anonymous|0 $function-types/makeAdder<f64>~~anonymous|0 $function-types/addI32~anonymous|0)
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
  (global $function-types/i32Adder (mut i32) (i32.const 0))
@@ -21,7 +21,7 @@
  (global $~lib/heap/__heap_base i32 (i32.const 68))
  (export "memory" (memory $0))
  (start $~start)
- (func $function-types/makeAdder<i32>~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $function-types/makeAdder<i32>~~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   local.get $1
   local.get $2
   i32.add
@@ -162,7 +162,7 @@
   call $~lib/rt/stub/__release
   local.get $2
  )
- (func $function-types/makeAdder<i64>~anonymous|0 (param $0 i32) (param $1 i64) (param $2 i64) (result i64)
+ (func $function-types/makeAdder<i64>~~anonymous|0 (param $0 i32) (param $1 i64) (param $2 i64) (result i64)
   local.get $1
   local.get $2
   i64.add
@@ -188,7 +188,7 @@
   call $~lib/rt/stub/__release
   local.get $2
  )
- (func $function-types/makeAdder<f64>~anonymous|0 (param $0 i32) (param $1 f64) (param $2 f64) (result f64)
+ (func $function-types/makeAdder<f64>~~anonymous|0 (param $0 i32) (param $1 f64) (param $2 f64) (result f64)
   local.get $1
   local.get $2
   f64.add

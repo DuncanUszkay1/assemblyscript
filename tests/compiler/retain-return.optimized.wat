@@ -14,7 +14,7 @@
  (data (i32.const 1072) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e")
  (data (i32.const 1136) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s")
  (table $0 7 funcref)
- (elem (i32.const 1) $start:retain-return~anonymous|0 $start:retain-return~anonymous|1 $start:retain-return~anonymous|2 $start:retain-return~anonymous|0 $start:retain-return~anonymous|0 $start:retain-return~anonymous|2)
+ (elem (i32.const 1) $start:retain-return~~anonymous|0 $start:retain-return~~anonymous|1 $start:retain-return~~anonymous|2 $start:retain-return~~anonymous|0 $start:retain-return~~anonymous|0 $start:retain-return~~anonymous|2)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
  (global $retain-return/ref (mut i32) (i32.const 0))
@@ -1099,17 +1099,17 @@
    call $~lib/rt/pure/decrement
   end
  )
- (func $start:retain-return~anonymous|0 (param $0 i32) (result i32)
+ (func $start:retain-return~~anonymous|0 (param $0 i32) (result i32)
   i32.const 0
   i32.const 3
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
  )
- (func $start:retain-return~anonymous|1 (param $0 i32) (param $1 i32) (result i32)
+ (func $start:retain-return~~anonymous|1 (param $0 i32) (param $1 i32) (result i32)
   local.get $1
   call $~lib/rt/pure/__retain
  )
- (func $start:retain-return~anonymous|2 (param $0 i32) (result i32)
+ (func $start:retain-return~~anonymous|2 (param $0 i32) (result i32)
   global.get $retain-return/ref
   call $~lib/rt/pure/__retain
  )

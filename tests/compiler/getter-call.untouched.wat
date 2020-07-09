@@ -6,7 +6,7 @@
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (memory $0 0)
  (table $0 2 funcref)
- (elem (i32.const 1) $getter-call/C#get:x~anonymous|0)
+ (elem (i32.const 1) $getter-call/C#get:x~~anonymous|0)
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
  (global $~argumentsLength (mut i32) (i32.const 0))
@@ -138,7 +138,7 @@
   end
   local.get $0
  )
- (func $getter-call/C#get:x~anonymous|0 (param $0 i32) (result i32)
+ (func $getter-call/C#get:x~~anonymous|0 (param $0 i32) (result i32)
   i32.const 42
  )
  (func $~lib/rt/stub/__release (param $0 i32)

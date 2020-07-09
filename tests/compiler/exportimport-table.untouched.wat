@@ -4,7 +4,7 @@
  (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (import "env" "table" (table $0 2 funcref))
- (elem (i32.const 1) $start:exportimport-table~anonymous|0)
+ (elem (i32.const 1) $start:exportimport-table~~anonymous|0)
  (memory $0 0)
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
@@ -13,7 +13,7 @@
  (export "memory" (memory $0))
  (export "table" (table $0))
  (start $~start)
- (func $start:exportimport-table~anonymous|0 (param $0 i32)
+ (func $start:exportimport-table~~anonymous|0 (param $0 i32)
   nop
  )
  (func $~lib/rt/stub/maybeGrowMemory (param $0 i32)

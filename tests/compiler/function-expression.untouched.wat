@@ -10,7 +10,7 @@
  (memory $0 1)
  (data (i32.const 16) ",\00\00\00\01\00\00\00\01\00\00\00,\00\00\00f\00u\00n\00c\00t\00i\00o\00n\00-\00e\00x\00p\00r\00e\00s\00s\00i\00o\00n\00.\00t\00s\00")
  (table $0 18 funcref)
- (elem (i32.const 1) $start:function-expression~anonymous|0 $start:function-expression~anonymous|1 $start:function-expression~someName $start:function-expression~anonymous|2 $start:function-expression~anonymous|3 $start:function-expression~anonymous|4 $start:function-expression~anonymous|5 $function-expression/testOmittedReturn1~anonymous|0 $function-expression/testOmittedReturn2~anonymous|0 $function-expression/testOmittedReturn3~anonymous|0 $function-expression/testNullable~anonymous|0 $function-expression/testGlobal~anonymous|0~anonymous|0 $function-expression/testGlobal~anonymous|0 $function-expression/testLocal~anonymous|0~anonymous|0 $function-expression/testLocal~anonymous|0 $function-expression/testField~anonymous|0~anonymous|0 $function-expression/testField~anonymous|0)
+ (elem (i32.const 1) $start:function-expression~~anonymous|0 $start:function-expression~~anonymous|1 $start:function-expression~someName $start:function-expression~~anonymous|2 $start:function-expression~~anonymous|3 $start:function-expression~~anonymous|4 $start:function-expression~~anonymous|5 $function-expression/testOmittedReturn1~~anonymous|0 $function-expression/testOmittedReturn2~~anonymous|0 $function-expression/testOmittedReturn3~~anonymous|0 $function-expression/testNullable~~anonymous|0 $function-expression/testGlobal~~anonymous|0~~anonymous|0 $function-expression/testGlobal~~anonymous|0 $function-expression/testLocal~~anonymous|0~~anonymous|0 $function-expression/testLocal~~anonymous|0 $function-expression/testField~~anonymous|0~~anonymous|0 $function-expression/testField~~anonymous|0)
  (global $~lib/rt/stub/startOffset (mut i32) (i32.const 0))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
  (global $function-expression/f1 (mut i32) (i32.const 0))
@@ -22,7 +22,7 @@
  (global $~lib/heap/__heap_base i32 (i32.const 76))
  (export "memory" (memory $0))
  (start $~start)
- (func $start:function-expression~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+ (func $start:function-expression~~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
   local.get $1
  )
  (func $~lib/rt/stub/maybeGrowMemory (param $0 i32)
@@ -137,16 +137,16 @@
  (func $~lib/rt/stub/__retain (param $0 i32) (result i32)
   local.get $0
  )
- (func $start:function-expression~anonymous|1 (param $0 i32) (param $1 i32) (result i32)
+ (func $start:function-expression~~anonymous|1 (param $0 i32) (param $1 i32) (result i32)
   local.get $1
  )
  (func $start:function-expression~someName (param $0 i32)
   nop
  )
- (func $start:function-expression~anonymous|2 (param $0 i32) (result i32)
+ (func $start:function-expression~~anonymous|2 (param $0 i32) (result i32)
   i32.const 1
  )
- (func $start:function-expression~anonymous|3 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $start:function-expression~~anonymous|3 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   local.get $1
   local.get $2
   i32.add
@@ -175,13 +175,13 @@
   call $~lib/rt/stub/__release
   local.get $2
  )
- (func $start:function-expression~anonymous|4 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $start:function-expression~~anonymous|4 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   local.get $1
  )
- (func $start:function-expression~anonymous|5 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $start:function-expression~~anonymous|5 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   i32.const 42
  )
- (func $function-expression/testOmittedReturn1~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $function-expression/testOmittedReturn1~~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   local.get $1
   local.get $2
   i32.add
@@ -207,7 +207,7 @@
   call $~lib/rt/stub/__release
   local.get $2
  )
- (func $function-expression/testOmittedReturn2~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $function-expression/testOmittedReturn2~~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   local.get $1
  )
  (func $function-expression/testOmittedReturn2 (result i32)
@@ -231,7 +231,7 @@
   call $~lib/rt/stub/__release
   local.get $2
  )
- (func $function-expression/testOmittedReturn3~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $function-expression/testOmittedReturn3~~anonymous|0 (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   i32.const 42
  )
  (func $function-expression/testOmittedReturn3 (result i32)
@@ -255,7 +255,7 @@
   call $~lib/rt/stub/__release
   local.get $2
  )
- (func $function-expression/testNullable~anonymous|0 (param $0 i32) (result i32)
+ (func $function-expression/testNullable~~anonymous|0 (param $0 i32) (result i32)
   i32.const 1
  )
  (func $function-expression/testNullable (param $0 i32) (result i32)
@@ -288,12 +288,12 @@
   end
   unreachable
  )
- (func $function-expression/testGlobal~anonymous|0~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+ (func $function-expression/testGlobal~~anonymous|0~~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
   i32.const 24
   local.get $1
   i32.add
  )
- (func $function-expression/testGlobal~anonymous|0 (param $0 i32) (result i32)
+ (func $function-expression/testGlobal~~anonymous|0 (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -380,12 +380,12 @@
   local.get $3
   call $~lib/rt/stub/__release
  )
- (func $function-expression/testLocal~anonymous|0~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+ (func $function-expression/testLocal~~anonymous|0~~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
   i32.const 24
   local.get $1
   i32.add
  )
- (func $function-expression/testLocal~anonymous|0 (param $0 i32) (result i32)
+ (func $function-expression/testLocal~~anonymous|0 (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -476,12 +476,12 @@
   call $~lib/rt/stub/__release
   local.get $0
  )
- (func $function-expression/testField~anonymous|0~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
+ (func $function-expression/testField~~anonymous|0~~anonymous|0 (param $0 i32) (param $1 i32) (result i32)
   i32.const 24
   local.get $1
   i32.add
  )
- (func $function-expression/testField~anonymous|0 (param $0 i32) (result i32)
+ (func $function-expression/testField~~anonymous|0 (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
