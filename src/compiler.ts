@@ -1988,7 +1988,7 @@ export class Compiler extends DiagnosticEmitter {
       let rtInstance = assert(this.resolver.resolveClass(program.functionPrototype, [ instance.type ]));
       let buf = rtInstance.createBuffer();
       assert(rtInstance.writeField("_index", index, buf));
-      assert(rtInstance.writeField("_env", 0, buf));
+      assert(rtInstance.writeField("_env", 0, buf)); // Replace this with a real address
       instance.memorySegment = memorySegment = this.addMemorySegment(buf);
     }
     return i64_add(memorySegment.offset, i64_new(program.runtimeHeaderSize));
