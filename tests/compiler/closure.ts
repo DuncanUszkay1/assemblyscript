@@ -1,5 +1,14 @@
 // NOTE torch2424 6/15/20: This test has a lot of errors skipped. Closures is currently a WIP
 
+let hello = 20;
+
+let closureFunc = (): i32 => {
+  return hello + 4;
+}
+
+assert(closureFunc() == 24);
+
+/*
 function testParam($local0: i32, $local1: i32): (value: i32) => i32 {
   return function inner(value: i32) {
     return $local1; // closure
@@ -82,4 +91,4 @@ function nestedExecutionTest(arg: i32): i32 {
   return g(f);
 }
 nestedExecutionTest(1);
-
+*/

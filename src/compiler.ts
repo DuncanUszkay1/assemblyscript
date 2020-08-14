@@ -3160,6 +3160,7 @@ export class Compiler extends DiagnosticEmitter {
             continue;
           }
           local = flow.parentFunction.addLocal(type, name, declaration);
+          console.log(name);
           if (isConst) flow.setLocalFlag(local.index, LocalFlags.CONSTANT);
         }
         let isManaged = type.isManaged;
