@@ -1971,7 +1971,7 @@ export class Compiler extends DiagnosticEmitter {
   // === Table ====================================================================================
 
   /** Ensures that a runtime counterpart of the specified function exists and returns its address. */
-  ensureRuntimeFunction(instance: Function): i64 {
+  ensureRuntimeFunction(instance: Function/*,flow: Flow*/): i64 {
     assert(instance.is(CommonFlags.COMPILED) && !instance.is(CommonFlags.STUB));
     var program = this.program;
     var memorySegment = instance.memorySegment;
@@ -3160,7 +3160,6 @@ export class Compiler extends DiagnosticEmitter {
             continue;
           }
           local = flow.parentFunction.addLocal(type, name, declaration);
-          console.log(name);
           if (isConst) flow.setLocalFlag(local.index, LocalFlags.CONSTANT);
         }
         let isManaged = type.isManaged;
@@ -3617,6 +3616,27 @@ export class Compiler extends DiagnosticEmitter {
         }
         fromType = fromType.nonNullableType;
       }
+
+      // TODO: torch2424 Add comment explaining the closure stuff
+      var toSignature = toType.signatureReference;
+      var fromSignature = fromType.signatureReference;
+      if (toSignature !== null && fromSignature !== null && fromSignature.equalsIgnoreThis(toSignature) && fromType.is(TypeFlags.IN_SCOPE_CLOSURE)) {
+        // When a closure leaves its initial scope, we copy in the closed over locals one last time
+        var tempResult = this.currentFlow.getTempLocal(fromType);
+        var convertExpr = module.block(null, [
+          module.local_set(
+            tempResult.index,
+            expr
+          ),
+          this.injectClosedLocals(tempResult),
+          module.local_get(tempResult.index, fromType.toNativeType())
+        ], toType.toNativeType());
+
+        // this.currentFlow.freeTempLocal(tempResult);
+        return convertExpr;
+      }
+
+
       if (fromType.isAssignableTo(toType)) { // downcast or same
         assert(fromType.kind == toType.kind);
         this.currentType = toType;
@@ -6213,6 +6233,35 @@ export class Compiler extends DiagnosticEmitter {
           this.currentType = tee ? local.type : Type.void;
           return module.unreachable();
         }
+
+        /**
+         * Closures:
+         * Store the value into the closure context, 
+         * then re-load that value since makeAssignment expects the value to be tee'd, 
+         * and it doesn't seem like module.store can tee. 
+         * (using a local instead is a possible optimization, 
+         * but just wanted to get this up first because it's more clear to read)
+         */
+        if (local.closureContextOffset > 0) {
+          var nativeType = valueType.toNativeType();
+          return module.block(null, [
+            module.store(
+              local.type.byteSize,
+              module.local_get(0, this.options.nativeSizeType),
+              valueExpr,
+              valueType.toNativeType(),
+              local.closureContextOffset
+            ),
+            module.load(
+              local.type.byteSize,
+              valueType.is(TypeFlags.SIGNED),
+              module.local_get(0, this.options.nativeSizeType),
+              valueType.toNativeType(),
+              local.closureContextOffset
+            )
+          ], nativeType);
+        }
+
         return this.makeLocalAssignment(local, valueExpr, valueType, tee);
       }
       case ElementKind.GLOBAL: {
@@ -6597,6 +6646,59 @@ export class Compiler extends DiagnosticEmitter {
     }
   }
 
+  /** Function to write a local to memory so the function can accessed the closed local */
+  private injectClosedLocals(
+    closureContextLocal: Local
+  ): ExpressionRef {
+    var module = this.module;
+    var type = closureContextLocal.type;
+    var locals = assert(type.locals);
+    let _values = Map_values(locals);
+    var exprs = new Array<ExpressionRef>(_values.length);
+    assert(type.is(TypeFlags.REFERENCE));
+    for (let i = 0, k = _values.length; i < k; ++i) {
+      let local = unchecked(_values[i]);
+      let nativeType = local.type.toNativeType();
+      assert(local.closureContextOffset > 0);
+      exprs[i] = module.store(
+        local.type.byteSize,
+        module.local_get(closureContextLocal.index, this.options.nativeSizeType),
+        module.local_get(local.index, nativeType),
+        nativeType,
+        local.closureContextOffset
+      );
+    }
+    return module.block(null, exprs);
+  }
+
+  /** Function to write the value of the local back to it's parent function */
+  private writebackClosedLocals(
+    closureContextLocal: Local
+  ): ExpressionRef {
+    var module = this.module;
+    var type = closureContextLocal.type;
+    var locals = assert(type.locals);
+    let _values = Map_values(locals);
+    var exprs = new Array<ExpressionRef>(_values.length);
+    assert(type.is(TypeFlags.REFERENCE));
+    for (let i = 0, k = _values.length; i < k; ++i) {
+      let local = unchecked(_values[i]);
+      let nativeType = local.type.toNativeType();
+      assert(local.closureContextOffset > 0);
+      exprs[i] = module.local_set(
+        local.index,
+        module.load(
+          local.type.byteSize,
+          local.type.is(TypeFlags.SIGNED),
+          module.local_get(closureContextLocal.index, this.options.nativeSizeType),
+          nativeType,
+          local.closureContextOffset
+        )
+      );
+    }
+    return module.block(null, exprs);
+  }
+
   /** Compiles a call expression according to the specified context. */
   private compileCallExpression(
     /** Call expression to compile. */
@@ -6699,6 +6801,8 @@ export class Compiler extends DiagnosticEmitter {
       // indirect call: index argument with signature (non-generic, can't be inlined)
       case ElementKind.LOCAL: {
         let local = <Local>target;
+        console.log('compileCallExpression, local');
+        console.log(local);
         signature = local.type.signatureReference;
         if (signature) {
           if (local.is(CommonFlags.INLINED)) {
@@ -8435,6 +8539,9 @@ export class Compiler extends DiagnosticEmitter {
 
         if (target.parent != flow.parentFunction) {
           // TODO: closures
+          console.log('parent', target.parent.constructor.name, target.parent.name);
+          console.log('parentFunction', flow.parentFunction.constructor.name, flow.parentFunction.name);
+          console.log(target);
           this.error(
             DiagnosticCode.Not_implemented_0,
             expression.range,

@@ -6,7 +6,8 @@
 import {
   Class,
   Program,
-  DecoratorFlags
+  DecoratorFlags,
+  Local
 } from "./program";
 
 import {
@@ -98,7 +99,9 @@ export const enum TypeFlags {
   /** Is a class. */
   CLASS = 1 << 12,
   /** Is a function. */
-  FUNCTION = 1 << 13
+  FUNCTION = 1 << 13,
+  /** Is a closure type. */
+  IN_SCOPE_CLOSURE = 1 << 14
 }
 
 /** Represents a resolved type. */
@@ -116,6 +119,8 @@ export class Type {
   classReference: Class | null;
   /** Underlying signature reference, if a function type. */
   signatureReference: Signature | null;
+  /** closed over locals */
+  locals: Map<string, Local> | null;
   /** Respective non-nullable type, if nullable. */
   private _nonNullableType: Type | null = null;
   /** Respective nullable type, if non-nullable. */
@@ -129,6 +134,7 @@ export class Type {
     this.byteSize = <i32>ceil<f64>(<f64>size / 8);
     this.classReference = null;
     this.signatureReference = null;
+    this.locals = null;
     if (!(flags & TypeFlags.NULLABLE)) {
       this._nonNullableType = this;
     } else {
@@ -299,6 +305,10 @@ export class Type {
     return this.isInternalReference
       ? this.signatureReference
       : null;
+  }
+
+  get isFunctionIndex(): bool {
+    return this.signatureReference !== null && !this.is(TypeFlags.IN_SCOPE_CLOSURE);
   }
 
   /** Tests if this is a managed type that needs GC hooks. */
@@ -657,6 +667,13 @@ export class Type {
 
   /** Alias of i32 indicating type inference of locals and globals with just an initializer. */
   static readonly auto: Type = new Type(Type.i32.kind, Type.i32.flags, Type.i32.size);
+
+  /** Type of an in-context local */
+  static readonly closure32: Type = new Type(Type.i32.kind,
+    TypeFlags.IN_SCOPE_CLOSURE |
+    TypeFlags.REFERENCE,
+    Type.i32.size
+  );
 }
 
 /** Converts an array of types to an array of native types. */
@@ -761,6 +778,12 @@ export class Signature {
       return false;
     }
 
+    return this.equalsIgnoreThis(other);
+  }
+
+  /** Check to see if this signature is equivalent to the caller, ignoring the this type */
+  // Originally: externalEquals
+  equalsIgnoreThis(other: Signature): bool {
     // check rest parameter
     if (this.hasRest != other.hasRest) return false;
 
@@ -836,6 +859,20 @@ export class Signature {
     sb.push(validWat ? "%29=>" : ") => ");
     sb.push(this.returnType.toString(validWat));
     return sb.join("");
+  }
+
+  toClosureSignature(): Signature {
+    var closureSignature = this.clone();
+    closureSignature.thisType = this.program.options.usizeType;
+    return closureSignature;
+  }
+
+  // Reverses toClosureSignature, for when we recompile a function with the context argument
+  // Not convinced this is the right way to go about getting the original unmodified signature, but it works
+  toAnonymousSignature(): Signature {
+    var normalSignature = this.clone();
+    normalSignature.thisType = null;
+    return normalSignature;
   }
 
   /** Creates a clone of this signature that is safe to modify. */
