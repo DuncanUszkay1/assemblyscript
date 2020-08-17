@@ -6801,9 +6801,57 @@ export class Compiler extends DiagnosticEmitter {
       // indirect call: index argument with signature (non-generic, can't be inlined)
       case ElementKind.LOCAL: {
         let local = <Local>target;
+
+        // TODO: torch2424, need to figure out if closures are stored as runtime ids, rather than table indexes
+        // And then change this accordingly.
         console.log('compileCallExpression, local');
         console.log(local);
-        signature = local.type.signatureReference;
+
+        let nativeSizeType = this.options.nativeSizeType;
+        signature = assert(local.type.signatureReference);\
+
+        // Check if we have a closure
+        if (local.type.is(TypeFlags.IN_SCOPE_CLOSURE)) {
+          if (this.currentFlow.parentFunction.parent.kind == ElementKind.FUNCTION) {
+            this.error(
+              DiagnosticCode.Not_implemented_0,
+              expression.expression.range,
+              "Calling a Closure from an anonymous function that shares the same parent."
+            );
+            return module.unreachable();
+          }
+          // If we're calling a local we know to be a closure, then we must still be in the creator functions
+          // scope. Because of this, we should update the values of locals that are still available
+          var nativeContextualType = contextualType.toNativeType();
+          var immediatelyDropped = contextualType == Type.void;
+          var exprs = Array<ExpressionRef>(immediatelyDropped ? 3 : 4)
+
+          exprs[0] = this.injectClosedLocals(local);
+          exprs[1] = this.compileCallIndirect(
+            assert(signature),
+            module.load(
+              local.type.byteSize,
+              local.type.is(TypeFlags.SIGNED),
+              module.local_get(local.index, nativeSizeType),
+              this.options.nativeSizeType,
+              0
+            ),
+            expression.args,
+            expression,
+            module.local_get(local.index, nativeSizeType),
+            immediatelyDropped
+          );
+          exprs[2] = this.writebackClosedLocals(local)
+
+          if(!immediatelyDropped) {
+            let result_local = this.currentFlow.getTempLocal(contextualType);
+            exprs[1] = module.local_set(result_local.index, exprs[1]);
+            exprs[3] = module.local_get(result_local.index, nativeContextualType);
+          }
+          return module.block(null, exprs, nativeContextualType);
+        }
+
+        // We did not have a closure, and had a normal local
         if (signature) {
           if (local.is(CommonFlags.INLINED)) {
             indexArg = module.i32(i64_low(local.constantIntegerValue));
@@ -6913,14 +6961,32 @@ export class Compiler extends DiagnosticEmitter {
         return module.unreachable();
       }
     }
-    return this.compileCallIndirect(
-      assert(signature), // FIXME: bootstrap can't see this yet
-      indexArg,
-      expression.args,
-      expression,
-      0,
-      contextualType == Type.void
-    );
+
+
+    // torch2424: Closures stuff
+    signature = assert(signature); // FIXME: asc can't see this yet
+    var returnType = signature.returnType;
+    var tempFunctionReferenceLocal = this.currentFlow.getTempLocal(this.options.usizeType);
+    var usize = this.options.nativeSizeType;
+    return module.block(null, [
+      module.local_set(tempFunctionReferenceLocal.index, indexArg),
+      this.compileCallIndirect( // If this is a closure
+        signature.toClosureSignature(),
+        module.block(null, [
+        module.load(
+          4,
+          true,
+          module.local_get(tempFunctionReferenceLocal.index, usize),
+          usize,
+          0
+        ),
+       ], this.options.nativeSizeType),
+        expression.args,
+        expression,
+        module.local_get(tempFunctionReferenceLocal.index, usize),
+        contextualType == Type.void
+      );
+    ], constraints & Constraints.WILL_DROP ? contextualType.toNativeType() : returnType.toNativeType());
   }
 
   private compileCallExpressionBuiltin(
@@ -7292,18 +7358,21 @@ export class Compiler extends DiagnosticEmitter {
     var stub = original.varargsStub;
     if (stub) return stub;
 
+    // this stub relies on the existence of the argumentsLength global
+    this.ensureArgumentsLength();
+
     var originalSignature = original.signature;
     var originalParameterTypes = originalSignature.parameterTypes;
     var originalParameterDeclarations = original.prototype.functionTypeNode.parameters;
     var returnType = originalSignature.returnType;
-    var isInstance = original.is(CommonFlags.INSTANCE);
+    var thisType = originalSignature.thisType;
 
     // arguments excl. `this`, operands incl. `this`
     var minArguments = originalSignature.requiredParameters;
     var minOperands = minArguments;
     var maxArguments = originalParameterTypes.length;
     var maxOperands = maxArguments;
-    if (isInstance) {
+    if (thisType !== null) {
       ++minOperands;
       ++maxOperands;
     }
@@ -7314,7 +7383,7 @@ export class Compiler extends DiagnosticEmitter {
 
     // forward `this` if applicable
     var module = this.module;
-    if (isInstance) {
+    if (thisType !== null) {
       forwardedOperands[0] = module.local_get(0, this.options.nativeSizeType);
       operandIndex = 1;
     }
@@ -8241,6 +8310,66 @@ export class Compiler extends DiagnosticEmitter {
     return module.unreachable();
   }
 
+  private makeClosureFunction(
+    instance: Function,
+    flow: Flow
+  ): ExpressionRef {
+    this.currentType = instance.signature.type;
+
+    var index = this.ensureFunctionTableEntry(instance); // reports
+
+    if(index < 0) return this.module.unreachable();
+
+    var nativeUsize = this.options.nativeSizeType;
+    var wasm64 = nativeUsize == NativeType.I64;
+
+    this.warning(
+      DiagnosticCode.Closure_support_is_experimental,
+      instance.prototype.declaration.range
+    );
+
+    // Append the appropriate signature and flags for this closure type, then set it to currentType
+    this.currentType = Type.closure32;
+    this.currentType.signatureReference = instance.signature;
+
+    // create a local which will hold our closure
+    var tempLocal = flow.getAutoreleaseLocal(this.currentType);
+    var tempLocalIndex = tempLocal.index;
+
+    // copied closed locals into type
+    this.currentType.locals = instance.closedLocals;
+
+    const closureSize = instance.nextGlobalClosureOffset;
+
+    var allocInstance = this.program.allocInstance;
+    this.compileFunction(allocInstance);
+
+    var closureExpr = this.module.flatten([
+      this.module.local_set( // Allocate memory for the closure
+        tempLocalIndex,
+        this.makeRetain(
+          this.module.call(allocInstance.internalName, [
+            wasm64 ? this.module.i64(closureSize) : this.module.i32(closureSize),
+            wasm64 ? this.module.i64(0) : this.module.i32(0)
+          ], nativeUsize),
+          this.currentType
+        )
+      ),
+      this.module.store( // Store the function pointer at the first index
+        4,
+        this.module.local_get(tempLocalIndex, nativeUsize),
+        wasm64 ? this.module.i64(index) : this.module.i32(index),
+        nativeUsize,
+        0
+      ),
+      this.module.local_get(tempLocalIndex, nativeUsize) // load the closure locals index
+    ], nativeUsize);
+
+    // flow.freeTempLocal(tempLocal);
+
+    return closureExpr;
+  }
+
   private compileFunctionExpression(
     expression: FunctionExpression,
     contextualSignature: Signature | null,
@@ -8354,11 +8483,10 @@ export class Compiler extends DiagnosticEmitter {
         prototype.name,
         prototype,
         null,
-        signature,
+        prototype.hasNestedDefinition ? signature.toClosureSignature() : signature,
         contextualTypeArguments
       );
       if (!this.compileFunction(instance)) return this.module.unreachable();
-      this.currentType = contextualSignature.type;
 
     // otherwise compile like a normal function
     } else {
@@ -8368,10 +8496,16 @@ export class Compiler extends DiagnosticEmitter {
       this.currentType = instance.signature.type;
     }
 
-    var offset = this.ensureRuntimeFunction(instance); // reports
-    return this.options.isWasm64
-      ? this.module.i64(i64_low(offset), i64_high(offset))
-      : this.module.i32(i64_low(offset));
+    return this.makeClosureFunction(
+      instance,
+      flow
+    );
+
+    // TODO: torch2424, make sure makeClosureFunction is returning an offset
+    // var offset = this.ensureRuntimeFunction(instance); // reports
+    // return this.options.isWasm64
+      // ? this.module.i64(i64_low(offset), i64_high(offset))
+      // : this.module.i32(i64_low(offset));
   }
 
   /** Makes sure the enclosing source file of the specified expression has been compiled. */
@@ -8527,6 +8661,23 @@ export class Compiler extends DiagnosticEmitter {
           this.currentType = localType;
           return module.unreachable();
         }
+
+        // If this local references a context offset, load its value from the closure context
+        var localClosureContextOffset = local.closureContextOffset;
+        if (localClosureContextOffset > 0) {
+          let contextLocal = assert(flow.lookupLocal(CommonNames.this_));
+
+          // TODO: replace this with a class field access, once we are able to construct the class before
+          // compiling
+          return module.load(
+            local.type.byteSize,
+            local.type.is(TypeFlags.SIGNED),
+            this.module.local_get(contextLocal.index, this.options.nativeSizeType),
+            local.type.toNativeType(),
+            localClosureContextOffset
+          );
+        }
+
         if (local.is(CommonFlags.INLINED)) {
           return this.compileInlineConstant(local, contextualType, constraints);
         }
@@ -8602,6 +8753,37 @@ export class Compiler extends DiagnosticEmitter {
           return module.unreachable();
         }
 
+        // Find the original function from our prototype
+        let functionInstanceCtxTypes = makeMap<string,Type>(flow.contextualTypeArguments);
+        let originalFunctionInstance = this.resolver.resolveFunction(
+          functionPrototype,
+          null,
+          functionInstanceCtxTypes
+        );
+        if (!originalFunctionInstance || !this.compileFunction(originalFunctionInstance)) return module.unreachable();
+
+        // Create a new closure function for our original function
+        let closureFunctionInstance = new Function(
+          functionPrototype.name + "~anonymous|" + (actualFunction.nextAnonymousId++).toString(),
+          functionPrototype,
+          null,
+          originalFunctionInstance.signature.toClosureSignature(),
+          functionInstanceCtxTypes
+        );
+        if (!this.compileFunction(closureFunctionInstance)) return this.module.unreachable();
+
+        if (contextualType.is(TypeFlags.HOST | TypeFlags.REFERENCE)) {
+          this.currentType = Type.anyref;
+          return module.ref_func(closureFunctionInstance.internalName);
+        }
+
+        return this.makeClosureFunction(
+          closureFunctionInstance,
+          flow
+        );
+
+        // TODO: torch2424 Closures, make sure closure returns an offset
+        /*
         let functionInstance = this.resolver.resolveFunction(
           functionPrototype,
           null,
@@ -8617,6 +8799,7 @@ export class Compiler extends DiagnosticEmitter {
         return this.options.isWasm64
           ? module.i64(i64_low(offset), i64_high(offset))
           : module.i32(i64_low(offset));
+          */
       }
     }
     assert(false);
