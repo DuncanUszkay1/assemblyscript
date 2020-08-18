@@ -6234,6 +6234,7 @@ export class Compiler extends DiagnosticEmitter {
           return module.unreachable();
         }
 
+        // TODO: torch2424 closure stuff
         /**
          * Closures:
          * Store the value into the closure context, 
@@ -6808,7 +6809,7 @@ export class Compiler extends DiagnosticEmitter {
         console.log(local);
 
         let nativeSizeType = this.options.nativeSizeType;
-        signature = assert(local.type.signatureReference);\
+        signature = assert(local.type.signatureReference);
 
         // Check if we have a closure
         if (local.type.is(TypeFlags.IN_SCOPE_CLOSURE)) {
@@ -6964,6 +6965,9 @@ export class Compiler extends DiagnosticEmitter {
 
 
     // torch2424: Closures stuff
+    // This handles function prototypes, classes, and property prototypes
+    // I think this is just handling the call indirect to the function table
+    // by first loading the locals, calling the function, and setting the locals back
     signature = assert(signature); // FIXME: asc can't see this yet
     var returnType = signature.returnType;
     var tempFunctionReferenceLocal = this.currentFlow.getTempLocal(this.options.usizeType);
@@ -6985,8 +6989,20 @@ export class Compiler extends DiagnosticEmitter {
         expression,
         module.local_get(tempFunctionReferenceLocal.index, usize),
         contextualType == Type.void
-      );
+      )
     ], constraints & Constraints.WILL_DROP ? contextualType.toNativeType() : returnType.toNativeType());
+
+    // TODO: torch2424 old calls from runtime functions main branch
+    /*
+       return this.compileCallIndirect(
+       assert(signature), // FIXME: bootstrap can't see this yet
+       indexArg,
+       expression.args,
+       expression,
+       0,
+       contextualType == Type.void
+       )
+    */
   }
 
   private compileCallExpressionBuiltin(
@@ -7366,6 +7382,9 @@ export class Compiler extends DiagnosticEmitter {
     var originalParameterDeclarations = original.prototype.functionTypeNode.parameters;
     var returnType = originalSignature.returnType;
     var thisType = originalSignature.thisType;
+
+    // TODO: torch2424, find out why signature is borked for closure functions
+    // console.log(original.name, originalSignature.toString(), originalSignature.thisType);
 
     // arguments excl. `this`, operands incl. `this`
     var minArguments = originalSignature.requiredParameters;
@@ -8316,9 +8335,10 @@ export class Compiler extends DiagnosticEmitter {
   ): ExpressionRef {
     this.currentType = instance.signature.type;
 
-    var index = this.ensureFunctionTableEntry(instance); // reports
+    // torch2424: Fixed this to be runtime instead of table index
+    var index: i64 = this.ensureRuntimeFunction(instance); // reports
 
-    if(index < 0) return this.module.unreachable();
+    if(index < changetype<i64>(0)) return this.module.unreachable();
 
     var nativeUsize = this.options.nativeSizeType;
     var wasm64 = nativeUsize == NativeType.I64;
@@ -8358,14 +8378,12 @@ export class Compiler extends DiagnosticEmitter {
       this.module.store( // Store the function pointer at the first index
         4,
         this.module.local_get(tempLocalIndex, nativeUsize),
-        wasm64 ? this.module.i64(index) : this.module.i32(index),
+        wasm64 ? this.module.i64(changetype<number>(index)) : this.module.i32(changetype<number>(index)),
         nativeUsize,
         0
       ),
       this.module.local_get(tempLocalIndex, nativeUsize) // load the closure locals index
     ], nativeUsize);
-
-    // flow.freeTempLocal(tempLocal);
 
     return closureExpr;
   }
@@ -8754,7 +8772,7 @@ export class Compiler extends DiagnosticEmitter {
         }
 
         // Find the original function from our prototype
-        let functionInstanceCtxTypes = makeMap<string,Type>(flow.contextualTypeArguments);
+        let functionInstanceCtxTypes = uniqueMap<string,Type>(flow.contextualTypeArguments);
         let originalFunctionInstance = this.resolver.resolveFunction(
           functionPrototype,
           null,
@@ -8772,8 +8790,8 @@ export class Compiler extends DiagnosticEmitter {
         );
         if (!this.compileFunction(closureFunctionInstance)) return this.module.unreachable();
 
-        if (contextualType.is(TypeFlags.HOST | TypeFlags.REFERENCE)) {
-          this.currentType = Type.anyref;
+        if (contextualType.isExternalReference) {
+          this.currentType = Type.externref;
           return module.ref_func(closureFunctionInstance.internalName);
         }
 

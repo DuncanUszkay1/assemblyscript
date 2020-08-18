@@ -1,15 +1,5 @@
 // NOTE torch2424 6/15/20: This test has a lot of errors skipped. Closures is currently a WIP
 
-/*
-let hello = 20;
-
-let closureFunc = (): i32 => {
-  return hello + 4;
-}
-
-assert(closureFunc() == 24);
-*/
-
 function testParam($local0: i32, $local1: i32): (value: i32) => i32 {
   return function inner(value: i32) {
     return $local1 + value; // closure
@@ -18,7 +8,6 @@ function testParam($local0: i32, $local1: i32): (value: i32) => i32 {
 let innerFunc = testParam(1, 2);
 assert(innerFunc(3) == 5);
 
-/*
 function testVar(): (value: i32) => i32 {
   var $local0 = 0;
   return function inner(value: i32) {
@@ -35,6 +24,7 @@ function testLet(): (value: i32) => i32 {
 }
 testLet();
 
+/*
 function passItAround(arg: i32): usize {
   return runClosure(createClosure(arg));
 }
